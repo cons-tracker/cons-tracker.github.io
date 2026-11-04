@@ -29,6 +29,13 @@ $head = @"
   <link rel="manifest" href="./manifest.json">
   <link rel="icon" href="./icons/icon-192.png">
   <link rel="apple-touch-icon" href="./icons/icon-512.png">
+  <script>
+    /* PWA: register the service worker and capture the install prompt from the start (the app renders only after the Supabase data loads) */
+    if ('serviceWorker' in navigator && location.protocol.indexOf('http') === 0) {
+      window.addEventListener('load', function () { navigator.serviceWorker.register('./sw.js', { scope: './' }).catch(function () {}); });
+    }
+    window.addEventListener('beforeinstallprompt', function (ev) { ev.preventDefault(); window.__pwaPrompt = ev; window.dispatchEvent(new Event('pwa-installable')); });
+  </script>
   <script src="./config.js"></script>
   <script src="$supabaseJs"></script>
   <script src="./cloud.js"></script>

@@ -25,9 +25,10 @@
       var vp=document.querySelector('meta[name=viewport]');
       if(vp) vp.setAttribute('content','width=device-width, initial-scale=1, viewport-fit=cover');
       if('serviceWorker' in navigator && location.protocol.indexOf('http')===0){
-        window.addEventListener('load',function(){ navigator.serviceWorker.register('./sw.js',{scope:'./'}).catch(function(){}); });
+        var regsw=function(){ navigator.serviceWorker.register('./sw.js',{scope:'./'}).catch(function(){}); };
+        if(document.readyState==='complete') regsw(); else window.addEventListener('load',regsw);
       }
-      window.__pwaPrompt=null;
+      window.__pwaPrompt=window.__pwaPrompt||null;
       window.addEventListener('beforeinstallprompt',function(ev){
         ev.preventDefault(); window.__pwaPrompt=ev;
         window.dispatchEvent(new Event('pwa-installable'));
