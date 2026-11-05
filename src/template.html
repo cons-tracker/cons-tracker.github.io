@@ -1818,7 +1818,10 @@ svg.leaflet-image-layer.leaflet-interactive path {
                     </sc-for>
                   </span>
                 </sc-for>
-                <span style="display:block;margin-top:5px;font-size:9px;font-weight:700;text-align:right;color:{{ a.fg }}">{{ a.toggleTxt }}</span>
+                <span style="display:flex;justify-content:space-between;gap:4px;margin-top:5px;font-size:9px;font-weight:700;color:{{ a.fg }}">
+                  <span>{{ a.doneTxt }}</span>
+                  <span>{{ a.toggleTxt }}</span>
+                </span>
               </button>
               <sc-if value="{{ a.expanded }}" hint-placeholder-val="{{ false }}">
                 <sc-for list="{{ a.moreGroups }}" as="gr" hint-placeholder-count="3">
@@ -3831,6 +3834,11 @@ class Component extends DCLogic {
     if(s==='ตรวจแล้ว') return {bg:'var(--c-ahead-bg)', fg:'var(--c-ahead)', bd:'var(--c-ahead-bd)'};
     return {bg:'var(--color-accent-100)', fg:'var(--color-accent-800)', bd:'var(--color-accent-300)'};
   }
+  CHAIR_BOX={
+    'ผส.ทล.5':{bg:'#fbdcd6', fg:'#8f1d12', bd:'#c0392b'},
+    'รส.ทล.5':{bg:'#dcefd3', fg:'#2f5f24', bd:'#4f8f3f'}
+  };
+  apptBoxStyle(status,p){ return this.CHAIR_BOX[this.chairOf(p).pos] || this.apptStyle(status); }
   fiscalYearOf(p){
     if(p.fiscalYear) return String(p.fiscalYear);
     if(!p.startDate) return '';
@@ -5073,7 +5081,7 @@ class Component extends DCLogic {
     const c=((p&&p.committee)||[]).find(x=>x && x.role==='ประธานกรรมการ') || null;
     if(!c) return {name:'', pos:'', color:'var(--color-neutral-700)'};
     const pos=c.pos||'';
-    const color = pos==='ผส.ทล.5' ? '#b8452f' : (pos==='รส.ทล.5' ? '#3f6b32' : 'var(--color-neutral-700)');
+    const color = (this.CHAIR_BOX[pos]||{}).fg || 'var(--color-neutral-700)';
     return {name:c.name||'', pos, color};
   }
   navUrlOf(p){
@@ -5897,7 +5905,7 @@ class Component extends DCLogic {
         diffBg:stt.bg, diffFg:stt.fg, diffBd:stt.bd,
         showPeople:true, people:this.peopleGroups(dp),
         showAppts:!this.isExec() && apps.length>0,
-        appts:apps.map(a=>{ const s=this.apptStyle(a.status);
+        appts:apps.map(a=>{ const s=this.apptBoxStyle(a.status,dp);
           return { dateTh:this.thShort(a.date), time:this.timeTh(a.time), phase:a.phase||'ตรวจรับงาน', place:a.place||'-',
             statusTxt:this.normStatus(a.status), bg:s.bg, fg:s.fg, bd:s.bd, open:this.openAppt(dp.id,a.id) }; }) };
     } else { out.detail={people:[],appts:[]}; }
@@ -5924,9 +5932,10 @@ class Component extends DCLogic {
           showToday:iso===todayIso && !nrw, dotToday:iso===todayIso && nrw,
           bg: iso===todayIso? 'var(--color-accent-100)' : (dow===0||dow===6? 'var(--color-neutral-200)':'var(--color-neutral-100)'),
           fg: dow===0? 'var(--c-late)' : 'var(--color-text)', fw: list.length? '700':'400',
-          appts:list.map(a=>{ const s=this.apptStyle(a.status), ch=this.chairOf(a.project);
+          appts:list.map(a=>{ const s=this.apptBoxStyle(a.status,a.project), ch=this.chairOf(a.project);
             const tt=this.timeTh(a.time);
             return { time:tt||'ไม่ระบุเวลา', timeLine:tt? 'เวลา '+tt : 'ไม่ระบุเวลา',
+              doneTxt:this.normStatus(a.status)==='ตรวจแล้ว'? 'ตรวจแล้ว ✓' : '',
               phaseLine:(()=>{ const ph=String(a.phase||'ตรวจรับงาน').trim(), no=String(this.phaseLabel(a)).trim().replace(/^\(\s*(.*?)\s*\)$/,'$1'); return no&&no!==ph? ph+' ('+no+')' : ph; })(),
               ...this.apptCardFields(a),
               textColor: (ch.pos==='ผส.ทล.5'||ch.pos==='รส.ทล.5')? ch.color : s.fg,
@@ -5937,7 +5946,8 @@ class Component extends DCLogic {
       out.cal={ monthTh:this.MONTHS[mm-1]+' '+(yy+543), cells, count,
         dowNames:['จ.','อ.','พ.','พฤ.','ศ.','ส.','อา.'],
         prev:this.shiftMonth(-1), next:this.shiftMonth(1), today:this.thisMonth };
-      out.apptLegend=this.APPT_STATUS.map(s=>Object.assign({label:s}, this.apptStyle(s)));
+      out.apptLegend=Object.keys(this.CHAIR_BOX).map(pos=>Object.assign({label:'ประธาน '+pos}, this.CHAIR_BOX[pos]))
+        .concat(this.APPT_STATUS.map(s=>Object.assign({label:s+' (ประธานอื่น)'}, this.apptStyle(s))));
       out.newAppt=this.newAppt;
       const DOWFULL=['อาทิตย์','จันทร์','อังคาร','พุธ','พฤหัสบดี','ศุกร์','เสาร์'];
       const agenda=[];
@@ -5946,7 +5956,7 @@ class Component extends DCLogic {
         agenda.push({ iso, isToday:iso===todayIso,
           dateTh:'วัน'+DOWFULL[d.getDay()]+'ที่ '+d.getDate()+' '+this.MONTHS_S[d.getMonth()]+' '+(d.getFullYear()+543),
           appts:byDate[iso].slice().sort((a,b)=>String(a.time||'').localeCompare(String(b.time||''))).map(a=>{
-            const s=this.apptStyle(a.status);
+            const s=this.apptBoxStyle(a.status,a.project);
             return { time:this.timeTh(a.time)||'ไม่ระบุเวลา', status:this.normStatus(a.status),
               ...this.apptCardFields(a),
               navUrl:this.navUrlOf(a.project), hasNav:!!this.navUrlOf(a.project),
