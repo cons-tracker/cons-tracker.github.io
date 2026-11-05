@@ -1596,6 +1596,7 @@ svg.leaflet-image-layer.leaflet-interactive path {
 <div class="noprint" style="position:sticky;top:0;z-index:40;background:var(--color-neutral-100);color:var(--color-text);padding:10px clamp(12px,3vw,20px);display:flex;align-items:center;gap:12px 16px;flex-wrap:wrap;border-bottom:1px solid var(--color-divider);box-shadow:var(--shadow-sm)">
   <div style="display:flex;flex-direction:column;line-height:1.15;flex:0 0 auto">
     <span class="hd" style="font-size:17px;white-space:nowrap;letter-spacing:-.02em">ระบบติดตามงานก่อสร้าง</span>
+    <span class="lbl" style="font-size:11px;white-space:nowrap;max-width:340px;overflow:hidden;text-overflow:ellipsis">ส่วนควบคุมงานก่อสร้างทาง</span>
     <span class="lbl" style="font-size:11px;white-space:nowrap;max-width:340px;overflow:hidden;text-overflow:ellipsis">{{ deptName }}</span>
   </div>
   <sc-if value="{{ isWide }}" hint-placeholder-val="{{ true }}">
@@ -1777,7 +1778,7 @@ svg.leaflet-image-layer.leaflet-interactive path {
   <div style="display:flex;align-items:flex-end;gap:16px;flex-wrap:wrap;margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid var(--color-divider)">
     <div>
       <div class="hd" style="font-size:clamp(14px,3.2vw,17px);line-height:1.2">ปฏิทินตรวจรับ</div>
-      <div class="lbl" style="font-size:clamp(13px,3.4vw,16px);font-weight:400;margin-top:1px">{{ cal.monthTh }}</div>
+      <div class="hd" style="font-size:clamp(18px,4.4vw,24px);line-height:1.25;margin-top:2px">{{ cal.monthTh }}</div>
     </div>
     <div style="display:flex;gap:6px;align-items:center;margin-left:auto;flex-wrap:wrap">
       <button sc-camel-on-click="{{ cal.prev }}" class="btn btn-secondary" style="white-space:nowrap;font-size:13px;cursor:pointer">‹ เดือนก่อน</button>
@@ -1790,8 +1791,8 @@ svg.leaflet-image-layer.leaflet-interactive path {
   </div>
 
   <div style="display:grid;grid-template-columns:{{ calCols }};gap:1px;background:var(--color-divider);border:1px solid var(--color-divider);border-radius:var(--radius-lg);overflow:hidden">
-    <sc-for list="{{ cal.dowNames }}" as="d" hint-placeholder-count="7">
-      <div class="hd" style="background:var(--color-neutral-200);padding:6px 2px;font-size:clamp(10px,2.6vw,12px);text-align:center">{{ d }}</div>
+    <sc-for list="{{ cal.dowHead }}" as="d" hint-placeholder-count="7">
+      <div class="hd" style="background:var(--color-neutral-200);padding:6px 2px;font-size:clamp(10px,2.6vw,12px);text-align:center;color:{{ d.fg }}">{{ d.name }}</div>
     </sc-for>
     <sc-for list="{{ cal.cells }}" as="c" hint-placeholder-count="35">
       <div style="background:{{ c.bg }};min-height:clamp(58px,13vw,112px);padding:clamp(4px,0.6vw,6px) 3px;display:flex;flex-direction:column;gap:clamp(3px,0.6vw,6px);overflow:hidden">
@@ -1918,7 +1919,7 @@ svg.leaflet-image-layer.leaflet-interactive path {
       <div class="hd" style="font-size:clamp(14px,3.2vw,17px);line-height:1.2">แดชบอร์ดภาพรวม</div>
       <div class="lbl" style="font-size:clamp(13px,3.4vw,16px);font-weight:400;margin-top:1px">สรุปภาพรวมโครงการก่อสร้างทาง</div>
     </div>
-    <div class="lbl" style="font-size:12px;font-weight:400;margin-left:auto;padding-bottom:4px">ข้อมูล ณ วันที่ {{ todayTh }} · {{ deptName }}</div>
+    <div class="lbl" style="font-size:12px;font-weight:400;margin-left:auto;padding-bottom:4px">ข้อมูล ณ วันที่ {{ todayTh }}</div>
     <div class="noprint" style="display:flex;gap:8px;padding-bottom:2px;flex:0 0 auto">
       <button sc-camel-on-click="{{ exportHomePdf }}" style="white-space:nowrap;border:1px solid var(--color-accent);background:var(--color-accent);color:var(--color-bg);border-radius:999px;padding:7px 16px;font-family:var(--font-body);font-size:12.5px;font-weight:700;cursor:pointer">ส่งออก PDF</button>
       <button sc-camel-on-click="{{ exportHomeJpg }}" style="white-space:nowrap;border:1px solid var(--color-divider);background:var(--color-neutral-100);color:var(--color-neutral-800);border-radius:999px;padding:7px 16px;font-family:var(--font-body);font-size:12.5px;font-weight:700;cursor:pointer">ส่งออก PNG</button>
@@ -5955,7 +5956,7 @@ class Component extends DCLogic {
         cells.push({ day:String(d), isToday:iso===todayIso,
           showToday:iso===todayIso && !nrw, dotToday:iso===todayIso && nrw,
           bg: iso===todayIso? 'var(--color-accent-100)' : (dow===0||dow===6? 'var(--color-neutral-200)':'var(--color-neutral-100)'),
-          fg: dow===0? 'var(--c-late)' : 'var(--color-text)', fw: list.length? '700':'400',
+          fg: (dow===0||dow===6)? 'var(--c-late)' : 'var(--color-text)', fw: list.length? '700':'400',
           appts:list.map(a=>{ const s=this.apptBoxStyle(a.status,a.project), ch=this.chairOf(a.project);
             const tt=this.timeTh(a.time);
             return { time:tt||'ไม่ระบุเวลา', timeLine:tt? 'เวลา '+tt : 'ไม่ระบุเวลา',
@@ -5968,7 +5969,7 @@ class Component extends DCLogic {
       }
       while(cells.length%7) cells.push({day:'', bg:'var(--color-neutral-200)', fg:'var(--color-neutral-600)', fw:'400', appts:[], isToday:false});
       out.cal={ monthTh:this.MONTHS[mm-1]+' '+(yy+543), cells, count,
-        dowNames:['จ.','อ.','พ.','พฤ.','ศ.','ส.','อา.'],
+        dowHead:['จ.','อ.','พ.','พฤ.','ศ.','ส.','อา.'].map((name,i)=>({ name, fg:i>=5? 'var(--c-late)' : 'var(--color-text)' })),
         prev:this.shiftMonth(-1), next:this.shiftMonth(1), today:this.thisMonth };
       out.apptLegend=Object.keys(this.CHAIR_BOX).map(pos=>Object.assign({label:'ประธาน '+pos}, this.CHAIR_BOX[pos]))
         .concat(this.APPT_STATUS.map(s=>Object.assign({label:s+' (ประธานอื่น)'}, this.apptStyle(s))));
