@@ -4979,21 +4979,33 @@ class Component extends DCLogic {
           '<span style="width:6px;height:6px;border-radius:999px;background:'+u.color+';flex:0 0 auto"></span>'+esc(u.unit)+'</div>'; })()+
       '<div style="font-size:11.5px;display:flex;flex-direction:column;gap:2px;margin-bottom:8px">'+
         '<div><span style="color:var(--color-neutral-700)">ผู้รับจ้าง </span>'+esc(p.contractor||'-')+'</div>'+
-        '<div><span style="color:var(--color-neutral-700)">ประเภทงาน </span>'+esc(p.workType||'-')+'</div>'+
-        '<div><span style="color:var(--color-neutral-700)">วันเริ่มสัญญา </span>'+esc(this.thShort(p.startDate))+'</div>'+
-        ((p.endDateOrig && p.endDate && p.endDateOrig!==p.endDate)? '<div><span style="color:var(--color-neutral-700)">สิ้นสุดสัญญา (เดิม) </span>'+esc(this.thShort(p.endDateOrig))+'</div>' : '')+
-        '<div><span style="color:var(--color-neutral-700)">สิ้นสุดสัญญา'+((p.endDateOrig && p.endDate && p.endDateOrig!==p.endDate)?' (ใหม่)':'')+' </span>'+esc(this.endOf(p)? this.thShort(this.endOf(p)) : '-')+'</div>'+
-        (()=>{ if(!p.endDateOrig || !p.endDate) return '';
-          const ad=this.days(p.endDateOrig,p.endDate);
-          return (isNaN(ad)||ad<=0)? '' : '<div style="color:var(--color-accent-700);font-weight:700">เพิ่มวันดำเนินการ '+ad+' วัน</div>'; })()+
-        '<div><span style="color:var(--color-neutral-700)">ระยะเวลาทำการ </span>'+esc(String(this.durOf(p)||p.duration||'-'))+' วัน</div>'+
+        (()=>{ /* each line holds two facts side by side; wraps only if the popup is too narrow */
+          const pair=(a,b)=>'<div style="display:flex;flex-wrap:wrap;column-gap:12px">'+a+b+'</div>';
+          const fact=(lbl,val)=>'<div><span style="color:var(--color-neutral-700)">'+lbl+' </span>'+esc(val)+'</div>';
+          const extended=p.endDateOrig && p.endDate && p.endDateOrig!==p.endDate;
+          const added=(p.endDateOrig && p.endDate)? this.days(p.endDateOrig,p.endDate) : NaN;
+          const addedTxt=(isNaN(added)||added<=0)? '' : '<div style="color:var(--color-accent-700);font-weight:700">เพิ่มวันดำเนินการ '+added+' วัน</div>';
+          const endTxt=this.endOf(p)? this.thShort(this.endOf(p)) : '-';
+          return (extended
+              ? pair(fact('วันเริ่มสัญญา',this.thShort(p.startDate)), fact('สิ้นสุดสัญญา (เดิม)',this.thShort(p.endDateOrig)))+
+                pair(fact('สิ้นสุดสัญญา (ใหม่)',endTxt), addedTxt)
+              : pair(fact('วันเริ่มสัญญา',this.thShort(p.startDate)), fact('สิ้นสุดสัญญา',endTxt))+addedTxt)+
+            pair(fact('ระยะเวลาทำการ',String(this.durOf(p)||p.duration||'-')+' วัน'), fact('ประเภทงาน',p.workType||'-'));
+        })()+
       '</div>'+
       '<div style="display:flex;gap:5px">'+
         box('% แผน', this.n(pr.plan,2), 'var(--color-accent-2-700)')+
         box('% ผลงาน', this.n(pr.actual,2), 'var(--color-accent-700)')+
         (()=>{ const dt=this.diffTint(pr.diff);
           return box('ผลต่าง', (pr.diff>0?'+':'')+this.n(pr.diff,2), dt?dt.fg:stt.fg, dt?dt.bg:stt.bg, dt?dt.bd:stt.bd); })()+
-      '</div>';
+      '</div>'+
+      (()=>{ /* same note the overview list shows: the current week's note, else the project note */
+        const wk=(p.weeks||{})[this.weeksOf(p)[this.currentIdx(p)]]||{};
+        const note=wk.note || (p.note==='-'? '' : (p.note||'')) || '-';
+        return '<div style="margin-top:6px;font-size:11.5px;border:1px solid var(--color-divider);border-radius:8px;padding:4px 8px">'+
+          '<div style="font-size:10px;color:var(--color-neutral-700)">หมายเหตุ</div>'+
+          '<div style="line-height:1.5;padding-bottom:2px;max-height:68px;overflow-y:auto;white-space:pre-wrap;overflow-wrap:anywhere">'+esc(note)+'</div>'+
+        '</div>'; })();
     const row=document.createElement('div');
     row.style.cssText='display:flex;gap:6px;margin-top:9px';
     const btn=document.createElement('button');
