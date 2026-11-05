@@ -28,7 +28,7 @@ $head = @"
   <meta name="theme-color" content="#c67139">
   <link rel="manifest" href="./manifest.json">
   <link rel="icon" href="./icons/icon-192.png">
-  <link rel="apple-touch-icon" href="./icons/icon-512.png">
+  <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png">
   <script>
     /* PWA: register the service worker and capture the install prompt from the start (the app renders only after the Supabase data loads) */
     if ('serviceWorker' in navigator && location.protocol.indexOf('http') === 0) {

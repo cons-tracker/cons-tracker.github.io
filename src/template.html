@@ -1794,7 +1794,7 @@ svg.leaflet-image-layer.leaflet-interactive path {
       <div class="hd" style="background:var(--color-neutral-200);padding:6px 2px;font-size:clamp(10px,2.6vw,12px);text-align:center">{{ d }}</div>
     </sc-for>
     <sc-for list="{{ cal.cells }}" as="c" hint-placeholder-count="35">
-      <div style="background:{{ c.bg }};min-height:clamp(58px,13vw,112px);padding:4px 3px;display:flex;flex-direction:column;gap:3px;overflow:hidden">
+      <div style="background:{{ c.bg }};min-height:clamp(58px,13vw,112px);padding:clamp(4px,0.6vw,6px) 3px;display:flex;flex-direction:column;gap:clamp(3px,0.6vw,6px);overflow:hidden">
         <div style="display:flex;align-items:center;gap:4px">
           <span class="val" style="font-size:12px;font-weight:{{ c.fw }};color:{{ c.fg }}">{{ c.day }}</span>
           <sc-if value="{{ c.showToday }}" hint-placeholder-val="{{ false }}">
@@ -1806,13 +1806,32 @@ svg.leaflet-image-layer.leaflet-interactive path {
         </div>
         <sc-if value="{{ isWide }}" hint-placeholder-val="{{ true }}">
           <sc-for list="{{ c.appts }}" as="a" hint-placeholder-count="1">
-            <button sc-camel-on-click="{{ a.open }}" style="text-align:left;border:1px solid {{ a.bd }};background:{{ a.bg }};color:{{ a.textColor }};border-radius:var(--radius-sm);padding:3px 5px;font-size:10.5px;line-height:1.3;cursor:pointer;overflow:hidden">
-              <span style="display:block;font-weight:700;overflow-wrap:anywhere">{{ a.contractNo }} เวลา {{ a.time }} น.</span>
-              <span style="display:block;overflow-wrap:anywhere">{{ a.phase }}</span>
-              <sc-if value="{{ a.hasChair }}" hint-placeholder-val="{{ false }}">
-                <span style="display:block;overflow-wrap:anywhere;font-weight:700;color:{{ a.chairColor }}">{{ a.chair }}</span>
+            <div style="container-type:inline-size;border:1px solid {{ a.bd }};background:{{ a.bg }};color:{{ a.textColor }};border-radius:var(--radius-sm);padding:6px 4px 5px;font-size:10.5px;line-height:1.5;overflow:hidden">
+              <button sc-camel-on-click="{{ a.toggle }}" aria-expanded="{{ a.ariaExp }}" style="display:block;width:100%;text-align:left;border:0;background:transparent;color:inherit;padding:0;font-family:inherit;font-size:inherit;line-height:inherit;cursor:pointer">
+                <span style="display:block;font-weight:700;font-size:clamp(9px,7.5cqw,12.5px);overflow-wrap:anywhere;color:var(--color-text)">{{ a.contractNo }} {{ a.timeLine }}</span>
+                <span style="display:block;margin-top:1px;font-size:clamp(9px,7.1cqw,12px);font-weight:500;overflow-wrap:anywhere;color:var(--color-text)">{{ a.phaseLine }}</span>
+                <sc-for list="{{ a.chairGroups }}" as="gr" hint-placeholder-count="1">
+                  <span style="display:block;margin-top:6px;padding-top:5px;border-top:1px solid {{ a.bd }}">
+                    <span style="display:block;margin-bottom:1px;font-size:9px;font-weight:700;color:{{ a.fg }}">{{ gr.label }}</span>
+                    <sc-for list="{{ gr.names }}" as="nm" hint-placeholder-count="1">
+                      <span style="display:block;font-size:9.5px;overflow-wrap:anywhere;font-weight:{{ gr.fw }};color:{{ gr.color }}">{{ nm }}</span>
+                    </sc-for>
+                  </span>
+                </sc-for>
+                <span style="display:block;margin-top:5px;font-size:9px;font-weight:700;text-align:right;color:{{ a.fg }}">{{ a.toggleTxt }}</span>
+              </button>
+              <sc-if value="{{ a.expanded }}" hint-placeholder-val="{{ false }}">
+                <sc-for list="{{ a.moreGroups }}" as="gr" hint-placeholder-count="3">
+                  <div style="margin-top:6px;padding-top:5px;border-top:1px solid {{ a.bd }}">
+                    <div style="margin-bottom:1px;font-size:9px;font-weight:700;color:{{ a.fg }}">{{ gr.label }}</div>
+                    <sc-for list="{{ gr.names }}" as="nm" hint-placeholder-count="2">
+                      <div style="font-size:9.5px;overflow-wrap:anywhere;font-weight:{{ gr.fw }};color:{{ gr.color }}">{{ nm }}</div>
+                    </sc-for>
+                  </div>
+                </sc-for>
+                <button sc-camel-on-click="{{ a.open }}" style="display:block;width:100%;margin-top:7px;padding:5px 4px;border:1px solid {{ a.bd }};border-radius:var(--radius-sm);background:var(--color-neutral-100);color:var(--color-text);font-family:inherit;font-size:9.5px;font-weight:700;cursor:pointer">ดูรายละเอียดทั้งหมด</button>
               </sc-if>
-            </button>
+            </div>
           </sc-for>
         </sc-if>
         <sc-if value="{{ isNarrow }}" hint-placeholder-val="{{ false }}">
@@ -1834,21 +1853,43 @@ svg.leaflet-image-layer.leaflet-interactive path {
         <div style="display:flex;flex-direction:column;gap:6px">
           <div class="val" style="font-size:12.5px;font-weight:700;color:var(--color-text)">{{ g.dateTh }}</div>
           <sc-for list="{{ g.appts }}" as="a" hint-placeholder-count="1">
-            <button sc-camel-on-click="{{ a.open }}" style="display:flex;flex-direction:column;gap:3px;text-align:left;width:100%;border:1px solid {{ a.bd }};background:{{ a.bg }};border-radius:var(--radius-md);padding:10px 12px;cursor:pointer;font-family:var(--font-body)">
-              <div style="display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;width:100%">
-                <span class="val" style="font-size:14px;font-weight:700;color:{{ a.fg }}">{{ a.time }}</span>
-                <span class="lbl" style="font-size:11.5px;margin-left:auto">{{ a.status }}</span>
-              </div>
-              <div class="val" style="font-size:12.5px;font-weight:700;line-height:1.35;color:var(--color-text)">{{ a.contractNo }}</div>
-              <div class="lbl" style="font-size:12px;font-weight:400;line-height:1.4">{{ a.projectName }}</div>
-              <div class="lbl" style="font-size:12px;font-weight:400;line-height:1.4">{{ a.phase }} · {{ a.place }}</div>
-              <sc-if value="{{ a.hasChair }}" hint-placeholder-val="{{ false }}">
-                <div class="val" style="font-size:12px;font-weight:700;line-height:1.4;color:{{ a.chairColor }}">{{ a.chair }}</div>
+            <div style="border:1px solid {{ a.bd }};background:{{ a.bg }};border-radius:var(--radius-md);padding:10px 12px">
+              <button sc-camel-on-click="{{ a.toggle }}" aria-expanded="{{ a.ariaExp }}" style="display:flex;flex-direction:column;gap:3px;text-align:left;width:100%;border:0;background:transparent;padding:0;cursor:pointer;font-family:var(--font-body)">
+                <div style="display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;width:100%">
+                  <span class="val" style="font-size:14px;font-weight:700;color:{{ a.fg }}">{{ a.time }}</span>
+                  <span class="lbl" style="font-size:11.5px;margin-left:auto">{{ a.status }}</span>
+                </div>
+                <div class="val" style="font-size:12.5px;font-weight:700;line-height:1.35;color:var(--color-text)">{{ a.contractNo }}</div>
+                <div class="lbl" style="font-size:12px;font-weight:400;line-height:1.4">{{ a.projectName }}</div>
+                <div class="lbl" style="font-size:12px;font-weight:400;line-height:1.4">{{ a.phase }} · {{ a.place }}</div>
+                <sc-for list="{{ a.chairGroups }}" as="gr" hint-placeholder-count="1">
+                  <div style="width:100%;margin-top:4px;padding-top:4px;border-top:1px solid {{ a.bd }}">
+                    <div style="font-size:11px;font-weight:700;line-height:1.4;color:{{ a.fg }}">{{ gr.label }}</div>
+                    <sc-for list="{{ gr.names }}" as="nm" hint-placeholder-count="1">
+                      <div class="val" style="font-size:12.5px;font-weight:{{ gr.fw }};line-height:1.4;color:{{ gr.color }}">{{ nm }}</div>
+                    </sc-for>
+                  </div>
+                </sc-for>
+                <sc-if value="{{ a.hasNew }}" hint-placeholder-val="{{ false }}">
+                  <div class="val" style="font-size:11.5px;font-weight:700;color:{{ a.fg }}">{{ a.newTxt }}</div>
+                </sc-if>
+                <div style="width:100%;margin-top:4px;font-size:12px;font-weight:700;text-align:right;color:{{ a.fg }}">{{ a.toggleTxt }}</div>
+              </button>
+              <sc-if value="{{ a.expanded }}" hint-placeholder-val="{{ false }}">
+                <sc-for list="{{ a.moreGroups }}" as="gr" hint-placeholder-count="3">
+                  <div style="margin-top:6px;padding-top:4px;border-top:1px solid {{ a.bd }}">
+                    <div style="font-size:11px;font-weight:700;line-height:1.4;color:{{ a.fg }}">{{ gr.label }}</div>
+                    <sc-for list="{{ gr.names }}" as="nm" hint-placeholder-count="2">
+                      <div class="val" style="font-size:12.5px;font-weight:{{ gr.fw }};line-height:1.4;color:{{ gr.color }}">{{ nm }}</div>
+                    </sc-for>
+                  </div>
+                </sc-for>
+                <button sc-camel-on-click="{{ a.open }}" style="display:block;width:100%;margin-top:9px;padding:9px 12px;border:1px solid {{ a.bd }};border-radius:999px;background:var(--color-neutral-100);color:var(--color-text);font-family:var(--font-body);font-size:13px;font-weight:700;cursor:pointer">ดูรายละเอียดทั้งหมด</button>
               </sc-if>
-              <sc-if value="{{ a.hasNew }}" hint-placeholder-val="{{ false }}">
-                <div class="val" style="font-size:11.5px;font-weight:700;color:{{ a.fg }}">{{ a.newTxt }}</div>
-              </sc-if>
-            </button>
+            </div>
+            <sc-if value="{{ a.hasNav }}" hint-placeholder-val="{{ false }}">
+              <a href="{{ a.navUrl }}" target="_blank" rel="noopener" style="align-self:flex-end;display:inline-flex;align-items:center;border:1px solid var(--color-accent-2-600);background:var(--color-accent-2-100);color:var(--color-accent-2-800);border-radius:999px;padding:9px 18px;font-family:var(--font-body);font-size:13px;font-weight:700;text-decoration:none">นำทาง</a>
+            </sc-if>
           </sc-for>
         </div>
       </sc-for>
@@ -1948,7 +1989,7 @@ svg.leaflet-image-layer.leaflet-interactive path {
       <div style="display:flex;flex-direction:column;gap:4px">
         <sc-for list="{{ alertsOver }}" as="a" hint-placeholder-count="1">
           <div style="font-size:13px;color:#8f1d12">
-            <a href="#" sc-camel-on-click="{{ a.open }}" style="color:#8f1d12;font-weight:700">{{ a.contractNo }}</a>
+            <span style="color:#8f1d12;font-weight:700">{{ a.contractNo }}</span>
             <span> — สิ้นสุดสัญญา {{ a.endTxt }} · เกิน {{ a.over }} วัน · ผลงาน {{ a.actual }}% · ค่าปรับสะสม {{ a.fineTxt }} บาท</span>
           </div>
         </sc-for>
@@ -1961,7 +2002,7 @@ svg.leaflet-image-layer.leaflet-interactive path {
       <div style="display:flex;flex-direction:column;gap:4px">
         <sc-for list="{{ alerts90 }}" as="a" hint-placeholder-count="1">
           <div style="font-size:13px;color:var(--color-accent-800)">
-            <a href="#" sc-camel-on-click="{{ a.open }}" style="color:var(--color-accent-800);font-weight:700">{{ a.contractNo }}</a>
+            <span style="color:var(--color-accent-800);font-weight:700">{{ a.contractNo }}</span>
             <span> — ผลงาน {{ a.actual }}% / แผน {{ a.plan }}%</span>
           </div>
         </sc-for>
@@ -1974,7 +2015,7 @@ svg.leaflet-image-layer.leaflet-interactive path {
       <div style="display:flex;flex-direction:column;gap:4px">
         <sc-for list="{{ alerts }}" as="a" hint-placeholder-count="2">
           <div style="font-size:13px;color:var(--color-accent-800)">
-            <a href="#" sc-camel-on-click="{{ a.open }}" style="color:var(--color-accent-800);font-weight:600">{{ a.contractNo }}</a>
+            <span style="color:var(--color-accent-800);font-weight:600">{{ a.contractNo }}</span>
             <span> — ผลงาน {{ a.actual }}% / แผน {{ a.plan }}% {{ a.diffLabel }} </span>
             <span style="font-weight:700;color:{{ a.diffColor }}">{{ a.diffSigned }}</span>
           </div>
@@ -2007,7 +2048,7 @@ svg.leaflet-image-layer.leaflet-interactive path {
       </sc-if>
       <sc-if value="{{ dash.hasWatch }}" hint-placeholder-val="{{ true }}">
       <div style="overflow-x:auto">
-      <sc-raw-table style="border-collapse:collapse;width:100%;min-width:1180px;font-size:12.5px">
+      <sc-raw-table style="border-collapse:collapse;width:100%;min-width:1350px;font-size:12.5px">
         <sc-raw-thead>
           <sc-raw-tr style="background:var(--color-neutral-200)">
             <sc-raw-th class="hd" style="text-align:left;padding:7px 8px;border:1px solid var(--color-divider);font-size:12px">สัญญา / โครงการ</sc-raw-th>
@@ -2020,13 +2061,14 @@ svg.leaflet-image-layer.leaflet-interactive path {
             <sc-raw-th class="hd" style="padding:7px 8px;border:1px solid var(--color-divider);width:82px;font-size:12px;color:var(--color-accent-700)">% ผลงาน</sc-raw-th>
             <sc-raw-th class="hd" style="padding:7px 8px;border:1px solid var(--color-divider);width:100px;font-size:12px">ผลต่าง</sc-raw-th>
             <sc-raw-th class="hd" style="text-align:left;padding:7px 8px;border:1px solid var(--color-divider);width:150px;font-size:12px">ผู้ควบคุมงาน</sc-raw-th>
+            <sc-raw-th class="hd" style="text-align:left;padding:7px 8px;border:1px solid var(--color-divider);width:170px;font-size:12px">หมายเหตุ</sc-raw-th>
           </sc-raw-tr>
         </sc-raw-thead>
         <sc-raw-tbody>
           <sc-for list="{{ dash.watch }}" as="w" hint-placeholder-count="4">
             <sc-raw-tr>
               <sc-raw-td style="padding:6px 8px;border:1px solid var(--color-divider)">
-                <span class="val" style="color:var(--color-accent);cursor:pointer" sc-camel-on-click="{{ w.open }}">{{ w.contractNo }}</span>
+                <span class="val">{{ w.contractNo }}</span>
                 <div class="lbl" style="font-size:11.5px">{{ w.projectName }}</div>
                 <div style="display:flex;gap:4px;margin-top:4px;flex-wrap:wrap;align-items:center">
                   <span class="lbl" style="font-size:10.5px;margin-right:2px">{{ w.district }}</span>
@@ -2051,6 +2093,7 @@ svg.leaflet-image-layer.leaflet-interactive path {
                 <div class="lbl" style="font-size:10px;letter-spacing:.03em;margin-top:3px">ช่างควบคุมด้านวัสดุ</div>
                 <div class="val" style="font-size:11px">{{ w.material }}</div>
               </sc-raw-td>
+              <sc-raw-td style="padding:6px 8px;border:1px solid var(--color-divider);font-size:11.5px;line-height:1.45;white-space:pre-wrap;overflow-wrap:anywhere">{{ w.note }}</sc-raw-td>
             </sc-raw-tr>
           </sc-for>
         </sc-raw-tbody>
@@ -2925,7 +2968,7 @@ svg.leaflet-image-layer.leaflet-interactive path {
           </label>
           <label style="display:flex;flex-direction:column;gap:3px">
             <span style="display:flex;align-items:baseline;gap:7px;flex-wrap:wrap">
-              <span class="lbl" style="font-size:12px">วันที่นัด</span>
+              <span class="lbl" style="font-size:12px;color:#c2410c;font-weight:700">วันที่นัด</span>
               <span class="val" style="font-size:11.5px;color:var(--color-accent-700)">{{ appt.dateTh }}</span>
             </span>
             <div style="position:relative">
@@ -2964,7 +3007,7 @@ svg.leaflet-image-layer.leaflet-interactive path {
             </div>
           </label>
           <label style="display:flex;flex-direction:column;gap:3px">
-            <span class="lbl" style="font-size:12px">เวลานัด (24 ชม.)</span>
+            <span class="lbl" style="font-size:12px;color:#c2410c;font-weight:700">เวลานัด (24 ชม.)</span>
             <span style="display:flex;align-items:center;gap:6px">
               <sc-raw-select value="{{ appt.hh }}" sc-camel-on-change="{{ appt.setHH }}" style="flex:1;min-width:0;border:1px solid var(--color-divider);border-radius:999px;padding:8px 12px;font-size:13px;background:var(--color-neutral-100)">
                 <sc-for list="{{ appt.hourOptions }}" as="o" hint-placeholder-count="6">
@@ -2982,7 +3025,7 @@ svg.leaflet-image-layer.leaflet-interactive path {
           </label>
           <sc-for list="{{ appt.fields }}" as="f" hint-placeholder-count="6">
             <label style="display:flex;flex-direction:column;gap:3px;grid-column:span {{ f.span }}">
-              <span class="lbl" style="font-size:12px">{{ f.label }}</span>
+              <span class="lbl" style="font-size:12px;color:#c2410c;font-weight:700">{{ f.label }}</span>
               <input type="{{ f.type }}" value="{{ f.value }}" sc-camel-on-change="{{ f.onChange }}" placeholder="{{ f.ph }}" style="border:1px solid var(--color-divider);border-radius:999px;padding:8px 13px;font-size:13px;background:var(--color-neutral-100)">
             </label>
           </sc-for>
@@ -2994,17 +3037,22 @@ svg.leaflet-image-layer.leaflet-interactive path {
             <div style="grid-column:span {{ r.span }}"><span class="lbl">{{ r.label }} </span><span class="val">{{ r.value }}</span></div>
           </sc-for>
         </div>
+        <div style="display:grid;grid-template-columns:auto minmax(0,1fr);gap:6px clamp(14px,4vw,32px);margin-top:10px;font-size:13.5px;font-weight:700;line-height:1.45">
+          <sc-for list="{{ appt.emRows }}" as="r" hint-placeholder-count="5">
+            <div style="grid-column:span {{ r.span }};overflow-wrap:anywhere"><span style="color:var(--color-text)">{{ r.label }} </span><span style="color:#c2410c">{{ r.value }}</span></div>
+          </sc-for>
+        </div>
       </sc-if>
 
       <div style="margin-top:16px;border-top:1px solid var(--color-divider);padding-top:12px">
-        <div class="hd" style="font-size:13px;margin-bottom:7px">ผู้เกี่ยวข้องในการตรวจรับ</div>
-        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr));gap:10px">
-          <sc-for list="{{ appt.people }}" as="g" hint-placeholder-count="4">
-            <div style="border:1px solid var(--color-divider);border-radius:var(--radius-md);padding:9px 12px">
-              <div class="lbl" style="font-size:11.5px;color:var(--color-accent-700)">{{ g.label }}</div>
-              <div style="display:flex;flex-direction:column;gap:2px;margin-top:3px">
+        <div class="hd" style="font-size:14px;margin-bottom:8px">ผู้เกี่ยวข้องในการตรวจรับ</div>
+        <div style="display:flex;flex-direction:column">
+          <sc-for list="{{ appt.people }}" as="g" hint-placeholder-count="5">
+            <div style="display:flex;flex-wrap:wrap;gap:2px 12px;padding:8px 0;border-top:1px solid var(--color-divider)">
+              <div style="flex:0 0 170px;font-size:13px;font-weight:700;line-height:1.5;color:var(--color-accent-700)">{{ g.label }}</div>
+              <div style="flex:1 1 270px;min-width:0;display:flex;flex-direction:column;gap:3px">
                 <sc-for list="{{ g.names }}" as="nm" hint-placeholder-count="2">
-                  <div class="val" style="font-size:12.5px">{{ nm }}</div>
+                  <div class="val" style="font-size:13px;line-height:1.5">{{ nm }}</div>
                 </sc-for>
               </div>
             </div>
@@ -3013,6 +3061,9 @@ svg.leaflet-image-layer.leaflet-interactive path {
       </div>
     </div>
     <div style="flex:0 0 auto;border-top:1px solid var(--color-divider);padding:11px 14px calc(11px + env(safe-area-inset-bottom));display:flex;gap:7px;flex-wrap:wrap;justify-content:flex-end;background:var(--color-neutral-200)">
+      <sc-if value="{{ appt.hasNav }}" hint-placeholder-val="{{ false }}">
+        <a href="{{ appt.navUrl }}" target="_blank" rel="noopener" style="white-space:nowrap;display:inline-flex;align-items:center;border:1px solid var(--color-accent-2-600);background:var(--color-accent-2-100);color:var(--color-accent-2-800);border-radius:999px;padding:8px 16px;font-family:var(--font-body);font-size:13px;font-weight:700;text-decoration:none">นำทาง</a>
+      </sc-if>
       <sc-if value="{{ appt.canEdit }}" hint-placeholder-val="{{ false }}">
         <button sc-camel-on-click="{{ deleteAppt }}" style="white-space:nowrap;background:var(--color-accent-100);color:var(--color-accent-700);border:1px solid var(--color-accent-300);border-radius:999px;padding:8px 14px;font-family:var(--font-body);font-size:12.5px;cursor:pointer">ลบนัด</button>
         <button sc-camel-on-click="{{ saveAppt }}" class="btn btn-primary" style="white-space:nowrap;font-size:13px;cursor:pointer;margin-left:auto">บันทึก</button>
@@ -4665,25 +4716,19 @@ class Component extends DCLogic {
   };
   pinned(){ return this.projects().filter(p=>isFinite(parseFloat(p.lat))&&isFinite(parseFloat(p.lng))); }
   mapPinned(){
-    const s=this.state, fy=s.mfy||'', bd=s.mbudget||'', wk=s.mwork||'', soon=s.msoon||'', ds=s.mdist||'';
-    if(!fy && !bd && !wk && !soon && !ds) return this.pinned();
+    const s=this.state, fy=s.mfy||'', bd=s.mbudget||'', wk=s.mwork||'', ds=s.mdist||'';
+    if(!fy && !bd && !wk && !ds) return this.pinned();
     return this.pinned().filter(p=>{
       if(ds && this.distOf(p)!==ds) return false;
       if(fy && String(p.fiscalYear||'')!==fy) return false;
       if(bd && String(p.budgetType||'')!==bd) return false;
       if(wk && String(p.workType||'')!==wk) return false;
-      if(soon){
-        const en=this.endOf(p); if(!en) return false;
-        const r=this.days(this.today(), en);
-        if(soon==='over'){ if(!(r<0)) return false; }
-        else if(!(r>=0 && r<=parseInt(soon,10))) return false;
-      }
       return true;
     });
   }
-  mapFilterActive(){ const s=this.state; return !!(s.mfy||s.mbudget||s.mwork||s.msoon||s.mdist); }
+  mapFilterActive(){ const s=this.state; return !!(s.mfy||s.mbudget||s.mwork||s.mdist); }
   setMapFilter = (k) => (e) => { const o={}; o[k]=e.target.value; this.setState(o); };
-  clearMapFilters = () => this.setState({mfy:'',mbudget:'',mwork:'',msoon:'',mdist:''});
+  clearMapFilters = () => this.setState({mfy:'',mbudget:'',mwork:'',mdist:''});
   mapFilterDefs(){
     const all=this.pinned(), s=this.state;
     const uniq=(f)=>{ const m={}; all.forEach(p=>{ const v=f(p); if(v) m[v]=1; }); return Object.keys(m).sort(); };
@@ -4696,8 +4741,7 @@ class Component extends DCLogic {
       mk('mdist', s.mdist, [{v:'',t:'แขวง'}].concat(uniq(p=>this.distOf(p)).map(v=>({v:v,t:'แขวงฯ'+v})))),
       mk('mfy', s.mfy, OPT(uniq(p=>String(p.fiscalYear||'')),'ปีงบ')),
       mk('mbudget', s.mbudget, OPT(uniq(p=>p.budgetType),'แหล่งงบ')),
-      mk('mwork', s.mwork, OPT(uniq(p=>p.workType),'ประเภท')),
-      mk('msoon', s.msoon, [{v:'',t:'อายุสัญญา all'},{v:'30',t:'≤ 30 วัน'},{v:'60',t:'≤ 60 วัน'},{v:'90',t:'≤ 90 วัน'},{v:'over',t:'เลยกำหนด'}])
+      mk('mwork', s.mwork, OPT(uniq(p=>p.workType),'ประเภท'))
     ];
   }
   progressOf(p){
@@ -4757,6 +4801,21 @@ class Component extends DCLogic {
     if(pk){ try{ pk.map.setView([h.lat,h.lng], 14, {animate:true}); }catch(e){} }
   }
   pickRef = (el) => { this._pickEl=el||null; if(el) requestAnimationFrame(()=>this.initPicker()); };
+  addBaseLayers(L,map){
+    const esriAttr='&copy; Esri, Maxar, Earthstar Geographics';
+    const esri=(path,attribution)=>L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/'+path+'/MapServer/tile/{z}/{y}/{x}',{maxZoom:19,maxNativeZoom:18,crossOrigin:true,attribution:attribution||''});
+    const bases={
+      'แผนที่ถนน':L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,crossOrigin:true,attribution:'&copy; OpenStreetMap'}),
+      'ดาวเทียม':esri('World_Imagery',esriAttr),
+      'ดาวเทียม + ชื่อถนน':L.layerGroup([esri('World_Imagery',esriAttr),esri('Reference/World_Transportation'),esri('Reference/World_Boundaries_and_Places')]),
+      'ภูมิประเทศ':esri('World_Topo_Map','&copy; Esri')
+    };
+    let name='แผนที่ถนน';
+    try{ const saved=localStorage.getItem('mapBaseLayer'); if(Object.keys(bases).includes(saved)) name=saved; }catch(e){}
+    bases[name].addTo(map);
+    L.control.layers(bases,null,{position:'topright'}).addTo(map);
+    map.on('baselayerchange',(e)=>{ try{ localStorage.setItem('mapBaseLayer',e.name); }catch(x){} });
+  }
   initPicker(){
     const el=this._pickEl; if(!el) return;
     if(!window.L){ setTimeout(()=>this.initPicker(),200); return; }
@@ -4769,7 +4828,7 @@ class Component extends DCLogic {
     const c=has?[la,ln]:[17.62,100.15];
     let map;
     try{ map=L.map(el,{zoomControl:true}).setView(c, has?15:9); }catch(e){ return; }
-    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,crossOrigin:true,attribution:'&copy; OpenStreetMap'}).addTo(map);
+    this.addBaseLayers(L,map);
 
     const mk=L.circleMarker(c,{radius:9,color:'#ffffff',weight:2,fillColor:'#c67139',fillOpacity:1});
     if(has) mk.addTo(map);
@@ -4796,7 +4855,7 @@ class Component extends DCLogic {
       let map;
       try{ map=L.map(el,{zoomControl:true}).setView([17.62,100.15],9); }
       catch(e){ console.error('MAP_INIT', e && e.message); return; }
-      L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,crossOrigin:true,attribution:'&copy; OpenStreetMap'}).addTo(map);
+      this.addBaseLayers(L,map);
       const FitCtl=L.Control.extend({
         options:{position:'topleft'},
         onAdd:()=>{
@@ -5017,6 +5076,32 @@ class Component extends DCLogic {
     const color = pos==='ผส.ทล.5' ? '#b8452f' : (pos==='รส.ทล.5' ? '#3f6b32' : 'var(--color-neutral-700)');
     return {name:c.name||'', pos, color};
   }
+  navUrlOf(p){
+    return (p&&p.lat&&p.lng)? ('https://www.google.com/maps/dir/?api=1&destination='+encodeURIComponent(p.lat+','+p.lng)+'&travelmode=driving') : '';
+  }
+  timeTh(t){
+    const v=String(t||'').trim();
+    return v? v.replace(':','.')+' น.' : '';
+  }
+  apptGroups(p){
+    const list=((p&&p.committee)||[]).filter(c=>c&&c.name);
+    const isChair=(c)=>c.role==='ประธานกรรมการ';
+    const chairs=list.filter(isChair).map(c=>c.pos||c.name);
+    const members=list.filter(c=>!isChair(c)).map(c=>c.name);
+    const groups=[];
+    if(chairs.length) groups.push({label:'ประธานกรรมการ', names:chairs, fw:'700', color:this.chairOf(p).color});
+    if(members.length) groups.push({label:'กรรมการ', names:members, fw:'500', color:'var(--color-text)'});
+    if(p&&p.supervisor) groups.push({label:'ผู้ควบคุมงาน', names:[p.supervisor], fw:'500', color:'var(--color-text)'});
+    if(p&&p.materialInspector) groups.push({label:'ผู้ควบคุมงานด้านวัสดุ', names:[p.materialInspector], fw:'500', color:'var(--color-text)'});
+    return groups;
+  }
+  apptCardFields(a){
+    const groups=this.apptGroups(a.project), key=a.pid+':'+a.id, expanded=this.state.calExpand===key;
+    return { chairGroups:groups.filter(g=>g.label==='ประธานกรรมการ'),
+      moreGroups:groups.filter(g=>g.label!=='ประธานกรรมการ'),
+      expanded, ariaExp:String(expanded), toggleTxt:expanded? 'ย่อ ▴' : 'รายละเอียด ▾',
+      toggle:()=>this.setState({calExpand:expanded? null : key}) };
+  }
   phaseLabel(a){
     const no=String((a&&a.phaseNo)||'').trim();
     if(no) return /^\d+$/.test(no)? ('งวดที่ '+no) : no;
@@ -5029,9 +5114,10 @@ class Component extends DCLogic {
   }
   peopleGroups(p){
     const g=[];
-    g.push({label:'ช่างควบคุมงาน (หัวหน้า)', names:[p.supervisor||'-']});
-    g.push({label:'ผู้ช่วยช่างควบคุมงาน', names:(p.assistants||[]).map(a=>[a.name,a.role].filter(Boolean).join(' — ')).filter(Boolean).concat([]).length? (p.assistants||[]).map(a=>[a.name,a.role].filter(Boolean).join(' — ')).filter(Boolean) : ['-']});
     g.push({label:'คณะกรรมการตรวจรับ', names:(p.committee||[]).map(c=>[c.name,c.role].filter(Boolean).join(' — ')).filter(Boolean).length? (p.committee||[]).map(c=>[c.name,c.role].filter(Boolean).join(' — ')).filter(Boolean) : ['-']});
+    g.push({label:'ช่างควบคุมงาน', names:[p.supervisor||'-']});
+    const asst=(p.assistants||[]).map(a=>a.name).filter(Boolean);
+    g.push({label:'ผู้ช่วยช่างควบคุมงาน', names:asst.length? asst : ['-']});
     g.push({label:'ผู้ควบคุมงานด้านวัสดุ', names:[p.materialInspector||'-']});
     g.push({label:'ผู้รับจ้าง', names:[p.contractor||'-']});
     return g;
@@ -5805,14 +5891,14 @@ class Component extends DCLogic {
         valueTxt:this.n(dp.contractValue), fineTxt:this.n(dp.finePerDay), workType:dp.workType||'-',
         coordTxt: (dp.lat&&dp.lng)? (dp.lat+', '+dp.lng) : 'ยังไม่ระบุ',
         hasCoord: !!(dp.lat&&dp.lng),
-        navUrl: (dp.lat&&dp.lng)? ('https://www.google.com/maps/dir/?api=1&destination='+encodeURIComponent(dp.lat+','+dp.lng)+'&travelmode=driving') : '#',
+        navUrl: this.navUrlOf(dp)||'#',
         unitTxt: (this.projectUnit(dp)||{}).unit || 'ยังไม่ระบุ',
         plan:this.n(pr.plan,2), actual:this.n(pr.actual,2), diff:(pr.diff>0?'+':'')+this.n(pr.diff,2),
         diffBg:stt.bg, diffFg:stt.fg, diffBd:stt.bd,
         showPeople:true, people:this.peopleGroups(dp),
         showAppts:!this.isExec() && apps.length>0,
         appts:apps.map(a=>{ const s=this.apptStyle(a.status);
-          return { dateTh:this.thShort(a.date), time:a.time||'', phase:a.phase||'ตรวจรับงาน', place:a.place||'-',
+          return { dateTh:this.thShort(a.date), time:this.timeTh(a.time), phase:a.phase||'ตรวจรับงาน', place:a.place||'-',
             statusTxt:this.normStatus(a.status), bg:s.bg, fg:s.fg, bd:s.bd, open:this.openAppt(dp.id,a.id) }; }) };
     } else { out.detail={people:[],appts:[]}; }
 
@@ -5839,11 +5925,12 @@ class Component extends DCLogic {
           bg: iso===todayIso? 'var(--color-accent-100)' : (dow===0||dow===6? 'var(--color-neutral-200)':'var(--color-neutral-100)'),
           fg: dow===0? 'var(--c-late)' : 'var(--color-text)', fw: list.length? '700':'400',
           appts:list.map(a=>{ const s=this.apptStyle(a.status), ch=this.chairOf(a.project);
-            return { time:a.time||'', phase:[a.phase||'ตรวจรับงาน', this.phaseLabel(a)].filter(Boolean).filter((v,i,arr)=>arr.indexOf(v)===i).join(' · '),
-              chair:[ch.pos||'', ((a.project&&a.project.committee)||[]).filter(x=>x&&x.name&&x.role!=='ประธานกรรมการ').map(x=>x.name).join(' · ')].filter(Boolean).join(' · '),
-              hasChair:!!ch.pos, chairColor:ch.color,
+            const tt=this.timeTh(a.time);
+            return { time:tt||'ไม่ระบุเวลา', timeLine:tt? 'เวลา '+tt : 'ไม่ระบุเวลา',
+              phaseLine:(()=>{ const ph=String(a.phase||'ตรวจรับงาน').trim(), no=String(this.phaseLabel(a)).trim().replace(/^\(\s*(.*?)\s*\)$/,'$1'); return no&&no!==ph? ph+' ('+no+')' : ph; })(),
+              ...this.apptCardFields(a),
               textColor: (ch.pos==='ผส.ทล.5'||ch.pos==='รส.ทล.5')? ch.color : s.fg,
-              contractNo:this.contractShort(a.project)||'ไม่ระบุเลขสัญญา',
+              contractNo:this.contractShort(a.project).replace(/\s*\/\s*/g,'/')||'ไม่ระบุเลขสัญญา',
               bg:s.bg, fg:s.fg, bd:s.bd, open:this.openAppt(a.pid,a.id) }; }) });
       }
       while(cells.length%7) cells.push({day:'', bg:'var(--color-neutral-200)', fg:'var(--color-neutral-600)', fw:'400', appts:[], isToday:false});
@@ -5859,9 +5946,10 @@ class Component extends DCLogic {
         agenda.push({ iso, isToday:iso===todayIso,
           dateTh:'วัน'+DOWFULL[d.getDay()]+'ที่ '+d.getDate()+' '+this.MONTHS_S[d.getMonth()]+' '+(d.getFullYear()+543),
           appts:byDate[iso].slice().sort((a,b)=>String(a.time||'').localeCompare(String(b.time||''))).map(a=>{
-            const s=this.apptStyle(a.status), ch=this.chairOf(a.project);
-            return { time:a.time||'ไม่ระบุเวลา', status:this.normStatus(a.status),
-              chair:ch.name? (ch.pos? ch.pos+' '+ch.name : ch.name) : '', hasChair:!!ch.name, chairColor:ch.color,
+            const s=this.apptStyle(a.status);
+            return { time:this.timeTh(a.time)||'ไม่ระบุเวลา', status:this.normStatus(a.status),
+              ...this.apptCardFields(a),
+              navUrl:this.navUrlOf(a.project), hasNav:!!this.navUrlOf(a.project),
               cellTxt:(a.time||'')+' '+(String(a.project.contractNo||'').replace(/^สัญญาเลขที่\s*/,'')||'-'),
               hasNew:false, newTxt:'',
               phase:this.phaseLabel(a), place:a.place||'-',
@@ -5869,7 +5957,7 @@ class Component extends DCLogic {
               projectName:a.project.projectName||'-',
               bg:s.bg, fg:s.fg, bd:s.bd, open:this.openAppt(a.pid,a.id) }; }) });
       });
-      out.calCols=nrw? 'repeat(5,minmax(0,1fr)) 0.78fr 0.78fr' : 'repeat(7,minmax(0,1fr))';
+      out.calCols=nrw? 'repeat(5,minmax(0,1fr)) 0.78fr 0.78fr' : 'repeat(5,minmax(0,1fr)) minmax(0,0.5fr) minmax(0,0.5fr)';
       out.calAgenda=agenda;
       out.hasAgenda=agenda.length>0;
       out.noAgenda=agenda.length===0;
@@ -5944,17 +6032,19 @@ class Component extends DCLogic {
         fields:[ AF('ตรวจรับงานครั้งที่.....','phase','text',1,'เช่น ตรวจรับงานครั้งที่ 1'),
           AF('งวดงานที่.....','phaseNo','text',1,'เช่น (งวดที่ 1)'),
           AF('สถานที่ / จุดนัดพบ','place','text',2,'เช่น กม.3+200 หน้าสำนักงานสนาม — พบที่สำนักงานสนามผู้รับจ้าง') ],
-        readRows:[ {label:'เลขที่สัญญา', value: ap? (ap.contractNo||'-'):'-', span:2},
+        readRows:[ {label:'เลขที่สัญญา', value: ap? (String(ap.contractNo||'').replace(/^\s*สัญญาเลขที่\s*/,'')||'-'):'-', span:2},
           {label:'โครงการ', value: ap? this.apptTitle(ap):'-', span:2},
-          {label:'วันที่นัด', value:this.th(ad.date), span:1},
-          {label:'เวลานัด', value:(ad.time||'-')+' น.', span:1},
-          {label:'งวดงานที่', value:ad.phaseNo||'-', span:1},
-          {label:'ตรวจรับงานครั้งที่', value:ad.phase||'-', span:1},
+        ],
+        emRows:[ {label:'วันที่นัด', value:this.th(ad.date), span:1},
+          {label:'เวลานัด', value:this.timeTh(ad.time)||'-', span:1},
+          {label:'ตรวจรับงานครั้งที่', value:String(ad.phase||'').trim().replace(/^ตรวจรับงานครั้งที่\s*/,'')||'-', span:1},
+          {label:'งวดงานที่', value:String(ad.phaseNo||'').trim().replace(/^\(\s*(.*?)\s*\)$/,'$1').replace(/^งวด(งาน)?ที่\s*/,'')||'-', span:1},
           {label:'สถานที่ / จุดนัดพบ', value:ad.place||'-', span:2},
         ],
+        navUrl:this.navUrlOf(ap), hasNav:!!this.navUrlOf(ap),
         people: ap? this.peopleGroups(ap) : [] };
     } else { const _dp={isDate:true,isPlain:false,open:false,displayTxt:'เลือกวันที่',cells:[],dowNames:[],monthTh:'',toggle:()=>{},close:()=>{},prev:()=>{},next:()=>{},clear:()=>{},goToday:()=>{}};
-      out.appt={people:[],fields:[],readRows:[],projectOptions:[],statusOptions:[],hourOptions:[],minOptions:[],dateTh:'',newDateTh:'',dateF:_dp}; }
+      out.appt={people:[],fields:[],readRows:[],emRows:[],projectOptions:[],statusOptions:[],hourOptions:[],minOptions:[],dateTh:'',newDateTh:'',dateF:_dp}; }
 
     /* overview */
     const rows=[], alerts=[], alerts90=[], alertsOver=[];
@@ -6000,16 +6090,13 @@ class Component extends DCLogic {
         del:()=>this.delProject(p.id)
       });
       if(!isNaN(remain) && remain<0 && actual<99.999) alertsOver.push({contractNo:p.contractNo, actual:this.n(actual,3),
-        endTxt:this.thShort(endIso), over:String(-remain), fineTxt:this.n(fa||0,0),
-        open:(e)=>{e.preventDefault();this.openProject(p.id);}});
-      if(plan>=99.999 && actual<90) alerts90.push({contractNo:p.contractNo, plan:this.n(plan,3), actual:this.n(actual,3),
-        open:(e)=>{e.preventDefault();this.openProject(p.id);}});
+        endTxt:this.thShort(endIso), over:String(-remain), fineTxt:this.n(fa||0,0)});
+      if(plan>=99.999 && actual<90) alerts90.push({contractNo:p.contractNo, plan:this.n(plan,3), actual:this.n(actual,3)});
       if(diff<=-redT) alerts.push({contractNo:p.contractNo, plan:this.n(plan,3), actual:this.n(actual,3),
         diff:this.n(-diff,3),
         diffLabel: diff<0? 'ช้ากว่าแผน' : 'เร็วกว่าแผน',
         diffSigned: (diff<0?'-':'+')+this.n(Math.abs(diff),3)+'%',
-        diffColor: diff<0? 'var(--c-late)' : 'var(--c-ahead)',
-        open:(e)=>{e.preventDefault();this.openProject(p.id);}});
+        diffColor: diff<0? 'var(--c-late)' : 'var(--c-ahead)'});
     });
     const sk='_'+(st8.sortKey||'contractNo'), dir=st8.sortDir||1;
     rows.sort((x,y)=>{
@@ -6348,14 +6435,14 @@ class Component extends DCLogic {
         if(!this.homeFilterPass(p)) return;
         watch.push({ diffN:diff, contractNo:p.contractNo, projectName:p.projectName,
           supervisor:p.supervisor||'-', material:p.materialInspector||'-',
+          note:((p.weeks||{})[this.weeksOf(p)[li]]||{}).note || (p.note==='-'? '' : (p.note||'')) || '-',
           district:'แขวงฯ'+this.distOf(p),
           fiscalYear:p.fiscalYear||'-', budgetType:p.budgetType||'-', workType:p.workType||'-',
           valueTxt:this.n(p.contractValue), startTxt:this.thShort(p.startDate)||'-', endTxt:this.endOf(p)? this.thShort(this.endOf(p)) : '-',
           durTxt:(this.durOf(p)||p.duration||'-')+' วัน', contractor:p.contractor||'-', fineTxt:this.n(p.finePerDay),
           plan:this.n(plan,3), actual:this.n(actual,3),
           diff:(diff>=0?'+':'')+this.n(diff,3), bg:stt.bg, fg:stt.fg,
-          remain: isNaN(rm)? '-' : (rm>=0? ((rm+1)+' วัน') : ('เกิน '+(-rm)+' วัน')),
-          open:()=>this.openProject(p.id) });
+          remain: isNaN(rm)? '-' : (rm>=0? ((rm+1)+' วัน') : ('เกิน '+(-rm)+' วัน')) });
       });
       watch.sort((x,y)=>x.diffN-y.diffN);
       const COLORS=['var(--color-accent)','var(--color-accent-2-600)','var(--color-accent-400)','var(--color-neutral-600)'];
@@ -6373,8 +6460,7 @@ class Component extends DCLogic {
         (diff<=-amberT? lateList:onList).push({
           name:(p.contractNo||'').replace(/^สัญญาเลขที่\s*/,''), plan:plan, actual:actual,
           planTxt:this.n(plan,2), actualTxt:this.n(actual,2),
-          color: diff<=-redT? 'var(--c-late)' : (diff<=-amberT? '#b8860b':'var(--c-ahead)'),
-          open:()=>this.openProject(p.id) });
+          color: diff<=-redT? 'var(--c-late)' : (diff<=-amberT? '#b8860b':'var(--c-ahead)') });
       });
       const watchList=watch;
       const doneGroups=[
@@ -6530,7 +6616,7 @@ class Component extends DCLogic {
           value:String(this.durOf(d)||''),
           onChange:()=>{}, readOnly:true, hasHint:true, hint:'นับจากวันเริ่มสัญญาถึงวันสิ้นสุดสัญญา' },
         F('ผู้รับจ้าง','contractor','text',2),
-        F('ช่างควบคุมงาน (หัวหน้า)','supervisor'),
+        F('ช่างควบคุมงาน','supervisor'),
         F('ผู้ควบคุมงานด้านวัสดุ','materialInspector'),
         F('ละติจูด (Lat) เช่น 17.5887','lat'),
         F('ลองจิจูด (Long) เช่น 99.9762','lng')
