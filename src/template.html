@@ -3445,7 +3445,7 @@ svg.leaflet-image-layer.leaflet-interactive path {
               <sc-raw-th class="hd" style="border:1px solid var(--color-divider);padding:5px;text-align:left;font-size:12px">รายการ</sc-raw-th>
               <sc-raw-th class="hd" style="border:1px solid var(--color-divider);padding:5px;width:88px;font-size:12px">ปริมาณ</sc-raw-th>
               <sc-raw-th class="hd" style="border:1px solid var(--color-divider);padding:5px;width:88px;font-size:12px">ถัวจ่าย</sc-raw-th>
-              <sc-raw-th class="hd" style="border:1px solid var(--color-divider);padding:5px;width:78px;font-size:12px">หน่วย</sc-raw-th>
+              <sc-raw-th class="hd" style="border:1px solid var(--color-divider);padding:5px;width:96px;font-size:12px">หน่วย</sc-raw-th>
               <sc-raw-th class="hd" style="border:1px solid var(--color-divider);padding:5px;width:96px;font-size:12px">หน่วยละ</sc-raw-th>
               <sc-raw-th class="hd" style="border:1px solid var(--color-divider);padding:5px;width:120px;font-size:12px">เป็นเงิน (บาท)</sc-raw-th>
               <sc-raw-th class="hd" style="border:1px solid var(--color-divider);padding:5px;width:74px;font-size:12px">% นน.</sc-raw-th>
@@ -3460,13 +3460,20 @@ svg.leaflet-image-layer.leaflet-interactive path {
                 <sc-raw-td style="border:1px solid var(--color-divider);padding:2px"><input sc-camel-input-mode="decimal" value="{{ d.qty }}" sc-camel-on-change="{{ d.setQty }}" sc-camel-on-focus="{{ d.focQty }}" sc-camel-on-blur="{{ d.blurNum }}" style="width:100%;border:0;padding:5px;font-size:12.5px;text-align:right"></sc-raw-td>
                 <sc-raw-td style="border:1px solid var(--color-divider);padding:2px"><input sc-camel-input-mode="decimal" value="{{ d.tua }}" sc-camel-on-change="{{ d.setTua }}" sc-camel-on-focus="{{ d.focTua }}" sc-camel-on-blur="{{ d.blurNum }}" placeholder="-" style="width:100%;border:0;padding:5px;font-size:12.5px;text-align:right;background:transparent;color:inherit"></sc-raw-td>
                 <sc-raw-td style="border:1px solid var(--color-divider);padding:2px">
-                  <sc-if value="{{ d.hasQty }}" hint-placeholder-val="{{ true }}">
-                    <sc-raw-select value="{{ d.unit }}" sc-camel-on-change="{{ d.setUnit }}" style="width:100%;border:0;padding:5px;font-size:12.5px;text-align:center;font-family:var(--font-body);color:inherit;background:transparent">
+                  <sc-if value="{{ d.unitFromList }}" hint-placeholder-val="{{ true }}">
+                    <sc-raw-select value="{{ d.unit }}" sc-camel-on-change="{{ d.pickUnit }}" style="width:100%;border:0;padding:5px;font-size:12.5px;text-align:center;font-family:var(--font-body);color:inherit;background:transparent">
                       <option value=""></option>
-                      <sc-for list="{{ unitOptions }}" as="uo" hint-placeholder-count="4">
+                      <sc-for list="{{ unitOptions }}" as="uo" hint-placeholder-count="8">
                         <option value="{{ uo }}">{{ uo }}</option>
                       </sc-for>
+                      <option value="__other">อื่นๆ (พิมพ์เอง)</option>
                     </sc-raw-select>
+                  </sc-if>
+                  <sc-if value="{{ d.unitCustom }}" hint-placeholder-val="{{ false }}">
+                    <div style="display:flex;gap:2px;align-items:center">
+                      <input value="{{ d.unit }}" sc-camel-on-change="{{ d.setUnit }}" placeholder="พิมพ์หน่วย" aria-label="พิมพ์หน่วย" style="flex:1 1 auto;min-width:0;width:100%;border:1px solid var(--color-accent-300);border-radius:var(--radius-sm);padding:4px;font-size:12.5px;text-align:center;font-family:var(--font-body);color:inherit;background:var(--color-accent-100)">
+                      <button sc-camel-on-click="{{ d.unitBackToList }}" title="เลือกจากรายการ" aria-label="เลือกจากรายการ" style="flex:0 0 auto;background:var(--color-neutral-200);color:var(--color-text);border:1px solid var(--color-divider);border-radius:var(--radius-sm);padding:4px 5px;font-size:11.5px;font-family:inherit;cursor:pointer">↩</button>
+                    </div>
                   </sc-if>
                 </sc-raw-td>
                 <sc-raw-td style="border:1px solid var(--color-divider);padding:2px"><input sc-camel-input-mode="decimal" value="{{ d.price }}" sc-camel-on-change="{{ d.setPrice }}" sc-camel-on-focus="{{ d.focPrice }}" sc-camel-on-blur="{{ d.blurNum }}" style="width:100%;border:0;padding:5px;font-size:12.5px;text-align:right"></sc-raw-td>
@@ -3727,6 +3734,10 @@ class Component extends DCLogic {
   }
   thAbbr(iso){ if(!iso) return ''; const d=this.d(iso); if(isNaN(d)) return ''; return d.getDate()+' '+this.MONTHS_S[d.getMonth()]+' '+(d.getFullYear()+543); }
   ROLES_COMMITTEE=['ประธานกรรมการ','กรรมการ'];
+  WORK_UNITS=['M.','SQ.M.','CU.M.','TON','EACH','EA.','P.S.','L.S.'];
+  /* units saved before WORK_UNITS existed show under their new name; other old values (e.g. ท่อน) stay as typed */
+  WORK_UNIT_ALIASES={'ม.':'M.','ตร.ม.':'SQ.M.','ลบ.ม.':'CU.M.','ตัน':'TON','LS.':'L.S.','PS.':'P.S.'};
+  workUnit(u){ return this.WORK_UNIT_ALIASES[u] || u || ''; }
   POSITIONS=['ผส.ทล.5','รส.ทล.5','ผอ.ขท.อุตรดิตถ์ที่ 1','ผอ.ขท.อุตรดิตถ์ที่ 2','ผอ.ขท.พิษณุโลกที่ 1','ผอ.ขท.พิษณุโลกที่ 2','ผอ.ขท.พิจิตร','วิศวกรโยธาปฏิบัติการ','วิศวกรโยธาชำนาญการ','นายช่างโยธาปฏิบัติงาน','นายช่างโยธาชำนาญงาน','นายช่างโยธาอาวุโส','วว.ทล.5','วบ.ทล.5','วผ.ทล.5'];
   ROLES_ASSISTANT=['ผู้ช่วยช่างควบคุมงาน','ช่างควบคุมงาน','เจ้าหน้าที่ควบคุมงาน','ผู้ควบคุมงานด้านวัสดุ','ผู้ตรวจสอบคุณภาพ'];
   knownNames(){
@@ -4307,7 +4318,7 @@ class Component extends DCLogic {
           pad:'8px',
           rowBg:'var(--color-neutral-100)',
           qty:(isHead||!this.num(it.qty))? '' : this.n(it.qty,3),
-          unit:(isHead||!this.num(it.qty))? '' : (it.unit||''),
+          unit:(isHead||!this.num(it.qty))? '' : this.workUnit(it.unit),
           price:(isHead||!this.num(it.qty))? '' : (this.num(it.price)? this.n(it.price,2):''),
           amount:(isHead||!this.num(it.qty))?'':this.n(this.num(it.qty)*this.num(it.price)),
           weight:(isHead||!this.num(it.qty))?'':this.n(w,3),
@@ -5534,7 +5545,7 @@ class Component extends DCLogic {
       const H={bold:true,fill:HEAD,align:'center'};
       const rows=[
         [C('',{fill:HEAD}),C('ค่างานในสัญญาต่อหน่วย',H),C('ปริมาณงาน',H),C('เป็นเงิน',H)],
-        [C(''),C(M(pr)+' บาท',{align:'center',bold:true}),C(it.unit||'',{align:'center'}),C('บาท',{align:'center'})],
+        [C(''),C(M(pr)+' บาท',{align:'center',bold:true}),C(this.workUnit(it.unit),{align:'center'}),C('บาท',{align:'center'})],
         [C('ตามสัญญา'),C(''),C(N(q),{align:'right'}),C(M(q*pr),{align:'right'})],
         [C('ถัวจ่าย'),C(''),C(tua? N(tua):'-',{align:'right'}),C(tua? M(tua*pr):'-',{align:'right'})],
         [C('ส่งงานถึงงวดที่แล้ว'),C(''),C(prev? N(prev):'-',{align:'right'}),C(prev? M(prev*pr):'-',{align:'right'})],
@@ -5639,6 +5650,7 @@ class Component extends DCLogic {
     const keys=this.weeksOf(d); d.weeks=d.weeks||{};
     delete d.weeks['undefined'];
     keys.forEach(k=>{ if(!d.weeks[k]) d.weeks[k]={plan:'',actual:{}}; });
+    (d.items||[]).forEach(it=>{ delete it.unitOther; it.unit=this.workUnit(String(it.unit||'').trim()); });
     const list=this.projects().map(x=>x.id===d.id?d:x);
     this.persist(list);
     this.logEdit('บันทึกข้อมูลสัญญา/แผนงาน — '+(d.contractNo||''));
@@ -6315,7 +6327,7 @@ class Component extends DCLogic {
         const cum=dls.reduce((t,d,i)=>t+this.dvQty(p,i,it.no),0);
         const over=cum>q+1e-9;
         return {
-          no:it.no, name:it.name||'', unit:it.unit||'',
+          no:it.no, name:it.name||'', unit:this.workUnit(it.unit),
           qtyTxt:this.n(q,3), tuaTxt:this.num(it.tua)? this.n(this.num(it.tua),3):'-',
           sumTxt:this.n(cum,3), leftTxt:this.n(q-cum,3), moneyTxt:this.cmoney(cum*pr),
           sumFg: over? 'var(--c-late)':'var(--color-text)',
@@ -6362,7 +6374,7 @@ class Component extends DCLogic {
           no:it.no, name:String(it.name||'').trim(), fw:'400', pad:'8px',
           rowBg:'var(--color-neutral-100)',
           qty:(isHead||!this.num(it.qty))? '' : this.n(it.qty,3),
-          unit:(isHead||!this.num(it.qty))? '' : (it.unit||''),
+          unit:(isHead||!this.num(it.qty))? '' : this.workUnit(it.unit),
           price:(isHead||!this.num(it.qty))? '' : (this.num(it.price)? this.n(it.price,2):''),
           amount:(isHead||!this.num(it.qty))?'':this.n(this.num(it.qty)*this.num(it.price)),
           weight:(isHead||!this.num(it.qty))?'':this.n(w,3),
@@ -6659,7 +6671,7 @@ class Component extends DCLogic {
       });
       out.committeeRoleOptions=this.ROLES_COMMITTEE;
       out.positionOptions=this.POSITIONS;
-      out.unitOptions=['ม.','ตร.ม.','ลบ.ม.','LS.','PS.'];
+      out.unitOptions=this.WORK_UNITS;
       out.assistantRoleOptions=this.ROLES_ASSISTANT;
       out.nameOptions=this.knownNames();
       out.addCommittee=()=>{ const nd=JSON.parse(JSON.stringify(d)); nd.committee=(nd.committee||[]).concat([{name:'',role:'',pos:''}]); this.setState({draft:nd}); };
@@ -6671,7 +6683,15 @@ class Component extends DCLogic {
         const fmt=(v,dg)=>(v===''||v===undefined||v===null||!this.num(v))? '' : this.n(this.num(v),dg);
         const show=(v,dg,k)=>foc===(i+':'+k)? v : fmt(v,dg);
         const hasQty=this.num(it.qty)>0;
-        return { no:it.no, name:it.name, hasQty, unit:hasQty? (it.unit||'') : '',
+        const unit=this.workUnit(it.unit);
+        const unitCustom=hasQty && (!!it.unitOther || (!!unit && !this.WORK_UNITS.includes(unit)));
+        const setUnitChoice=(v,other)=>{ const nd=JSON.parse(JSON.stringify(d)); nd.items[i].unit=v;
+          if(other) nd.items[i].unitOther=true; else delete nd.items[i].unitOther;
+          this.setState({draft:nd}); };
+        return { no:it.no, name:it.name, hasQty, unit:hasQty? unit : '',
+          unitCustom, unitFromList:hasQty && !unitCustom,
+          pickUnit:(e)=>{ const v=e.target.value; if(v==='__other') setUnitChoice('',true); else setUnitChoice(v,false); },
+          unitBackToList:()=>setUnitChoice('',false),
           qty:show(it.qty,3,'qty'), price:hasQty? show(it.price,2,'price') : '',
           focQty:()=>this.setState({itemFocus:i+':qty'}),
           focPrice:()=>this.setState({itemFocus:i+':price'}),
@@ -6680,7 +6700,7 @@ class Component extends DCLogic {
           weight: (hasQty&&tot)? this.n(amt*100/tot,3):'',
           tua:show(it.tua,3,'tua'), setTua:set('tua'),
           focTua:()=>this.setState({itemFocus:i+':tua'}),
-          setNo:set('no'), setName:set('name'), setQty:set('qty'), setUnit:set('unit'), setPrice:set('price'),
+          setNo:set('no'), setName:set('name'), setQty:set('qty'), setUnit:(e)=>setUnitChoice(e.target.value,true), setPrice:set('price'),
           remove:()=>{ const nd=JSON.parse(JSON.stringify(d)); nd.items.splice(i,1); this.setState({draft:nd}); },
           insertAfter:()=>{ const nd=JSON.parse(JSON.stringify(d)); nd.items.splice(i+1,0,{no:'',name:'',qty:0,unit:'',price:0}); this.setState({draft:nd}); } };
       });
