@@ -2704,9 +2704,7 @@ svg.leaflet-image-layer.leaflet-interactive path {
                 <div class="wk-card-hd">
                   <span class="wk-no">{{ s.idx }}</span>
                   <span class="wk-cno"><span class="wk-cno-lbl">สัญญาเลขที่</span> {{ s.h.contractNoVal }}</span>
-                  <sc-if value="{{ pg.mixedDates }}" hint-placeholder-val="{{ false }}">
-                    <span class="wk-card-date">ข้อมูล ณ {{ s.week.dateTh }}</span>
-                  </sc-if>
+                  <span class="wk-card-date">ข้อมูล ณ {{ s.week.dateTh }}</span>
                   <span class="wk-pill" style="background:{{ s.summary.bg }};color:{{ s.summary.fg }};border-color:{{ s.summary.bd }}">{{ s.summary.statusTxt }}</span>
                 </div>
 
@@ -6824,11 +6822,8 @@ class Component extends DCLogic {
         const total=Math.ceil(cards.length/PER_PAGE);
         for(let i=0;i<total;i++){
           const projects=cards.slice(i*PER_PAGE,(i+1)*PER_PAGE);
-          const dates=projects.map(c=>c.week.dateTh).filter((d,k,a)=>a.indexOf(d)===k);
-          const mixedDates=dates.length>1;
-          out.weeklyPages.push({ no:i+1, total, dept:deptTxt, projects, mixedDates, printedTh,
-            dateLbl: mixedDates? 'วันที่พิมพ์รายงาน' : 'ข้อมูล ณ วันที่',
-            dateVal: mixedDates? printedTh : dates[0],
+          out.weeklyPages.push({ no:i+1, total, dept:deptTxt, projects, printedTh,
+            dateLbl:'วันที่พิมพ์รายงาน', dateVal:printedTh,
             blanks: Array.from({length:PER_PAGE-projects.length},(_,k)=>({k})) });
         }
       }
