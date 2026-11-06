@@ -1568,9 +1568,56 @@ svg.leaflet-image-layer.leaflet-interactive path {
   ::selection{background:color-mix(in srgb, var(--color-accent) 30%, transparent)}
   ::-webkit-scrollbar{height:10px;width:10px}
   ::-webkit-scrollbar-thumb{background:var(--color-neutral-400);border-radius:999px}
+  /* รายงานประจำสัปดาห์: A4 แนวตั้ง หน้าละ 4 โครงการ — พื้นที่พิมพ์ 190x277mm (ขอบ 10mm) = 718x1047px */
+  .wk-scroll{overflow-x:auto;padding:2px 2px 8px}
+  .wk-sheet{width:794px;height:1123px;padding:38px;margin:0 auto 18px;background:#fff;box-shadow:0 1px 10px rgba(32,30,29,.18);color:#201e1d;font-size:10.5px;line-height:1.42}
+  .wk-fit{height:1044px;overflow:hidden}
+  .wk-page{width:100%;height:100%;display:flex;flex-direction:column;gap:10px;transform-origin:top left}
+  .wk-head{display:flex;align-items:center;gap:11px;padding-bottom:9px;border-bottom:2px solid var(--color-accent)}
+  .wk-logo{width:44px;height:44px;flex:none;object-fit:contain}
+  .wk-head-tx{flex:1;min-width:0}
+  .wk-title{font-family:var(--font-heading);font-size:16.5px;font-weight:700;line-height:1.3}
+  .wk-sub{font-size:11px;color:#645c50}
+  .wk-head-date{flex:none;text-align:right;line-height:1.3}
+  .wk-head-datelbl{font-size:9.5px;color:#645c50}
+  .wk-head-dateval{font-size:12.5px;font-weight:700;white-space:nowrap}
+  .wk-grid{flex:1 1 auto;display:grid;grid-auto-rows:1fr;gap:9px}
+  .wk-card{display:flex;flex-direction:column;border:1px solid #c0b6a5;border-radius:7px;overflow:hidden;break-inside:avoid;page-break-inside:avoid}
+  .wk-card-hd{display:flex;align-items:center;gap:8px;padding:5px 9px;background:#f4f1ea;border-bottom:1px solid #dcd3c4}
+  .wk-no{flex:none;width:20px;height:20px;border-radius:50%;background:#474238;color:#fff;font-size:10.5px;font-weight:700;display:flex;align-items:center;justify-content:center;font-variant-numeric:tabular-nums}
+  .wk-cno{flex:1;min-width:0;font-size:12px;font-weight:700}
+  .wk-cno-lbl{font-size:10px;font-weight:500;color:#645c50}
+  .wk-card-date{flex:none;font-size:9.5px;color:#645c50;white-space:nowrap}
+  .wk-pill{flex:none;font-size:10px;font-weight:700;line-height:1.3;padding:2px 9px;border:1px solid;border-radius:999px;white-space:nowrap}
+  .wk-card-bd{flex:1;display:grid;grid-template-columns:minmax(0,1fr) 312px;min-height:0}
+  .wk-prog{display:flex;flex-direction:column;gap:2px;padding:7px 10px 8px;min-width:0}
+  .wk-prog-line{font-size:10.5px;font-weight:500;line-height:1.5;color:#201e1d}
+  .wk-prog-line:empty{display:none}
+  .wk-prog-para{text-align:justify;text-justify:inter-character}
+  .wk-bars{margin-top:auto;padding-top:6px;display:flex;flex-direction:column;gap:3px}
+  .wk-bar-row{display:grid;grid-template-columns:62px minmax(0,1fr) 62px;align-items:center;gap:6px}
+  .wk-bar-lbl{font-size:10px;color:#474238;white-space:nowrap}
+  .wk-bar-track{height:8px;background:#eee7db;border-radius:4px;overflow:hidden}
+  .wk-bar-fill{display:block;height:100%;border-radius:4px}
+  .wk-bar-plan{background:var(--color-accent-2-700)}
+  .wk-bar-act{background:var(--color-accent)}
+  .wk-bar-val{font-size:10.5px;font-weight:700;text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
+  .wk-bar-delta{margin-top:1px}
+  .wk-bar-delta .wk-bar-lbl{font-weight:700}
+  .wk-kv{display:flex;flex-direction:column;justify-content:center;gap:2px;padding:7px 10px;border-left:1px solid #dcd3c4;min-width:0}
+  .wk-kv-row{display:grid;grid-template-columns:88px minmax(0,1fr);gap:6px;align-items:baseline}
+  .wk-one-line{display:inline-block;white-space:nowrap}
+  .wk-k{font-size:9.5px;color:#645c50;white-space:nowrap}
+  .wk-v{font-size:10.5px;font-weight:600;overflow-wrap:anywhere}
+  .wk-num{font-variant-numeric:tabular-nums}
+  .wk-note{padding:4px 10px;border-top:1px solid #dcd3c4;font-size:10px;line-height:1.38;color:#2e2b25}
+  .wk-note-lbl{font-weight:700;color:#645c50;margin-right:3px}
+  .wk-foot{display:flex;justify-content:space-between;gap:12px;padding-top:5px;border-top:1px solid #dcd3c4;font-size:9px;color:#645c50}
   @media print{
     body{background:var(--color-neutral-100)}
     .noprint{display:none !important}
+    .wk-scroll{overflow:visible !important;padding:0 !important}
+    .wk-sheet{height:auto !important}
     .printsheet{box-shadow:none !important;margin:0 !important;border:0 !important;padding:0 !important;width:var(--fit-w,100%) !important;max-width:none !important;break-inside:avoid;page-break-inside:avoid}
     [data-print-root],[data-print-wrap]{padding:0 !important;margin:0 !important;min-height:0 !important;max-width:none !important}
     .printsheet{break-after:auto !important;page-break-after:auto !important}
@@ -2082,7 +2129,7 @@ svg.leaflet-image-layer.leaflet-interactive path {
                 </div>
               </sc-raw-td>
               <sc-raw-td style="padding:6px 8px;border:1px solid var(--color-divider);text-align:right;font-size:11.5px;font-variant-numeric:tabular-nums;">{{ w.valueTxt }}</sc-raw-td>
-              <sc-raw-td style="padding:6px 8px;border:1px solid var(--color-divider);text-align:center;font-size:11.5px;line-height:1.45"><div>{{ w.startTxt }}</div><div>{{ w.endTxt }}</div></sc-raw-td>
+              <sc-raw-td style="padding:6px 8px;border:1px solid var(--color-divider);text-align:center;font-size:11.5px;line-height:1.45"><div>{{ w.startTxt }}</div><sc-for list="{{ w.endLines }}" as="e" hint-placeholder-count="1"><div style="white-space:nowrap">{{ e }}</div></sc-for></sc-raw-td>
               <sc-raw-td style="padding:6px 8px;border:1px solid var(--color-divider);text-align:center;font-size:11.5px;font-variant-numeric:tabular-nums;">{{ w.durTxt }}</sc-raw-td>
               <sc-raw-td style="padding:6px 8px;border:1px solid var(--color-divider);text-align:left;font-size:11.5px;font-variant-numeric:tabular-nums;line-height:1.4">{{ w.contractor }}</sc-raw-td>
               <sc-raw-td style="padding:6px 8px;border:1px solid var(--color-divider);text-align:right;font-size:11.5px;font-variant-numeric:tabular-nums;">{{ w.fineTxt }}</sc-raw-td>
@@ -2248,7 +2295,9 @@ svg.leaflet-image-layer.leaflet-interactive path {
             <sc-raw-td style="padding:7px 8px;border:1px solid var(--color-divider);text-align:right;vertical-align:top;font-variant-numeric:tabular-nums">{{ r.value }}</sc-raw-td>
             <sc-raw-td style="padding:7px 8px;border:1px solid var(--color-divider);text-align:center;vertical-align:top;line-height:1.4">
               <div>{{ r.start }}</div>
-              <div style="color:var(--color-neutral-600)">{{ r.end }}</div>
+              <sc-for list="{{ r.endLines }}" as="e" hint-placeholder-count="1">
+                <div style="color:var(--color-neutral-600);white-space:nowrap">{{ e }}</div>
+              </sc-for>
             </sc-raw-td>
             <sc-raw-td style="padding:7px 8px;border:1px solid var(--color-divider);text-align:center;vertical-align:top">
               <div>{{ r.duration }} วัน</div>
@@ -2302,6 +2351,7 @@ svg.leaflet-image-layer.leaflet-interactive path {
             <button sc-camel-on-click="{{ exportSchedule }}" style="background:transparent;border:0;border-radius:var(--radius-sm);padding:8px 12px;font-size:13px;font-family:var(--font-body);color:var(--color-text);cursor:pointer;text-align:left;white-space:nowrap" style-hover="background:var(--color-neutral-200)">Schedule</button>
             <button sc-camel-on-click="{{ exportScheduleAll }}" style="background:transparent;border:0;border-radius:var(--radius-sm);padding:8px 12px;font-size:13px;font-family:var(--font-body);color:var(--color-text);text-align:left;cursor:pointer" style-hover="background:var(--color-accent-100)">Schedule ทุกสัปดาห์ (A4 นอน)</button>
             <button sc-camel-on-click="{{ exportCurrent }}" style="background:transparent;border:0;border-radius:var(--radius-sm);padding:8px 12px;font-size:13px;font-family:var(--font-body);color:var(--color-text);cursor:pointer;text-align:left;white-space:nowrap" style-hover="background:var(--color-neutral-200)">รายงานประจำสัปดาห์</button>
+            <button sc-camel-on-click="{{ exportItemsXlsx }}" style="background:transparent;border:0;border-radius:var(--radius-sm);padding:8px 12px;font-size:13px;font-family:var(--font-body);color:var(--color-text);cursor:pointer;text-align:left;white-space:nowrap" style-hover="background:var(--color-neutral-200)">รายการก่อสร้าง (Excel)</button>
             <div class="lbl" style="font-size:11px;letter-spacing:.05em;padding:8px 12px 3px">งานนำเสนอตรวจรับงาน</div>
             <button sc-camel-on-click="{{ pptxExport }}" style="background:transparent;border:0;border-radius:var(--radius-sm);padding:8px 12px 8px 22px;font-size:13px;font-family:var(--font-body);color:var(--color-text);text-align:left;cursor:pointer" style-hover="background:var(--color-accent-100)">งานนำเสนอ (.pptx)</button>
             <div class="lbl" style="font-size:11px;letter-spacing:.05em;padding:8px 12px 3px">ใบปะหน้าประจำสัปดาห์ (Word)</div>
@@ -2604,8 +2654,9 @@ svg.leaflet-image-layer.leaflet-interactive path {
     <sc-if value="{{ canBackToProject }}" hint-placeholder-val="{{ false }}">
       <button sc-camel-on-click="{{ backToProject }}" class="btn btn-secondary" style="white-space:nowrap;font-size:13px;cursor:pointer">← กลับหน้าโครงการ</button>
     </sc-if>
-    <span class="lbl" style="font-size:12.5px">ชุดรายงาน {{ sheetCount }} โครงการ — โครงการละ 1 หน้า</span>
+    <span class="lbl" style="font-size:12.5px">{{ printSummary }}</span>
     <div style="margin-left:auto;display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap">
+      <sc-if value="{{ showPaperPick }}" hint-placeholder-val="{{ false }}">
       <label style="display:flex;flex-direction:column;gap:3px">
         <span class="lbl" style="font-size:11px">ขนาดกระดาษ</span>
         <sc-raw-select value="{{ paperSize }}" sc-camel-on-change="{{ setPaper }}" style="border:1px solid var(--color-divider);border-radius:999px;padding:6px 12px;font-size:12.5px;background:var(--color-neutral-100)">
@@ -2622,16 +2673,99 @@ svg.leaflet-image-layer.leaflet-interactive path {
           <option value="portrait">แนวตั้ง</option>
         </sc-raw-select>
       </label>
+      </sc-if>
       <button sc-camel-on-click="{{ doPrintNow }}" class="btn btn-primary" style="white-space:nowrap;font-size:13px;cursor:pointer">PDF (สั่งพิมพ์)</button>
       <button sc-camel-on-click="{{ exportImages }}" class="btn btn-secondary" style="white-space:nowrap;font-size:13px;cursor:pointer">รูปภาพ .png (ส่งไลน์)</button>
     </div>
   </div>
 
+  <div class="wk-scroll">
+  <sc-for list="{{ weeklyPages }}" as="pg" hint-placeholder-count="1">
+    <div class="printsheet wk-sheet">
+      <div class="wk-fit">
+        <div class="wk-page">
+          <div class="wk-head">
+            <img class="wk-logo" src="./icons/icon-192.png" alt="">
+            <div class="wk-head-tx">
+              <div class="wk-title">รายงานผลงานก้าวหน้าโครงการก่อสร้างทาง</div>
+              <div class="wk-sub">ส่วนควบคุมงานก่อสร้างทาง &nbsp;{{ pg.dept }}</div>
+            </div>
+            <div class="wk-head-date">
+              <div class="wk-head-datelbl">{{ pg.dateLbl }}</div>
+              <div class="wk-head-dateval">{{ pg.dateVal }}</div>
+            </div>
+          </div>
+
+          <div class="wk-grid">
+            <sc-for list="{{ pg.projects }}" as="s" hint-placeholder-count="4">
+              <div class="wk-card">
+                <div class="wk-card-hd">
+                  <span class="wk-no">{{ s.idx }}</span>
+                  <span class="wk-cno"><span class="wk-cno-lbl">สัญญาเลขที่</span> {{ s.h.contractNoVal }}</span>
+                  <sc-if value="{{ pg.mixedDates }}" hint-placeholder-val="{{ false }}">
+                    <span class="wk-card-date">ข้อมูล ณ {{ s.week.dateTh }}</span>
+                  </sc-if>
+                  <span class="wk-pill" style="background:{{ s.summary.bg }};color:{{ s.summary.fg }};border-color:{{ s.summary.bd }}">{{ s.summary.statusTxt }}</span>
+                </div>
+
+                <div class="wk-card-bd">
+                  <div class="wk-prog">
+                    <div class="wk-prog-line wk-prog-para"><sc-for list="{{ s.h.projectParts }}" as="x" hint-placeholder-count="1"><span style="white-space:{{ x.ws }}">{{ x.t }}</span></sc-for></div>
+
+                    <div class="wk-bars">
+                      <div class="wk-bar-row">
+                        <span class="wk-bar-lbl">แผนงาน</span>
+                        <span class="wk-bar-track"><span class="wk-bar-fill wk-bar-plan" style="width:{{ s.summary.planW }}%"></span></span>
+                        <span class="wk-bar-val">{{ s.summary.plan }} %</span>
+                      </div>
+                      <div class="wk-bar-row">
+                        <span class="wk-bar-lbl">ผลงาน</span>
+                        <span class="wk-bar-track"><span class="wk-bar-fill wk-bar-act" style="width:{{ s.summary.actualW }}%"></span></span>
+                        <span class="wk-bar-val">{{ s.summary.actual }} %</span>
+                      </div>
+                      <div class="wk-bar-row wk-bar-delta">
+                        <span class="wk-bar-lbl">{{ s.summary.deltaLbl }}</span>
+                        <span></span>
+                        <span class="wk-bar-val" style="color:{{ s.summary.fg }}">{{ s.summary.deltaTxt }} %</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="wk-kv">
+                    <div class="wk-kv-row"><span class="wk-k">ผู้รับจ้าง</span><span class="wk-v"><span class="wk-one-line">{{ s.h.contractor }}</span></span></div>
+                    <div class="wk-kv-row"><span class="wk-k">ผู้ควบคุมงาน</span><span class="wk-v">{{ s.h.supervisor }}</span></div>
+                    <div class="wk-kv-row"><span class="wk-k">ผู้ควบคุมงานด้านวัสดุ</span><span class="wk-v">{{ s.h.materialTxt }}</span></div>
+                    <div class="wk-kv-row"><span class="wk-k">วันเริ่มสัญญา</span><span class="wk-v">{{ s.h.startTh }}</span></div>
+                    <div class="wk-kv-row"><span class="wk-k">{{ s.h.endLabel1Short }}</span><span class="wk-v">{{ s.h.end1 }}</span></div>
+                    <sc-if value="{{ s.h.hasNewEnd }}" hint-placeholder-val="{{ false }}">
+                      <div class="wk-kv-row"><span class="wk-k">สิ้นสุดสัญญา (ใหม่)</span><span class="wk-v">{{ s.h.end2 }}</span></div>
+                    </sc-if>
+                    <div class="wk-kv-row"><span class="wk-k">ระยะเวลา</span><span class="wk-v wk-num">{{ s.h.duration }} วัน</span></div>
+                    <div class="wk-kv-row"><span class="wk-k">ค่างาน</span><span class="wk-v wk-num">{{ s.h.valueTxt }} บาท</span></div>
+                    <div class="wk-kv-row"><span class="wk-k">ค่าปรับวันละ</span><span class="wk-v wk-num">{{ s.h.fineTxt }} บาท</span></div>
+                  </div>
+                </div>
+
+                <div class="wk-note"><span class="wk-note-lbl">หมายเหตุ</span> {{ s.h.note }}</div>
+              </div>
+            </sc-for>
+            <sc-for list="{{ pg.blanks }}" as="b" hint-placeholder-count="0">
+              <div></div>
+            </sc-for>
+          </div>
+
+          <div class="wk-foot">
+            <span>ระบบติดตามงานก่อสร้าง · พิมพ์เมื่อ {{ pg.printedTh }}</span>
+            <span>หน้า {{ pg.no }} / {{ pg.total }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </sc-for>
+  </div>
+
   <sc-for list="{{ sheets }}" as="s" hint-placeholder-count="1">
     <div class="printsheet" style="background:#ffffff;border:0;border-radius:var(--radius-lg);padding:14px 16px;margin-bottom:var(--space-4);width:{{ sheetWidth }};max-width:100%">
-      <sc-if value="{{ s.plainChart }}" hint-placeholder-val="{{ true }}">
-        <div class="hd" style="text-align:center;font-size:16px;line-height:1.35;margin-bottom:9px">{{ s.title }}</div>
-      </sc-if>
       <sc-if value="{{ s.showItems }}" hint-placeholder-val="{{ false }}">
       <div style="text-align:center;line-height:1.4">
         <div class="hd" style="font-size:15px">{{ s.h.dept }}</div>
@@ -2647,7 +2781,13 @@ svg.leaflet-image-layer.leaflet-interactive path {
       <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px 20px;margin:10px 0;font-size:12px">
         <div style="display:flex;flex-direction:column;gap:2px">
           <div><span class="lbl">เริ่มสัญญาวันที่ </span><span class="val">{{ s.h.startTh }}</span></div>
-          <div><span class="lbl">วันสิ้นสุดสัญญาวันที่ </span><span class="val">{{ s.h.endTh }}</span></div>
+          <sc-if value="{{ s.h.hasNewEnd }}" hint-placeholder-val="{{ false }}">
+            <div><span class="lbl">วันสิ้นสุดสัญญา (เดิม) วันที่ </span><span class="val">{{ s.h.endOrigTh }}</span></div>
+            <div><span class="lbl">วันสิ้นสุดสัญญา (ใหม่) วันที่ </span><span class="val">{{ s.h.endNewTh }}</span></div>
+          </sc-if>
+          <sc-if value="{{ s.h.noNewEnd }}" hint-placeholder-val="{{ true }}">
+            <div><span class="lbl">วันสิ้นสุดสัญญาวันที่ </span><span class="val">{{ s.h.endTh }}</span></div>
+          </sc-if>
           <div><span class="lbl">เวลาทำการ </span><span class="val">{{ s.h.duration }} วัน</span></div>
         </div>
         <div style="display:flex;flex-direction:column;gap:2px">
@@ -2772,85 +2912,6 @@ svg.leaflet-image-layer.leaflet-interactive path {
       </div>
       </sc-if>
 
-      <sc-if value="{{ s.plainChart }}" hint-placeholder-val="{{ true }}">
-      <sc-raw-table style="border-collapse:collapse;width:100%;table-layout:fixed;font-size:12.5px;line-height:1.5">
-        
-          
-          
-          
-          
-          
-          
-          
-          
-          
-        
-        <sc-raw-thead>
-          <sc-raw-tr>
-            <sc-raw-th class="hd" style="border:1px solid var(--color-neutral-800);padding:3px 2px;font-size:11.5px;vertical-align:middle">ลำดับที่</sc-raw-th>
-            <sc-raw-th class="hd" sc-camel-col-span="8" style="border:1px solid var(--color-neutral-800);padding:4px 6px;font-size:14.5px">โครงการ</sc-raw-th>
-          </sc-raw-tr>
-        </sc-raw-thead>
-        <sc-raw-tbody>
-          <sc-raw-tr>
-            <sc-raw-td sc-camel-row-span="8" class="val" style="border:1px solid var(--color-neutral-800);text-align:center;font-size:14px">{{ s.idx }}</sc-raw-td>
-            <sc-raw-td class="lbl" style="border:1px solid var(--color-neutral-800);padding:4px 10px 4px 4px;text-align:right;white-space:nowrap;font-size:11.5px">สัญญาเลขที่ :</sc-raw-td>
-            <sc-raw-td sc-camel-col-span="4" class="val" style="border:1px solid var(--color-neutral-800);padding:4px 8px">{{ s.h.contractNoVal }}</sc-raw-td>
-            <sc-raw-td class="lbl" style="border:1px solid var(--color-neutral-800);padding:4px 10px 4px 4px;text-align:right;white-space:nowrap;font-size:11.5px">ผู้รับจ้าง :</sc-raw-td>
-            <sc-raw-td sc-camel-col-span="2" class="val" style="border:1px solid var(--color-neutral-800);padding:4px 8px">{{ s.h.contractor }}</sc-raw-td>
-          </sc-raw-tr>
-          <sc-raw-tr>
-            <sc-raw-td sc-camel-col-span="5" class="val" style="border:1px solid var(--color-neutral-800);padding:4px 8px;font-weight:400">{{ s.h.program1 }}</sc-raw-td>
-            <sc-raw-td class="lbl" style="border:1px solid var(--color-neutral-800);padding:4px 10px 4px 4px;text-align:right;white-space:nowrap;font-size:11.5px">วันเริ่มสัญญา :</sc-raw-td>
-            <sc-raw-td sc-camel-col-span="2" class="val" style="border:1px solid var(--color-neutral-800);padding:4px 8px">{{ s.h.startTh }}</sc-raw-td>
-          </sc-raw-tr>
-          <sc-raw-tr>
-            <sc-raw-td sc-camel-col-span="5" class="val" style="border:1px solid var(--color-neutral-800);padding:4px 8px;font-weight:400">{{ s.h.program2 }}</sc-raw-td>
-            <sc-raw-td class="lbl" style="border:1px solid var(--color-neutral-800);padding:4px 10px 4px 4px;text-align:right;white-space:nowrap;font-size:11.5px">{{ s.h.endLabel1 }}</sc-raw-td>
-            <sc-raw-td sc-camel-col-span="2" class="val" style="border:1px solid var(--color-neutral-800);padding:4px 8px">{{ s.h.end1 }}</sc-raw-td>
-          </sc-raw-tr>
-          <sc-raw-tr>
-            <sc-raw-td sc-camel-col-span="5" class="val" style="border:1px solid var(--color-neutral-800);padding:4px 8px;font-weight:400">{{ s.h.projectName }}</sc-raw-td>
-            <sc-raw-td class="lbl" style="border:1px solid var(--color-neutral-800);padding:4px 10px 4px 4px;text-align:right;white-space:nowrap;font-size:11.5px">{{ s.h.endLabel2 }}</sc-raw-td>
-            <sc-raw-td sc-camel-col-span="2" class="val" style="border:1px solid var(--color-neutral-800);padding:4px 8px">{{ s.h.end2 }}</sc-raw-td>
-          </sc-raw-tr>
-          <sc-raw-tr>
-            <sc-raw-td sc-camel-col-span="5" class="val" style="border:1px solid var(--color-neutral-800);padding:4px 8px;font-weight:400">{{ s.h.location }}</sc-raw-td>
-            <sc-raw-td class="lbl" style="border:1px solid var(--color-neutral-800);padding:4px 10px 4px 4px;text-align:right;white-space:nowrap;font-size:11.5px">ระยะเวลา :</sc-raw-td>
-            <sc-raw-td class="val" style="border:1px solid var(--color-neutral-800);padding:3px 6px;text-align:right;font-variant-numeric:tabular-nums">{{ s.h.duration }}</sc-raw-td>
-            <sc-raw-td class="lbl" style="border:1px solid var(--color-neutral-800);padding:4px 8px">วัน</sc-raw-td>
-          </sc-raw-tr>
-          <sc-raw-tr>
-            <sc-raw-td sc-camel-col-span="5" style="border:1px solid var(--color-neutral-800);padding:4px 8px">&nbsp;</sc-raw-td>
-            <sc-raw-td class="lbl" style="border:1px solid var(--color-neutral-800);padding:4px 10px 4px 4px;text-align:right;white-space:nowrap;font-size:11.5px">ค่างาน :</sc-raw-td>
-            <sc-raw-td class="val" style="border:1px solid var(--color-neutral-800);padding:3px 6px;text-align:right;font-variant-numeric:tabular-nums">{{ s.h.valueTxt }}</sc-raw-td>
-            <sc-raw-td class="lbl" style="border:1px solid var(--color-neutral-800);padding:4px 8px">บาท</sc-raw-td>
-          </sc-raw-tr>
-          <sc-raw-tr>
-            <sc-raw-td sc-camel-row-span="2" class="lbl" style="border:1px solid var(--color-neutral-800);padding:3px 6px;vertical-align:middle">แผนงาน/ผลงาน</sc-raw-td>
-            <sc-raw-td class="lbl" style="border:1px solid var(--color-neutral-800);padding:3px 6px;text-align:center;color:var(--color-accent-2-700)">แผนงาน (%)</sc-raw-td>
-            <sc-raw-td class="lbl" style="border:1px solid var(--color-neutral-800);padding:3px 6px;text-align:center;color:var(--c-late)">ผลงาน (%)</sc-raw-td>
-            <sc-raw-td class="lbl" style="border:1px solid var(--color-neutral-800);padding:3px 6px;text-align:center">เร็วกว่า (%)</sc-raw-td>
-            <sc-raw-td class="lbl" style="border:1px solid var(--color-neutral-800);padding:3px 6px;text-align:center">ช้ากว่า (%)</sc-raw-td>
-            <sc-raw-td class="lbl" style="border:1px solid var(--color-neutral-800);padding:4px 10px 4px 4px;text-align:right;white-space:nowrap;font-size:11.5px">ค่าปรับวันละ :</sc-raw-td>
-            <sc-raw-td class="val" style="border:1px solid var(--color-neutral-800);padding:3px 6px;text-align:right;font-variant-numeric:tabular-nums">{{ s.h.fineTxt }}</sc-raw-td>
-            <sc-raw-td class="lbl" style="border:1px solid var(--color-neutral-800);padding:4px 8px">บาท</sc-raw-td>
-          </sc-raw-tr>
-          <sc-raw-tr>
-            <sc-raw-td class="val" style="border:1px solid var(--color-neutral-800);padding:3px 6px;text-align:center;font-variant-numeric:tabular-nums;color:var(--color-accent-2-700)">{{ s.summary.plan }}</sc-raw-td>
-            <sc-raw-td class="val" style="border:1px solid var(--color-neutral-800);padding:3px 6px;text-align:center;font-variant-numeric:tabular-nums;color:var(--color-accent-700)">{{ s.summary.actual }}</sc-raw-td>
-            <sc-raw-td class="val" style="border:1px solid var(--color-neutral-800);padding:3px 6px;text-align:center;font-variant-numeric:tabular-nums">{{ s.summary.ahead }}</sc-raw-td>
-            <sc-raw-td class="val" style="border:1px solid var(--color-neutral-800);padding:3px 6px;text-align:center;font-variant-numeric:tabular-nums">{{ s.summary.behind }}</sc-raw-td>
-            <sc-raw-td class="lbl" style="border:1px solid var(--color-neutral-800);padding:4px 10px 4px 4px;text-align:right;white-space:nowrap;font-size:11.5px">ผู้ควบคุมงาน :</sc-raw-td>
-            <sc-raw-td sc-camel-col-span="2" class="val" style="border:1px solid var(--color-neutral-800);padding:4px 8px">{{ s.h.supervisor }}</sc-raw-td>
-          </sc-raw-tr>
-          <sc-raw-tr>
-            <sc-raw-td sc-camel-col-span="2" class="lbl" style="border:1px solid var(--color-neutral-800);padding:4px 10px 4px 4px;text-align:right;white-space:nowrap;font-size:11.5px">หมายเหตุ :</sc-raw-td>
-            <sc-raw-td sc-camel-col-span="7" class="val" style="border:1px solid var(--color-neutral-800);padding:3px 6px;text-align:center;color:var(--c-late);font-weight:400">{{ s.h.note }}</sc-raw-td>
-          </sc-raw-tr>
-        </sc-raw-tbody>
-      </sc-raw-table>
-      </sc-if>
       </div>
       <sc-if value="{{ s.showItems }}" hint-placeholder-val="{{ false }}">
         <div style="display:flex;gap:18px;align-items:center;border:1px solid var(--color-neutral-400);border-top:0;padding:4px 8px;font-size:9px">
@@ -3046,6 +3107,20 @@ svg.leaflet-image-layer.leaflet-interactive path {
             <div style="grid-column:span {{ r.span }};overflow-wrap:anywhere"><span style="color:var(--color-text)">{{ r.label }} </span><span style="color:#c2410c">{{ r.value }}</span></div>
           </sc-for>
         </div>
+      </sc-if>
+
+      <sc-if value="{{ appt.hasContract }}" hint-placeholder-val="{{ true }}">
+      <div style="margin-top:16px;border-top:1px solid var(--color-divider);padding-top:12px">
+        <div class="hd" style="font-size:14px;margin-bottom:8px">ข้อมูลสัญญา</div>
+        <div style="display:flex;flex-direction:column">
+          <sc-for list="{{ appt.contract }}" as="c" hint-placeholder-count="5">
+            <div style="display:flex;flex-wrap:wrap;gap:2px 12px;padding:8px 0;border-top:1px solid var(--color-divider)">
+              <div style="flex:0 0 170px;font-size:13px;font-weight:700;line-height:1.5;color:var(--color-accent-700)">{{ c.label }}</div>
+              <div class="val" style="flex:1 1 270px;min-width:0;font-size:13px;line-height:1.5;font-variant-numeric:tabular-nums">{{ c.value }}</div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
       </sc-if>
 
       <div style="margin-top:16px;border-top:1px solid var(--color-divider);padding-top:12px">
@@ -4282,6 +4357,19 @@ class Component extends DCLogic {
   }
 
   /* ---------- printable sheet (read-only) ---------- */
+  /* ชื่อโครงการ ทางหลวง และสถานที่ ต่อกันเป็นย่อหน้าเดียว แบ่งเป็นท่อน ๆ เพื่อไม่ให้ตัดบรรทัดกลางชื่อตอน ช่วง กม. ตำบล/อำเภอ/จังหวัด ปริมาณงานในวงเล็บ หรือระหว่างคำกับตัวเลข */
+  wkProjectParts(p){
+    const txt=[p.program1,p.program2,p.program3,p.projectName,p.location].map(x=>String(x||'').trim()).filter(Boolean).join(' ').replace(/\s+/g,' ');
+    const keep=/ตอน\s\S+(?:\s[-–])?|(?:ระหว่าง\s)?กม\.\S+(?:\s[-–])?|(?:ตำบล|อำเภอ|จังหวัด)\S{1,24}(?:\s\d+)?|ระยะทาง\s\S+\s\S+|พ\.ศ\.\s?\d+|\(\S+\s\S+\)|(?<=[-–]\s)\S+|\S{1,8}\s\d[\d.,+]*/g;
+    const parts=[]; let last=0, m;
+    while((m=keep.exec(txt))){
+      if(m.index>last) parts.push({t:txt.slice(last,m.index), ws:'normal'});
+      parts.push({t:m[0], ws:'nowrap'});
+      last=m.index+m[0].length;
+    }
+    if(last<txt.length) parts.push({t:txt.slice(last), ws:'normal'});
+    return parts;
+  }
   sheetData(p, wkIdx){
     const keys=this.weeksOf(p);
     const wk=Math.min(Math.max(wkIdx||0,0), Math.max(keys.length-1,0));
@@ -4291,7 +4379,9 @@ class Component extends DCLogic {
     const st=this.status(diff), total=this.totalAmount(p);
     const over=wk>=this.contractWeekCount(p);
     return {
-      h:{ materialTxt:p.materialInspector||'-', contractNo:p.contractNo, dept:p.dept+(p.section?("  ·  "+p.section):""), program1:p.program1, program2:p.program2, program3:p.program3||'',
+      h:{ noNewEnd: !this.hasNewEnd(p), endLabel1Short: this.hasNewEnd(p)? 'สิ้นสุดสัญญา (เดิม)' : 'วันสิ้นสุดสัญญา',
+        projectParts:this.wkProjectParts(p),
+        materialTxt:p.materialInspector||'-', contractNo:p.contractNo, dept:p.dept+(p.section?("  ·  "+p.section):""), program1:p.program1, program2:p.program2, program3:p.program3||'',
         projectName:p.projectName, location:p.location,
         materialTxt:p.materialInspector||'-',
         startTh:this.th(p.startDate), endTh:this.th(this.endOf(p)),
@@ -4329,7 +4419,10 @@ class Component extends DCLogic {
       totals:{ amount:this.n(total), weight:this.n((p.items||[]).reduce((s,it)=>s+this.weight(p,it),0),3), actual:this.n(actual,3) },
       summary:{ plan:this.n(plan,3), actual:this.n(actual,3),
         ahead: diff>0? this.n(diff,3):'-', behind: diff<0? this.n(diff,3):'-',
-        bg:st.bg, fg:st.fg, bd:st.bd,
+        bg:st.bg, fg:st.fg, bd:st.bd, statusTxt:st.txt,
+        planW:Math.min(100,Math.max(0,plan)), actualW:Math.min(100,Math.max(0,actual)),
+        deltaLbl: diff>0? 'เร็วกว่าแผน' : (diff<0? 'ช้ากว่าแผน' : 'ตรงตามแผน'),
+        deltaTxt: (diff>0?'+':'')+this.n(diff,3),
         sentence:'แผนงาน '+this.n(plan,3)+' %   ผลงาน '+this.n(actual,3)+' %   ผลงาน '+(diff<0?'ช้า':'เร็ว')+' กว่า แผนงาน '+this.n(diff,3)+' %' },
       chart:this.chartEl(p,keys,wk)
     };
@@ -4381,12 +4474,28 @@ class Component extends DCLogic {
   }
 
   PAPER_MM={A4:[297,210],A3:[420,297],Letter:[279.4,215.9],Legal:[355.6,215.9]};
+  /* รายงานประจำสัปดาห์: ถ้าข้อความยาวจนล้นหน้า ย่อทั้งหน้าลงให้พอดี 1 แผ่น */
+  fitWeekly = () => {
+    /* ชื่อผู้รับจ้างต้องอยู่บรรทัดเดียว: ถ้ายาวเกินช่องให้ลดขนาดตัวอักษรลงเฉพาะชื่อนั้น */
+    document.querySelectorAll('.wk-one-line').forEach(el=>{
+      el.style.fontSize='';
+      const room=el.parentElement.clientWidth, w=el.offsetWidth;
+      if(w>room) el.style.fontSize=(parseFloat(getComputedStyle(el).fontSize)*room/w*0.995)+'px';
+    });
+    document.querySelectorAll('.wk-page').forEach(el=>{
+      el.style.transform=''; el.style.width=''; el.style.height='';
+      const H=el.parentElement.clientHeight, h=el.scrollHeight;
+      if(h>H+1){ const s=H/h;
+        el.style.transform='scale('+s+')'; el.style.width=(100/s)+'%'; el.style.height=(100/s)+'%'; }
+    });
+  };
   fitPrint = () => {
+    this.fitWeekly();
     const p=this.PAPER_MM[this.state.paper]||this.PAPER_MM.A4;
     const land=(this.state.orient||'landscape')==='landscape';
     const px=(mm)=>mm*96/25.4;
     const availH=px((land?p[1]:p[0])-12)-6;
-    document.querySelectorAll('.printsheet').forEach(el=>{
+    document.querySelectorAll('.printsheet:not(.wk-sheet)').forEach(el=>{
       el.style.transform='';el.style.height='';el.style.removeProperty('--fit-w');
       const h=el.scrollHeight;
       if(h>availH){
@@ -4398,7 +4507,7 @@ class Component extends DCLogic {
       }
     });
   };
-  unfitPrint = () => document.querySelectorAll('.printsheet').forEach(el=>{el.style.transform='';el.style.height='';el.style.removeProperty('--fit-w');});
+  unfitPrint = () => document.querySelectorAll('.printsheet:not(.wk-sheet)').forEach(el=>{el.style.transform='';el.style.height='';el.style.removeProperty('--fit-w');});
 
   exportImages = (baseName) => {
     const base=(typeof baseName==='string'&&baseName)||'รายงานสัปดาห์';
@@ -4707,8 +4816,10 @@ class Component extends DCLogic {
   syncPage(){
     let el=document.getElementById('om-page-rule');
     if(!el){ el=document.createElement('style'); el.id='om-page-rule'; document.head.appendChild(el); }
-    const size=this.state.paper||'A4', o=this.state.orient||'landscape';
-    el.textContent='@page{size:'+size+' '+o+';margin:6mm}';
+    /* รายงานประจำสัปดาห์ล็อกเป็น A4 แนวตั้งเสมอ โดยไม่แตะค่ากระดาษของ Schedule และหน้าภาพรวม */
+    const weekly=this.state.view==='print' && !this.state.scheduleMode;
+    const size=weekly? 'A4' : (this.state.paper||'A4'), o=weekly? 'portrait' : (this.state.orient||'landscape');
+    el.textContent='@page{size:'+size+' '+o+';margin:'+(weekly?'10mm':'6mm')+'}';
   }
   exportHomePdf = () => { this.syncPage(); setTimeout(()=>window.print(),60); };
   exportHomeJpg = () => this.exportImages('ภาพรวมโครงการ');
@@ -5144,6 +5255,25 @@ class Component extends DCLogic {
     const loc=(p.location||'').trim();
     return (p.contractNo||'โครงการ')+(loc?' — '+loc:'');
   }
+  /* บรรทัดวันสิ้นสุดในคอลัมน์ "เริ่ม / สิ้นสุดสัญญา": ถ้าขยายสัญญาให้แสดงทั้งเดิมและใหม่ */
+  endLines(p){
+    if(this.hasNewEnd(p)) return [(this.thShort(p.endDateOrig)||'-')+' (เดิม)', (this.thShort(p.endDate)||'-')+' (ใหม่)'];
+    const e=this.endOf(p);
+    return [e? this.thShort(e) : '-'];
+  }
+  contractFacts(p){
+    const money=(v)=>String(v===undefined||v===null?'':v).trim()===''? '-' : this.n(v)+' บาท';
+    const newEnd=this.hasNewEnd(p), dur=this.durOf(p);
+    return [
+      {label:'วันเริ่มสัญญา', value:this.th(p.startDate)||'-'},
+      ...(newEnd
+        ? [{label:'วันสิ้นสุดสัญญา (เดิม)', value:this.th(p.endDateOrig)||'-'}, {label:'วันสิ้นสุดสัญญา (ใหม่)', value:this.th(p.endDate)||'-'}]
+        : [{label:'วันสิ้นสุดสัญญา', value:this.th(this.endOf(p))||'-'}]),
+      {label:'ระยะเวลา', value:dur? dur+' วัน' : '-'},
+      {label:'ค่างาน', value:money(p.contractValue)},
+      {label:'ค่าปรับวันละ', value:money(p.finePerDay)}
+    ];
+  }
   peopleGroups(p){
     const g=[];
     g.push({label:'คณะกรรมการตรวจรับ', names:(p.committee||[]).map(c=>[c.name,c.role].filter(Boolean).join(' — ')).filter(Boolean).length? (p.committee||[]).map(c=>[c.name,c.role].filter(Boolean).join(' — ')).filter(Boolean) : ['-']});
@@ -5244,9 +5374,10 @@ class Component extends DCLogic {
     this.setState({view:'print', targets, hover:null});
     setTimeout(()=>window.print(), 700);
   };
-  exportSelected = () => this.openPrint(Object.keys(this.state.sel||{}));
-  exportAll = () => this.openPrint(this.projects().filter(p=>!p.isDraftNew).map(p=>p.id));
-  exportCurrent = () => { this.setState({scheduleMode:false, exportMenu:false}); this.openPrint([this.state.pid], this.state.wk); };
+  openWeekly = (ids, wkOverride) => { this.setState({scheduleMode:false, exportMenu:false}); this.openPrint(ids, wkOverride); };
+  exportSelected = () => this.openWeekly(Object.keys(this.state.sel||{}));
+  exportAll = () => this.openWeekly(this.projects().filter(p=>!p.isDraftNew).map(p=>p.id));
+  exportCurrent = () => this.openWeekly([this.state.pid], this.state.wk);
   exportSchedule = () => { this.setState({scheduleMode:true, exportMenu:false, paper:'A4', orient:'landscape'}); this.openPrint([this.state.pid], this.state.wk); };
   exportScheduleAll = () => {
     const p=this.byId(this.state.pid); if(!p) return;
@@ -5260,7 +5391,7 @@ class Component extends DCLogic {
   crc32(u8){ let t=this._crcT;
     if(!t){ t=[]; for(let n=0;n<256;n++){ let c=n; for(let k=0;k<8;k++) c=(c&1)?(0xEDB88320^(c>>>1)):(c>>>1); t[n]=c>>>0; } this._crcT=t; }
     let c=0xFFFFFFFF; for(let i=0;i<u8.length;i++) c=t[(c^u8[i])&0xFF]^(c>>>8); return (c^0xFFFFFFFF)>>>0; }
-  zipStore(entries){
+  zipStore(entries, mime){
     const enc=new TextEncoder(), parts=[], cdir=[];
     const w16=v=>[v&255,(v>>>8)&255], w32=v=>[v&255,(v>>>8)&255,(v>>>16)&255,(v>>>24)&255];
     let off=0, cdlen=0;
@@ -5272,8 +5403,117 @@ class Component extends DCLogic {
       cdir.push(ch,nm); cdlen+=ch.length+nm.length; off+=lh.length+nm.length+sz;
     });
     const eocd=new Uint8Array([].concat(w32(0x06054b50),w16(0),w16(0),w16(entries.length),w16(entries.length),w32(cdlen),w32(off),w16(0)));
-    return new Blob(parts.concat(cdir,[eocd]),{type:'application/vnd.openxmlformats-officedocument.wordprocessingml.document'});
+    return new Blob(parts.concat(cdir,[eocd]),{type:mime||'application/vnd.openxmlformats-officedocument.wordprocessingml.document'});
   }
+  /* ===== รายการก่อสร้าง (.xlsx): ตารางรายการงานของสัญญาที่เปิดอยู่ ===== */
+  exportItemsXlsx = () => {
+    this.setState({exportMenu:false});
+    const p=this.byId(this.state.pid); if(!p) return;
+    const items=p.items||[];
+    if(!items.length){ window.alert('โครงการนี้ยังไม่มีรายการงานให้ export'); return; }
+    const esc=(s)=>String(s===undefined||s===null?'':s).replace(/[\x00-\x08\x0b\x0c\x0e-\x1f]/g,'')
+      .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    const T=(ref,s,txt)=>'<c r="'+ref+'" s="'+s+'" t="inlineStr"><is><t xml:space="preserve">'+esc(txt)+'</t></is></c>';
+    const N=(ref,s,v)=>'<c r="'+ref+'" s="'+s+'"><v>'+v+'</v></c>';
+    const F=(ref,s,f,v)=>'<c r="'+ref+'" s="'+s+'"><f>'+f+'</f><v>'+v+'</v></c>';
+    const B=(ref,s)=>'<c r="'+ref+'" s="'+s+'"/>';
+    /* ป้ายสีเทา + ค่าตัวหนา ในเซลล์เดียว */
+    const LV=(ref,s,label,val)=>'<c r="'+ref+'" s="'+s+'" t="inlineStr"><is>'
+      +'<r><rPr><sz val="14"/><color rgb="FF645C50"/><rFont val="TH Sarabun New"/><family val="2"/><charset val="222"/></rPr><t xml:space="preserve">'+esc(label)+'  </t></r>'
+      +'<r><rPr><b/><sz val="14"/><color rgb="FF201E1D"/><rFont val="TH Sarabun New"/><family val="2"/><charset val="222"/></rPr><t xml:space="preserve">'+esc(val)+'</t></r></is></c>';
+    /* เซลล์ที่ผสานกันปรับความสูงแถวเองไม่ได้ จึงวัดความยาวข้อความแล้วกำหนดความสูงให้ (14pt = 18.67px, 16pt = 21.33px) */
+    const FAM=" 'TH Sarabun New', sans-serif", REG='18.67px', BOLD='bold 18.67px', HEAD='21.33px', HEADB='bold 21.33px';
+    const cv=document.createElement('canvas').getContext('2d');
+    cv.font=REG+FAM;
+    const digit=Math.max(1,Math.round(cv.measureText('0').width));
+    const COLS=[7,56,14,8,13,17], px=(a,b)=>COLS.slice(a,b+1).reduce((t,w)=>t+w*digit,0);
+    const nLines=(txt,room,font)=>{ cv.font=font+FAM; return Math.max(1,Math.ceil(cv.measureText(String(txt)).width/(room*0.9))); };
+    const rows=[], merges=[]; let rn=0;
+    const addRow=(ht,cells)=>{ rn++; rows.push('<row r="'+rn+'" ht="'+ht+'" customHeight="1">'+cells(rn)+'</row>'); return rn; };
+    const clean=(s)=>String(s===undefined||s===null?'':s).replace(/\s+/g,' ').trim();
+    /* สไตล์: 1 หัวตาราง, 2 ลำดับที่, 3 รายการ/รายละเอียด, 4 ปริมาณ, 5 หน่วย, 6 เงิน, 7 ป้ายรวม, 8 ยอดรวม, 9 หัวตารางชิดซ้าย,
+       10 หัวเอกสารตัวหนา, 11 หัวเอกสารตัวปกติ (ขนาดเท่ากันทุกบรรทัด) */
+    const h=this.sheetData(p,this.state.wk||0).h;
+    [ [h.dept,10,HEADB], ['กรมทางหลวง   กระทรวงคมนาคม',10,HEADB], [h.contractNo,10,HEADB],
+      [h.program1,11,HEAD], [h.program2,11,HEAD], [h.program3,11,HEAD], [h.projectName,10,HEADB], [h.location,11,HEAD]
+    ].forEach(([txt,st,font],i)=>{
+      const t=i===1? txt : clean(txt); if(!t) return;
+      const at=addRow(nLines(t,px(0,5),font)*24, x=>T('A'+x,st,t)+['B','C','D','E','F'].map(c=>B(c+x,st)).join(''));
+      merges.push('A'+at+':F'+at);
+    });
+    addRow(7,()=>'');
+    const rowH=(n)=>n*21+3;
+    const contractor=clean(h.contractor)||'-';
+    const top=addRow(rowH(nLines('ผู้รับจ้าง  '+contractor,px(0,5)-14,BOLD)),
+      x=>LV('A'+x,3,'ผู้รับจ้าง',contractor)+['B','C','D','E','F'].map(c=>B(c+x,3)).join(''));
+    merges.push('A'+top+':F'+top);
+    [ [['ผู้ควบคุมงาน',h.supervisor],['เริ่มสัญญาวันที่',h.startTh]],
+      [['ผู้ช่วยผู้ควบคุมงาน',h.assistantsTxt],['วันสิ้นสุดสัญญาวันที่',h.endTh]],
+      [['ผู้ควบคุมงานด้านวัสดุ',h.materialTxt],['เวลาทำการ',h.duration+' วัน']],
+      [['เงินค่างานในสัญญา',h.valueTxt+' บาท'],['ค่าปรับวันละ',h.fineTxt+' บาท']]
+    ].forEach(([a,b])=>{
+      const av=clean(a[1])||'-', bv=clean(b[1])||'-';
+      const n=Math.max(nLines(a[0]+'  '+av,px(0,1)-14,BOLD), nLines(b[0]+'  '+bv,px(2,5)-14,BOLD));
+      const at=addRow(rowH(n), x=>LV('A'+x,3,a[0],av)+B('B'+x,3)+LV('C'+x,3,b[0],bv)+['D','E','F'].map(c=>B(c+x,3)).join(''));
+      merges.push('A'+at+':B'+at,'C'+at+':F'+at);
+    });
+    addRow(9,()=>'');
+    const heads=['ลำดับ\nที่','รายการ','ปริมาณงาน\nจำนวน','หน่วย','หน่วยละ\n( บาท )','เป็นเงิน\n( บาท )'];
+    const hdr=addRow(44, x=>heads.map((t,i)=>T('ABCDEF'[i]+x,i===1?9:1,t)).join(''));
+    const first=hdr+1;
+    items.forEach((it)=>{
+      const name=String(it.name||'').trim(), qty=this.num(it.qty), price=this.num(it.price), hasQty=!!qty;
+      addRow(rowH(nLines(name,px(1,1)-14,REG)), r=>T('A'+r,2,it.no)+T('B'+r,3,name)
+        +(hasQty? N('C'+r,4,qty) : B('C'+r,4))
+        +(hasQty? T('D'+r,5,this.workUnit(it.unit)) : B('D'+r,5))
+        +(hasQty&&price? N('E'+r,6,price) : B('E'+r,6))
+        +(hasQty? F('F'+r,6,'C'+r+'*E'+r,qty*price) : B('F'+r,6)));
+    });
+    const last=rn;
+    const tr=addRow(25, x=>T('A'+x,7,'รวม')+['B','C','D','E'].map(c=>B(c+x,7)).join('')
+      +F('F'+x,8,'SUM(F'+first+':F'+last+')',this.totalAmount(p)));
+    merges.push('A'+tr+':E'+tr);
+    const NS='xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"';
+    const XML='<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n';
+    const SHEET='รายการก่อสร้าง';
+    const sheetXml=XML+'<worksheet '+NS+'><sheetPr><pageSetUpPr fitToPage="1"/></sheetPr><dimension ref="A1:F'+tr+'"/>'
+      +'<sheetViews><sheetView showGridLines="0" workbookViewId="0"/></sheetViews>'
+      +'<sheetFormatPr defaultRowHeight="21"/>'
+      +'<cols>'+COLS.map((w,i)=>'<col min="'+(i+1)+'" max="'+(i+1)+'" width="'+w+'" customWidth="1"/>').join('')+'</cols>'
+      +'<sheetData>'+rows.join('')+'</sheetData>'
+      +'<mergeCells count="'+merges.length+'">'+merges.map(m=>'<mergeCell ref="'+m+'"/>').join('')+'</mergeCells>'
+      +'<pageMargins left="0.4" right="0.4" top="0.5" bottom="0.5" header="0.3" footer="0.3"/>'
+      +'<pageSetup paperSize="9" orientation="portrait" fitToWidth="1" fitToHeight="0"/>'
+      +'<ignoredErrors><ignoredError sqref="A'+first+':A'+last+'" numberStoredAsText="1"/></ignoredErrors>'
+      +'</worksheet>';
+    const bd='<border><left style="thin"><color rgb="FFC0B6A5"/></left><right style="thin"><color rgb="FFC0B6A5"/></right><top style="thin"><color rgb="FFC0B6A5"/></top><bottom style="thin"><color rgb="FFC0B6A5"/></bottom><diagonal/></border>';
+    const xf=(num,font,fill,border,h,wrap)=>'<xf numFmtId="'+num+'" fontId="'+font+'" fillId="'+fill+'" borderId="'+border+'" xfId="0" applyNumberFormat="1" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1"><alignment horizontal="'+h+'" vertical="center"'+(wrap?' wrapText="1"':'')+(h==='center'?'':' indent="1"')+'/></xf>';
+    const stylesXml=XML+'<styleSheet '+NS+'><numFmts count="1"><numFmt numFmtId="164" formatCode="#,##0.000"/></numFmts>'
+      +'<fonts count="4">'+[['',14],['<b/>',14],['<b/>',16],['',16]].map(([b,sz])=>'<font>'+b+'<sz val="'+sz+'"/><name val="TH Sarabun New"/><family val="2"/><charset val="222"/></font>').join('')+'</fonts>'
+      +'<fills count="3"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill><fill><patternFill patternType="solid"><fgColor rgb="FFEEE7DB"/><bgColor indexed="64"/></patternFill></fill></fills>'
+      +'<borders count="2"><border><left/><right/><top/><bottom/><diagonal/></border>'+bd+'</borders>'
+      +'<cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs>'
+      +'<cellXfs count="12"><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/>'
+      +xf(0,1,2,1,'center',true)+xf(49,0,0,1,'center',false)+xf(0,0,0,1,'left',true)+xf(164,0,0,1,'right',false)
+      +xf(0,0,0,1,'center',false)+xf(4,0,0,1,'right',false)+xf(0,1,2,1,'left',false)+xf(4,1,2,1,'right',false)
+      +xf(0,1,2,1,'left',true)
+      +xf(0,2,0,0,'center',true)+xf(0,3,0,0,'center',true)
+      +'</cellXfs><cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles></styleSheet>';
+    const enc=new TextEncoder(), file=(name,xml)=>({name,data:enc.encode(xml)});
+    const blob=this.zipStore([
+      file('[Content_Types].xml',XML+'<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/><Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/></Types>'),
+      file('_rels/.rels',XML+'<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/></Relationships>'),
+      file('xl/workbook.xml',XML+'<workbook '+NS+' xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheets><sheet name="'+SHEET+'" sheetId="1" r:id="rId1"/></sheets><definedNames><definedName name="_xlnm.Print_Titles" localSheetId="0">\''+SHEET+'\'!$'+hdr+':$'+hdr+'</definedName></definedNames></workbook>'),
+      file('xl/_rels/workbook.xml.rels',XML+'<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/></Relationships>'),
+      file('xl/worksheets/sheet1.xml',sheetXml),
+      file('xl/styles.xml',stylesXml)
+    ],'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    const short=this.contractShort(p).replace(/\s*\/\s*/g,'-').replace(/[\\:*?"<>|]/g,'-').replace(/\s+/g,' ').trim();
+    const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
+    a.download='รายการก่อสร้าง '+(short||'โครงการ')+'.xlsx';
+    document.body.appendChild(a); a.click();
+    setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); },1500);
+  };
   coverWeeks(p){
     const D=(x)=>{ const d=new Date(String(x)+'T00:00:00'); return isNaN(d)?null:d; };
     const s0=D(p.contractDate||p.startDate); if(!s0) return [];
@@ -5763,6 +6003,7 @@ class Component extends DCLogic {
       pptxExport: this.pptxExport,
       exportCoverOne: this.exportCoverOne,
       exportCoverAll: this.exportCoverAll,
+      exportItemsXlsx: this.exportItemsXlsx,
       openPeople: this.openPeople,
       closePeople: this.closePeople,
       peopleOpen: !!this.state.peopleOpen,
@@ -6077,9 +6318,10 @@ class Component extends DCLogic {
           {label:'สถานที่ / จุดนัดพบ', value:ad.place||'-', span:2},
         ],
         navUrl:this.navUrlOf(ap), hasNav:!!this.navUrlOf(ap),
+        hasContract:!!ap, contract: ap? this.contractFacts(ap) : [],
         people: ap? this.peopleGroups(ap) : [] };
     } else { const _dp={isDate:true,isPlain:false,open:false,displayTxt:'เลือกวันที่',cells:[],dowNames:[],monthTh:'',toggle:()=>{},close:()=>{},prev:()=>{},next:()=>{},clear:()=>{},goToday:()=>{}};
-      out.appt={people:[],fields:[],readRows:[],emRows:[],projectOptions:[],statusOptions:[],hourOptions:[],minOptions:[],dateTh:'',newDateTh:'',dateF:_dp}; }
+      out.appt={hasContract:false,contract:[],people:[],fields:[],readRows:[],emRows:[],projectOptions:[],statusOptions:[],hourOptions:[],minOptions:[],dateTh:'',newDateTh:'',dateF:_dp}; }
 
     /* overview */
     const rows=[], alerts=[], alerts90=[], alertsOver=[];
@@ -6108,7 +6350,7 @@ class Component extends DCLogic {
         contractNo:p.contractNo, projectName:p.projectName, location:p.location,
         noColor: actual>=99.999? 'var(--c-ahead)' : 'var(--color-accent)',
         fiscalYear:fy||'-', budgetType:p.budgetType||'-', workType:p.workType||'-',
-        value:this.n(p.contractValue), start:this.thShort(p.startDate), end:endIso? this.thShort(endIso):'-',
+        value:this.n(p.contractValue), start:this.thShort(p.startDate), end:endIso? this.thShort(endIso):'-', endLines:this.endLines(p),
         duration:(this.durOf(p)||'-'),
         remain: isNaN(remain)? '-' : (remain>=0? ('เหลือ '+(remain+1)+' วัน') : ('เกิน '+(-remain)+' วัน')),
         plan:this.n(plan,3), actual:this.n(actual,3),
@@ -6117,7 +6359,7 @@ class Component extends DCLogic {
         fine:this.n(p.finePerDay), fineAccrued: fa? ('ค่าปรับสะสม '+this.n(fa,0)) : '',
         checked: !!(this.state.sel||{})[p.id],
         toggle: ()=>this.toggleSel(p.id),
-        exportOne: ()=>this.openPrint([p.id]),
+        exportOne: ()=>this.openWeekly([p.id]),
         open:()=>this.openProject(p.id),
         edit:()=>{ const dd=JSON.parse(JSON.stringify(p)); this._draftBase=JSON.stringify(dd);
           this.setState({view:'project',pid:p.id,wk:li,draft:dd}); },
@@ -6473,7 +6715,7 @@ class Component extends DCLogic {
           note:((p.weeks||{})[this.weeksOf(p)[li]]||{}).note || (p.note==='-'? '' : (p.note||'')) || '-',
           district:'แขวงฯ'+this.distOf(p),
           fiscalYear:p.fiscalYear||'-', budgetType:p.budgetType||'-', workType:p.workType||'-',
-          valueTxt:this.n(p.contractValue), startTxt:this.thShort(p.startDate)||'-', endTxt:this.endOf(p)? this.thShort(this.endOf(p)) : '-',
+          valueTxt:this.n(p.contractValue), startTxt:this.thShort(p.startDate)||'-', endTxt:this.endOf(p)? this.thShort(this.endOf(p)) : '-', endLines:this.endLines(p),
           durTxt:(this.durOf(p)||p.duration||'-')+' วัน', contractor:p.contractor||'-', fineTxt:this.n(p.finePerDay),
           plan:this.n(plan,3), actual:this.n(actual,3),
           diff:(diff>=0?'+':'')+this.n(diff,3), bg:stt.bg, fg:stt.fg,
@@ -6544,24 +6786,42 @@ class Component extends DCLogic {
     /* print / export view */
     if(this.state.view==='print'){
       const tg=(this.state.targets||[]).filter(t=>this.byId(t.pid));
-      out.sheets=tg.map((t,ti)=>{
+      const isSchedule=!!this.state.scheduleMode;
+      const deptTxt=this.props.deptName ?? dept;
+      const cards=tg.map((t,ti)=>{
         const q=this.byId(t.pid);
-        const sd=this.sheetData(q,t.wk); sd.showItems=!!this.state.scheduleMode;
+        const sd=this.sheetData(q,t.wk); sd.showItems=isSchedule;
         sd.h.contractNoVal=String(sd.h.contractNo||'').replace(/^\s*สัญญาเลขที่\s*:?\s*/,'');
-        return { idx:ti+1,
-          title:'รายงานผลงานก้าวหน้า '+(this.props.deptName ?? dept)+'  วันที่ '+sd.week.dateTh,
-          h:sd.h, week:sd.week, items:sd.items, totals:sd.totals, summary:sd.summary,
-          chart:sd.chart, hasOver:!!sd.week.overTxt, showItems:sd.showItems,
-          plainChart: !sd.showItems,
-          ...this.ganttData(q, t.wk, !!sd.showItems),
-          mainDir: sd.showItems? 'row' : 'column',
-          rowAlign: 'flex-start',
-          chartFlex: sd.showItems? '0 0 400px' : '1',
-          chartBoxStyle: sd.showItems
-            ? 'flex:1;display:flex;flex-direction:column;overflow:hidden;min-height:0'
-            : 'max-height:330px;overflow:hidden',
-          summaryCols: sd.showItems? '1fr' : '340px 1fr' };
+        const base={ idx:ti+1, h:sd.h, week:sd.week, summary:sd.summary };
+        if(!isSchedule) return base;
+        return Object.assign(base, {
+          items:sd.items, totals:sd.totals,
+          chart:sd.chart, hasOver:!!sd.week.overTxt, showItems:true,
+          ...this.ganttData(q, t.wk, true),
+          mainDir:'row', rowAlign:'flex-start', chartFlex:'0 0 400px',
+          chartBoxStyle:'flex:1;display:flex;flex-direction:column;overflow:hidden;min-height:0',
+          summaryCols:'1fr' });
       });
+      out.sheets=isSchedule? cards : [];
+      /* รายงานประจำสัปดาห์: A4 แนวตั้ง หน้าละ 4 โครงการ */
+      const PER_PAGE=4, printedTh=this.th(this.today());
+      out.weeklyPages=[];
+      if(!isSchedule){
+        const total=Math.ceil(cards.length/PER_PAGE);
+        for(let i=0;i<total;i++){
+          const projects=cards.slice(i*PER_PAGE,(i+1)*PER_PAGE);
+          const dates=projects.map(c=>c.week.dateTh).filter((d,k,a)=>a.indexOf(d)===k);
+          const mixedDates=dates.length>1;
+          out.weeklyPages.push({ no:i+1, total, dept:deptTxt, projects, mixedDates, printedTh,
+            dateLbl: mixedDates? 'วันที่พิมพ์รายงาน' : 'ข้อมูล ณ วันที่',
+            dateVal: mixedDates? printedTh : dates[0],
+            blanks: Array.from({length:PER_PAGE-projects.length},(_,k)=>({k})) });
+        }
+      }
+      out.showPaperPick=isSchedule;
+      out.printSummary=isSchedule
+        ? 'ชุดรายงาน '+cards.length+' โครงการ — โครงการละ 1 หน้า'
+        : 'รายงานประจำสัปดาห์ '+cards.length+' โครงการ — A4 แนวตั้ง หน้าละ 4 โครงการ (รวม '+out.weeklyPages.length+' หน้า)';
       out.canBackToProject = tg.length===1;
       out.backToProject=()=>this.setState({view:'project', pid:tg[0]&&tg[0].pid, wk:(tg[0]&&tg[0].wk)||0});
       out.exportImages=this.exportImages;
