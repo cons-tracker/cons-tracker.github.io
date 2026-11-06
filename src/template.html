@@ -1571,7 +1571,7 @@ svg.leaflet-image-layer.leaflet-interactive path {
   /* รายงานประจำสัปดาห์: A4 แนวตั้ง หน้าละ 4 โครงการ — พื้นที่พิมพ์ 190x277mm (ขอบ 10mm) = 718x1047px */
   .wk-scroll{overflow-x:auto;padding:2px 2px 8px}
   .wk-sheet{width:794px;height:1123px;padding:38px;margin:0 auto 18px;background:#fff;box-shadow:0 1px 10px rgba(32,30,29,.18);color:#201e1d;font-size:10.5px;line-height:1.42}
-  .wk-fit{height:1044px;overflow:hidden}
+  .wk-fit{height:1044px;overflow:hidden;padding:0 2px} /* เว้น 2px กันเส้นขอบการ์ดด้านขวาถูกตัดตอนพิมพ์ */
   .wk-page{width:100%;height:100%;display:flex;flex-direction:column;gap:10px;transform-origin:top left}
   .wk-head{display:flex;align-items:center;gap:11px;padding-bottom:9px;border-bottom:2px solid var(--color-accent)}
   .wk-logo{width:44px;height:44px;flex:none;object-fit:contain}
@@ -1618,6 +1618,8 @@ svg.leaflet-image-layer.leaflet-interactive path {
     .noprint{display:none !important}
     .wk-scroll{overflow:visible !important;padding:0 !important}
     .wk-sheet{height:auto !important}
+    .wk-card{border-color:#8f8676}
+    html,body,[data-print-root],[data-print-wrap]{background:#fff !important}
     .printsheet{box-shadow:none !important;margin:0 !important;border:0 !important;padding:0 !important;width:var(--fit-w,100%) !important;max-width:none !important;break-inside:avoid;page-break-inside:avoid}
     [data-print-root],[data-print-wrap]{padding:0 !important;margin:0 !important;min-height:0 !important;max-width:none !important}
     .printsheet{break-after:auto !important;page-break-after:auto !important}
@@ -2764,8 +2766,10 @@ svg.leaflet-image-layer.leaflet-interactive path {
   </sc-for>
   </div>
 
+  <!-- ล็อกความกว้างเท่ากระดาษเสมอ (จอแคบใช้เลื่อนดูแทน) เพื่อให้ความสูงกราฟที่คำนวณบนจอตรงกับตอนพิมพ์ -->
+  <div class="wk-scroll">
   <sc-for list="{{ sheets }}" as="s" hint-placeholder-count="1">
-    <div class="printsheet" style="background:#ffffff;border:0;border-radius:var(--radius-lg);padding:14px 16px;margin-bottom:var(--space-4);width:{{ sheetWidth }};max-width:100%">
+    <div class="printsheet" style="background:#ffffff;border:0;border-radius:var(--radius-lg);padding:14px 16px;margin-bottom:var(--space-4);width:{{ sheetWidth }}">
       <sc-if value="{{ s.showItems }}" hint-placeholder-val="{{ false }}">
       <div style="text-align:center;line-height:1.4">
         <div class="hd" style="font-size:15px">{{ s.h.dept }}</div>
@@ -2921,7 +2925,7 @@ svg.leaflet-image-layer.leaflet-interactive path {
         </div>
       </sc-if>
       </div>
-    </sc-for></div>
+    </sc-for></div></div>
   
 </sc-if></div>
 
@@ -5374,7 +5378,17 @@ class Component extends DCLogic {
     this.setState({view:'print', targets, hover:null});
     setTimeout(()=>window.print(), 700);
   };
-  openWeekly = (ids, wkOverride) => { this.setState({scheduleMode:false, exportMenu:false}); this.openPrint(ids, wkOverride); };
+  /* เรียงตามเลขที่สัญญา (ตัวเลขเรียงตามค่า เช่น 8 ก่อน 11) ลำดับในรายงานจะได้ไม่เปลี่ยนตามลำดับที่ดึงจากฐานข้อมูล */
+  sortByContract(ids){
+    const coll=new Intl.Collator('th',{numeric:true,sensitivity:'base'});
+    const key=(id)=>this.contractShort(this.byId(id)).replace(/\s+/g,'');
+    return (ids||[]).slice().sort((a,b)=>{
+      const ka=key(a), kb=key(b);
+      if(!ka||!kb) return ka? -1 : (kb? 1 : String(a).localeCompare(String(b)));
+      return coll.compare(ka,kb)||String(a).localeCompare(String(b));
+    });
+  }
+  openWeekly = (ids, wkOverride) => { this.setState({scheduleMode:false, exportMenu:false}); this.openPrint(this.sortByContract(ids), wkOverride); };
   exportSelected = () => this.openWeekly(Object.keys(this.state.sel||{}));
   exportAll = () => this.openWeekly(this.projects().filter(p=>!p.isDraftNew).map(p=>p.id));
   exportCurrent = () => this.openWeekly([this.state.pid], this.state.wk);
