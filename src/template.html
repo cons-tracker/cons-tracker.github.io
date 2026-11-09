@@ -2439,6 +2439,13 @@ svg.leaflet-image-layer.leaflet-interactive path {
             </sc-raw-td>
             <sc-raw-td style="padding:7px 8px;border:1px solid var(--color-divider);vertical-align:top">
               <div style="display:flex;flex-direction:column;gap:3px;min-width:142px">
+                <sc-if value="{{ r.statusHasSaved }}" hint-placeholder-val="{{ false }}">
+                  <div style="display:flex;flex-wrap:wrap;gap:3px;margin-bottom:2px">
+                    <sc-for list="{{ r.statusSaved }}" as="sv" hint-placeholder-count="2">
+                      <button type="button" sc-camel-on-click="{{ sv.open }}" title="เปิดดูกรณีนี้" style="border:1px solid var(--c-ahead);border-radius:999px;padding:1px 8px;font-size:11px;line-height:1.5;font-family:var(--font-body);background:{{ sv.bg }};color:{{ sv.fg }};font-weight:{{ sv.weight }};cursor:pointer;white-space:nowrap">✓ {{ sv.t }}</button>
+                    </sc-for>
+                  </div>
+                </sc-if>
                 <sc-raw-select value="{{ r.statusCase }}" sc-camel-on-change="{{ r.setStatusCase }}" disabled="{{ r.statusReadOnly }}" style="width:100%;border:1px solid var(--color-divider);border-radius:var(--radius-sm);padding:3px 4px;font-size:11.5px;font-family:var(--font-body);background:var(--color-neutral-100);color:var(--color-text);cursor:pointer">
                   <sc-for list="{{ r.statusCaseOptions }}" as="o" hint-placeholder-count="4">
                     <option value="{{ o.v }}">{{ o.t }}</option>
@@ -3966,10 +3973,9 @@ class Component extends DCLogic {
     });
     return out;
   }
-  /* กรณีที่กำลังเปิดอยู่ — ค่าเริ่มต้นคือกรณีแรกที่บันทึกไว้ */
+  /* กรณีที่กำลังเปิดอยู่ — ค่าเริ่มต้นคือยังไม่เปิดกรณีใด (แสดงแค่ป้ายชื่อกรณีที่บันทึกแล้ว) */
   statusActive(p){
-    const sel=this.state.statusSel||{};
-    return (p.id in sel)? sel[p.id] : (Object.keys(this.statusRecords(p))[0]||'');
+    return (this.state.statusSel||{})[p.id]||'';
   }
   statusDraft(p,c){ return ((this.state.statusDrafts||{})[p.id]||{})[c]; }
   statusDropDraft(id,c){
@@ -4010,7 +4016,9 @@ class Component extends DCLogic {
     const c=this.statusActive(p);
     if(!c) return;
     const rec=this.statusDraft(p,c)||this.statusRecords(p)[c]||this.statusClean({});
-    this.statusWrite(id,c,Object.assign({},rec,{text:rec.text.trim()}));
+    /* บันทึกแล้วปิดรายละเอียด ให้ dropdown กลับไปที่ "— เลือกกรณี —" */
+    this.statusWrite(id,c,Object.assign({},rec,{text:rec.text.trim()}),
+      {statusSel:Object.assign({},this.state.statusSel,{[id]:''})});
   };
   /* ยืนยันการลบในแถวเอง เพราะ window.confirm ใช้ไม่ได้ในบางสภาพแวดล้อม (คืนค่า false โดยไม่แสดงกล่องถาม) */
   askRemoveStatusCase = (id,c) => this.setState({statusRemoveAsk:Object.assign({},this.state.statusRemoveAsk,{[id]:c})});
@@ -4040,6 +4048,13 @@ class Component extends DCLogic {
       statusHasCase:!!c,
       statusReadOnly:!can,
       setStatusCase:(e)=>this.selectStatusCase(p.id,e.target.value),
+      /* รายชื่อกรณีที่บันทึกแล้ว แสดงเฉพาะชื่อ ไม่แสดงรายละเอียด กดเพื่อเปิดกรณีนั้น */
+      statusSaved:this.STATUS_CASES.filter(x=>records[x.v]).map(x=>{
+        const on=x.v===c;
+        return { t:x.t, open:()=>this.selectStatusCase(p.id,on? '' : x.v),
+          bg:on?'var(--c-ahead)':'var(--color-neutral-100)', fg:on?'#fff':'var(--c-ahead)', weight:on?600:500 };
+      }),
+      statusHasSaved:Object.keys(records).length>0,
       statusCaseOptions:[{v:'',t:'— เลือกกรณี —'}].concat(this.STATUS_CASES.map(x=>({v:x.v, t:(records[x.v]? '✓ ' : '')+x.t}))),
       statusSteps:resultOnly? [] : this.STATUS_STEPS.map((s,i)=>box((i+1)+'. '+s.label, !!st.checks[s.key], 'var(--c-ahead)', ()=>this.toggleStatusStep(p.id,s.key))),
       statusText:st.text,
