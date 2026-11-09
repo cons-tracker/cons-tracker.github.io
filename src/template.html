@@ -1627,6 +1627,10 @@ svg.leaflet-image-layer.leaflet-interactive path {
     [data-print-root],[data-print-wrap]{padding:0 !important;margin:0 !important;min-height:0 !important;max-width:none !important}
     .printsheet{break-after:auto !important;page-break-after:auto !important}
     .printsheet + .printsheet{break-before:page !important;page-break-before:always !important}
+    /* Schedule: พิมพ์ด้วยความกว้างและระยะขอบเดียวกับบนจอ แล้วย่อทั้งแผ่น (fitPrint) ให้หน้าตาเหมือนก่อนพิมพ์ทุกอย่าง */
+    .printsheet.sched-sheet{padding:14px 16px !important;width:var(--sched-w,100%) !important}
+    .sched-page{height:var(--sched-h,auto);overflow:hidden;break-inside:avoid;page-break-inside:avoid}
+    .sched-page + .sched-page{break-before:page;page-break-before:always}
     .printsheet svg{max-width:100%;height:auto}
     .printsheet .chartbox svg{max-height:290px;width:auto;max-width:100%;display:block;margin:0 auto}
     .printsheet .chartbox[style*="flex-direction:column"] svg{flex:1;width:100%;height:100%;max-height:none;margin:0}
@@ -2574,7 +2578,13 @@ svg.leaflet-image-layer.leaflet-interactive path {
     <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px 28px;margin:16px 0 14px;font-size:12.5px;line-height:1.6;border-top:1px solid var(--color-divider);border-bottom:1px solid var(--color-divider);padding:11px 0">
       <div style="display:flex;flex-direction:column;gap:3px">
         <div><span class="lbl">เริ่มสัญญาวันที่ </span><span class="val">{{ p.startTh }}</span></div>
-        <div><span class="lbl">วันสิ้นสุดสัญญาวันที่ </span><span class="val">{{ p.endTh }}</span></div>
+        <!-- ขยายสัญญาแล้ว: แสดงวันสิ้นสุดเดิม / ใหม่ ต่อกันในบรรทัดเดียว -->
+        <sc-if value="{{ p.hasNewEnd }}" hint-placeholder-val="{{ false }}">
+          <div><span class="lbl">วันสิ้นสุดสัญญา (เดิม) </span><span class="val">{{ p.endOrigTh }}</span><span class="lbl"> / วันสิ้นสุดสัญญา (ใหม่) </span><span class="val">{{ p.endNewTh }}</span></div>
+        </sc-if>
+        <sc-if value="{{ p.noNewEnd }}" hint-placeholder-val="{{ true }}">
+          <div><span class="lbl">วันสิ้นสุดสัญญาวันที่ </span><span class="val">{{ p.endTh }}</span></div>
+        </sc-if>
         <div><span class="lbl">เวลาทำการ </span><span class="val">{{ p.duration }} วัน</span></div>
       </div>
       <div style="display:flex;flex-direction:column;gap:3px">
@@ -2936,20 +2946,22 @@ svg.leaflet-image-layer.leaflet-interactive path {
   <!-- ล็อกความกว้างเท่ากระดาษเสมอ (จอแคบใช้เลื่อนดูแทน) เพื่อให้ความสูงกราฟที่คำนวณบนจอตรงกับตอนพิมพ์ -->
   <div class="wk-scroll">
   <sc-for list="{{ sheets }}" as="s" hint-placeholder-count="1">
-    <div class="printsheet" style="background:#ffffff;border:0;border-radius:var(--radius-lg);padding:14px 16px;margin-bottom:var(--space-4);width:{{ sheetWidth }}">
+    <!-- กรอบ 1 หน้ากระดาษ: ตอนพิมพ์สูงเท่าพื้นที่พิมพ์พอดี (fitPrint ตั้ง --sched-h) แผ่นที่ย่อแล้วจึงไม่ล้นไปแผ่นที่ 2 -->
+    <div class="sched-page">
+    <div class="printsheet sched-sheet" style="background:#ffffff;border:0;border-radius:var(--radius-lg);padding:14px 16px;margin-bottom:var(--space-4);width:{{ sheetWidth }}">
       <sc-if value="{{ s.showItems }}" hint-placeholder-val="{{ false }}">
-      <div style="text-align:center;line-height:1.4">
-        <div class="hd" style="font-size:15px">{{ s.h.dept }}</div>
-        <div class="val" style="font-size:13px">กรมทางหลวง &nbsp; กระทรวงคมนาคม</div>
-        <div class="val" style="font-size:12.5px;margin-top:4px">{{ s.h.contractNo }}</div>
-        <div class="lbl" style="font-size:11.5px;font-weight:400">{{ s.h.program1 }}</div>
-        <div class="lbl" style="font-size:11.5px;font-weight:400">{{ s.h.program2 }}</div>
-        <div class="lbl" style="font-size:11.5px;font-weight:400">{{ s.h.program3 }}</div>
-        <div class="val" style="font-size:12.5px;margin-top:3px">{{ s.h.projectName }}</div>
-        <div class="lbl" style="font-size:11.5px;font-weight:400">{{ s.h.location }}</div>
+      <div style="text-align:center;line-height:1.3">
+        <div class="hd" style="font-size:14px">{{ s.h.dept }}</div>
+        <div class="val" style="font-size:11.5px">กรมทางหลวง &nbsp; กระทรวงคมนาคม</div>
+        <div class="val" style="font-size:12px;margin-top:2px">{{ s.h.contractNo }}</div>
+        <div class="lbl" style="font-size:10.5px;font-weight:400">{{ s.h.program1 }}</div>
+        <div class="lbl" style="font-size:10.5px;font-weight:400">{{ s.h.program2 }}</div>
+        <div class="lbl" style="font-size:10.5px;font-weight:400">{{ s.h.program3 }}</div>
+        <div class="val" style="font-size:11.5px;margin-top:2px">{{ s.h.projectName }}</div>
+        <div class="lbl" style="font-size:10.5px;font-weight:400">{{ s.h.location }}</div>
       </div>
 
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px 20px;margin:10px 0;font-size:12px">
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px 20px;margin:6px 0;font-size:10.5px;line-height:1.35">
         <div style="display:flex;flex-direction:column;gap:2px">
           <div><span class="lbl">เริ่มสัญญาวันที่ </span><span class="val">{{ s.h.startTh }}</span></div>
           <sc-if value="{{ s.h.hasNewEnd }}" hint-placeholder-val="{{ false }}">
@@ -2973,15 +2985,17 @@ svg.leaflet-image-layer.leaflet-interactive path {
         </div>
       </div>
 
-      <div class="hd" style="text-align:center;font-size:13.5px;background:var(--color-neutral-200);border:1px solid var(--color-divider);border-radius:var(--radius-sm);padding:5px;margin-bottom:8px">รายงานประจำสัปดาห์ วันจันทร์ที่ {{ s.week.dateTh }}</div>
+      <div class="hd" style="text-align:center;font-size:12px;background:var(--color-neutral-200);border:1px solid var(--color-divider);border-radius:var(--radius-sm);padding:3px;margin-bottom:6px">รายงานประจำสัปดาห์ วันจันทร์ที่ {{ s.week.dateTh }}</div>
       <sc-if value="{{ s.hasOver }}" hint-placeholder-val="{{ false }}">
         <div style="text-align:center;font-size:12px;font-weight:600;color:var(--color-accent-800);background:var(--color-accent-200);border:1px solid var(--color-accent-400);border-radius:var(--radius-sm);padding:4px;margin:-4px 0 8px">{{ s.week.overTxt }}</div>
       </sc-if>
       </sc-if>
 
-      <div style="display:flex;flex-direction:{{ s.mainDir }};gap:10px;align-items:{{ s.rowAlign }};margin-top:5px">
+      <div data-sched-row="1" style="display:flex;flex-direction:{{ s.mainDir }};gap:10px;align-items:{{ s.rowAlign }};margin-top:5px">
       <sc-if value="{{ s.showItems }}" hint-placeholder-val="{{ false }}">
-      <sc-raw-table data-sched-table="1" style="border-collapse:collapse;width:100%;font-size:8.5px;flex:1;min-width:0">
+      <!-- ครึ่งซ้ายของกระดาษคือคอลัมน์ ที่ + รายการ ตั้งแต่คอลัมน์ปริมาณถึงกราฟอยู่ครึ่งขวา
+           fitGantt วัดความกว้างคอลัมน์ตัวเลขใส่ --sched-num แล้วกราฟกว้าง 50% ลบส่วนนั้น -->
+      <sc-raw-table data-sched-table="1" style="border-collapse:collapse;width:100%;font-size:9px;line-height:1.25;flex:1 1 0;min-width:0">
         <sc-raw-thead>
           <sc-raw-tr style="background:var(--color-neutral-200)">
             <sc-raw-th style="border:1px solid var(--color-neutral-400);padding:2px;width:24px">ที่</sc-raw-th>
@@ -3021,23 +3035,27 @@ svg.leaflet-image-layer.leaflet-interactive path {
       </sc-if>
 
       <sc-if value="{{ s.showItems }}" hint-placeholder-val="{{ false }}">
-      <div data-gantt-block="1" style="flex:0 0 30%;min-width:0;display:flex;flex-direction:column;border:1px solid var(--color-neutral-400);font-size:7.5px;align-self:flex-start">
+      <div data-gantt-block="1" style="flex:0 0 calc(50% - var(--sched-num, 390px) - 10px);min-width:200px;display:flex;flex-direction:column;border:1px solid var(--color-neutral-400);font-size:7.5px;align-self:flex-start">
         <div data-gantt-head="1" style="display:flex;border-bottom:1px solid var(--color-neutral-400)">
           <div style="width:26px;flex:0 0 26px;border-right:1px solid var(--color-neutral-400);text-align:center;font-weight:700">%</div>
-          <div style="flex:1;min-width:0">
+          <!-- กราฟแคบ (คอลัมน์สัปดาห์กว้างไม่ถึง 10px): ปี/เดือนตัดข้อความไม่ให้ล้นช่อง
+               วันที่เขียนแนวตั้งให้แต่ละสัปดาห์อ่านได้โดยไม่ทับกัน -->
+          <div style="flex:1;min-width:0;line-height:1.2">
             <div style="display:grid;grid-template-columns:{{ s.yearTemplate }};border-bottom:1px solid var(--color-neutral-400);text-align:center;font-weight:700">
               <sc-for list="{{ s.yearCols }}" as="y" hint-placeholder-count="2">
-                <div style="border-right:1px solid var(--color-neutral-400);padding:1px 0">{{ y.label }}</div>
+                <div style="border-right:1px solid var(--color-neutral-400);padding:1px 0;min-width:0;overflow:hidden;white-space:nowrap;text-overflow:clip">{{ y.label }}</div>
               </sc-for>
             </div>
-            <div style="display:grid;grid-template-columns:{{ s.monthTemplate }};border-bottom:1px solid var(--color-neutral-400);text-align:center;font-weight:700">
+            <div style="display:grid;grid-template-columns:{{ s.monthTemplate }};border-bottom:1px solid var(--color-neutral-400);text-align:center;font-weight:700;font-size:7px">
               <sc-for list="{{ s.monthCols }}" as="m" hint-placeholder-count="6">
-                <div style="border-right:1px solid var(--color-neutral-400);padding:1px 0">{{ m.label }}</div>
+                <div style="border-right:1px solid var(--color-neutral-400);padding:1px 0;min-width:0;overflow:hidden;white-space:nowrap;text-overflow:clip">{{ m.label }}</div>
               </sc-for>
             </div>
             <div style="display:grid;grid-template-columns:{{ s.colTemplate }};text-align:center">
               <sc-for list="{{ s.weekCols }}" as="w" hint-placeholder-count="10">
-                <div style="border-right:1px solid var(--color-divider);padding:1px 0;font-weight:700">{{ w.day }}</div>
+                <div data-week-day="1" style="border-right:1px solid var(--color-divider);min-width:0;height:13px;overflow:hidden;display:flex;align-items:center;justify-content:center">
+                  <span style="writing-mode:vertical-rl;transform:rotate(180deg);font-weight:700;font-size:6.5px;line-height:1;font-variant-numeric:tabular-nums">{{ w.day }}</span>
+                </div>
               </sc-for>
             </div>
           </div>
@@ -3046,7 +3064,7 @@ svg.leaflet-image-layer.leaflet-interactive path {
         <div data-gantt-plot="1" style="flex:1;min-height:120px;display:flex">
           <div style="width:26px;flex:0 0 26px;border-right:1px solid var(--color-neutral-400);position:relative">
             <sc-for list="{{ s.yTicks }}" as="t" hint-placeholder-count="11">
-              <div style="position:absolute;right:2px;top:{{ t.top }}%;transform:translateY(-50%);font-variant-numeric:tabular-nums">{{ t.label }}</div>
+              <div style="position:absolute;right:2px;top:{{ t.top }}%;transform:translateY({{ t.ty }});font-variant-numeric:tabular-nums">{{ t.label }}</div>
             </sc-for>
           </div>
           <div style="flex:1;min-width:0;position:relative">
@@ -3092,8 +3110,9 @@ svg.leaflet-image-layer.leaflet-interactive path {
         </div>
       </sc-if>
       </div>
+    </div>
     </sc-for></div></div>
-  
+
 </sc-if></div>
 
 
@@ -3103,7 +3122,15 @@ svg.leaflet-image-layer.leaflet-interactive path {
     <div style="display:flex;align-items:flex-start;gap:12px;padding:14px 20px;border-bottom:1px solid var(--color-divider)">
       <div style="flex:1;min-width:0">
         <div class="hd" style="font-size:16px;line-height:1.3">{{ detail.contractNo }}</div>
-        <div class="lbl" style="font-size:12.5px;font-weight:400;margin-top:3px;line-height:1.35;color:var(--color-neutral-800)">{{ detail.projectName }}</div>
+        <div style="margin-top:3px">
+          <sc-for list="{{ detail.nameLines }}" as="nl" hint-placeholder-count="2">
+            <div class="lbl" style="font-size:12px;font-weight:400;line-height:1.35">{{ nl.t }}</div>
+          </sc-for>
+        </div>
+        <div class="lbl" style="font-size:12.5px;font-weight:600;margin-top:2px;line-height:1.35;color:var(--color-neutral-800)">{{ detail.projectName }}</div>
+        <sc-if value="{{ detail.hasLocation }}" hint-placeholder-val="{{ true }}">
+          <div class="lbl" style="font-size:12px;font-weight:400;margin-top:1px;line-height:1.35">{{ detail.location }}</div>
+        </sc-if>
       </div>
       <button sc-camel-on-click="{{ closeDetail }}" class="btn btn-secondary" style="white-space:nowrap;font-size:13px;cursor:pointer">ปิด</button>
     </div>
@@ -4173,6 +4200,9 @@ class Component extends DCLogic {
     const e=this.d(endIso);
     let guard=0, lastMon=null;
     while(d<=e && guard++<600){ lastMon=this.iso(d); out.push(lastMon); d.setDate(d.getDate()+7); }
+    /* ขยายสัญญาแล้ว: คงคอลัมน์วันสิ้นสุดสัญญาเดิมไว้ เพราะแผนงานครบ 100% ที่วันนั้น */
+    const orig=p.endDateOrig;
+    if(orig && orig!==endIso && orig>p.startDate && orig<endIso && !out.includes(orig)){ out.push(orig); out.sort(); }
     if(out[out.length-1]!==endIso) out.push(endIso);
     const ex=Math.max(0, parseInt(p.extraWeeks||0,10)||0);
     if(ex && lastMon){
@@ -4257,6 +4287,17 @@ class Component extends DCLogic {
   UNIT_COLORS={'หมวดทางหลวงพิชัย':'#7d9cc4','หมวดทางหลวงทองแสนขัน':'#c39c68','หมวดทางหลวงลับแล':'#8fae7c','หมวดทางหลวงตรอน':'#c08b9c'};
   UNIT_FALLBACK='#a8a29a';
   unitColor(u){ return this.UNIT_COLORS[u] || this.UNIT_FALLBACK; }
+  /* ชื่อโครงการสำหรับทะเบียนสัญญา: ขึ้นต้นด้วย "ทางหลวงหมายเลข ..." เสมอ
+     - ตัดคำนำหน้า (เช่น "ก่อสร้างเพิ่มประสิทธิภาพทางหลวง") ที่อยู่ก่อนหมายเลขทางหลวง
+     - ถ้าชื่อไม่มีหมายเลขทางหลวง ดึง "ทางหลวงหมายเลข X ตอนควบคุม Y" จากชื่อแผนงาน/กิจกรรมมาต่อข้างหน้า */
+  highwayTitle(p){
+    const name=String((p&&p.projectName)||'').replace(/\s+/g,' ').trim();
+    const at=name.indexOf('ทางหลวงหมายเลข');
+    if(at>=0) return name.slice(at);
+    const src=[p.program1,p.program2,p.program3].map(x=>String(x||'')).join(' ');
+    const m=src.match(/ทางหลวงหมายเลข\s*[\d.]+(\s*ตอนควบคุม\s*\d+)?/);
+    return m? (m[0].replace(/\s+/g,' ')+(name? ' '+name : '')) : name;
+  }
   projectUnit(p){ return (p&&p.section)? {unit:p.section, color:this.unitColor(p.section)} : null; }
   deepen(hex){
     const m=/^#([0-9a-f]{6})$/i.exec(hex); if(!m) return hex;
@@ -4822,17 +4863,19 @@ class Component extends DCLogic {
     const grid=[];
     for(let g=0;g<=100;g+=10) grid.push(E('line',{key:'h'+g,x1:0,x2:100,y1:y(g),y2:y(g),
       stroke:'var(--color-divider)',strokeWidth:0.5,vectorEffect:'non-scaling-stroke'}));
-    cols.forEach((k,ci)=>grid.push(E('line',{key:'v'+ci,x1:x(ci-st),x2:x(ci-st),y1:0,y2:100,
-      stroke:'var(--color-divider)',strokeWidth:0.5,vectorEffect:'non-scaling-stroke'})));
+    /* เส้นแนวตั้งอยู่ที่ขอบคอลัมน์ ให้ตรงกับเส้นช่องวันที่ด้านบนและช่อง % ด้านล่าง (จุดข้อมูลอยู่กลางคอลัมน์) */
+    for(let ci=1;ci<n;ci++) grid.push(E('line',{key:'v'+ci,x1:ci/n*100,x2:ci/n*100,y1:0,y2:100,
+      stroke:'var(--color-divider)',strokeWidth:0.5,vectorEffect:'non-scaling-stroke'}));
     const p0=st? [x(-1)+','+y(0)] : [];
     const planPts=p0.concat(keys.map((k,i)=>x(i)+','+y(plans[i]))).join(' ');
     const actPts=p0.concat(keys.slice(0,last+1).map((k,i)=>x(i)+','+y(acts[i]))).join(' ');
     const dots=st? [E('circle',{key:'pd0',cx:x(-1),cy:y(0),r:0.9,fill:'var(--color-accent-2-600)',vectorEffect:'non-scaling-stroke'}),
-      E('circle',{key:'ad0',cx:x(-1),cy:y(0),r:1.3,fill:'var(--color-accent)',vectorEffect:'non-scaling-stroke'})] : [];
+      E('circle',{key:'ad0',cx:x(-1),cy:y(0),r:0.9,fill:'var(--color-accent)',vectorEffect:'non-scaling-stroke'})] : [];
+    /* จุดผลงานจริงขนาดเท่าจุดแผนงาน */
     keys.forEach((k,i)=>{
       dots.push(E('circle',{key:'pd'+i,cx:x(i),cy:y(plans[i]),r:0.9,
         fill:'var(--color-accent-2-600)',vectorEffect:'non-scaling-stroke'}));
-      if(i<=last) dots.push(E('circle',{key:'ad'+i,cx:x(i),cy:y(acts[i]),r:1.3,
+      if(i<=last) dots.push(E('circle',{key:'ad'+i,cx:x(i),cy:y(acts[i]),r:0.9,
         fill:'var(--color-accent)',vectorEffect:'non-scaling-stroke'}));
     });
     const gantt=E('svg',{viewBox:'0 0 100 100',preserveAspectRatio:'none',
@@ -4845,7 +4888,8 @@ class Component extends DCLogic {
       ...dots
     ]);
     const yTicks=[];
-    for(let g=100;g>=0;g-=10) yTicks.push({label:String(g), top:(100-g)});
+    /* ป้าย 100 อยู่ใต้เส้นบนสุด ป้าย 0 อยู่เหนือเส้นล่างสุด ไม่ให้ทับขอบกราฟ ป้ายอื่นอยู่กึ่งกลางเส้น */
+    for(let g=100;g>=0;g-=10) yTicks.push({label:String(g), top:(100-g), ty:g===100? '0%' : (g===0? '-100%' : '-50%')});
     return { weekCols, monthCols, yearCols, colTemplate:'repeat('+n+',1fr)',
       monthTemplate:tmpl(monthCols), yearTemplate:tmpl(yearCols), yTicks, gantt };
   }
@@ -4872,9 +4916,25 @@ class Component extends DCLogic {
     const land=(this.state.orient||'landscape')==='landscape';
     const px=(mm)=>mm*96/25.4;
     const availH=px((land?p[1]:p[0])-12)-6;
+    const availW=px((land?p[0]:p[1])-12)-2;
     document.querySelectorAll('.printsheet:not(.wk-sheet):not(.hm-print)').forEach(el=>{
-      el.style.transform='';el.style.height='';el.style.removeProperty('--fit-w');
+      el.style.transform='';el.style.height='';el.style.removeProperty('--fit-w');el.style.removeProperty('--sched-w');
+      if(el.parentElement) el.parentElement.style.removeProperty('--sched-h');
       const h=el.scrollHeight;
+      /* Schedule: คงความกว้างเท่าบนจอ (ไม่ขยายแผ่น) ย่อทั้งแผ่นด้วย scale สัดส่วนเดียว แล้วจัดกึ่งกลางกระดาษ
+         ตาราง/กราฟ/ตำแหน่งคอลัมน์ตอนพิมพ์จึงเหมือนหน้าก่อนพิมพ์
+         scale ไม่ลดขนาดที่เบราว์เซอร์ใช้แบ่งหน้า กรอบ .sched-page จึงล็อกความสูงเท่าภาพที่ย่อแล้วและตัดส่วนเกิน
+         ไม่ให้ไหลไปแผ่นที่ 2 */
+      if(el.classList.contains('sched-sheet')){
+        const W=el.offsetWidth, s=Math.min(1, (availH-4)/h, availW/W);
+        el.style.setProperty('--sched-w', W+'px');
+        el.style.transformOrigin='top left';
+        const shift=Math.max(0,(availW-W*s)/2);
+        el.style.transform='translateX('+shift.toFixed(1)+'px) scale('+s+')';
+        if(el.parentElement && el.parentElement.classList.contains('sched-page'))
+          el.parentElement.style.setProperty('--sched-h', Math.ceil(h*s)+'px');
+        return;
+      }
       if(h>availH){
         const s=availH/h;
         el.style.transformOrigin='top left';
@@ -4884,7 +4944,7 @@ class Component extends DCLogic {
       }
     });
   };
-  unfitPrint = () => document.querySelectorAll('.printsheet:not(.wk-sheet):not(.hm-print)').forEach(el=>{el.style.transform='';el.style.height='';el.style.removeProperty('--fit-w');});
+  unfitPrint = () => document.querySelectorAll('.printsheet:not(.wk-sheet):not(.hm-print)').forEach(el=>{el.style.transform='';el.style.height='';el.style.removeProperty('--fit-w');el.style.removeProperty('--sched-w');if(el.parentElement) el.parentElement.style.removeProperty('--sched-h');});
 
   exportImages = (baseName) => {
     const base=(typeof baseName==='string'&&baseName)||'รายงานสัปดาห์';
@@ -5183,6 +5243,12 @@ class Component extends DCLogic {
     document.querySelectorAll('[data-gantt-block]').forEach(block=>{
       const sheet=block.closest('.printsheet'); if(!sheet) return;
       const tbl=sheet.querySelector('[data-sched-table]'); if(!tbl) return;
+      /* ความกว้างตั้งแต่คอลัมน์ปริมาณถึงขอบขวาตาราง (คงที่เป็น px) ใช้จัดให้ปริมาณเริ่มกลางกระดาษ */
+      const row=sheet.querySelector('[data-sched-row]'), qty=tbl.querySelector('thead th:nth-child(3)');
+      if(row && qty) row.style.setProperty('--sched-num', Math.ceil(tbl.getBoundingClientRect().right-qty.getBoundingClientRect().left)+'px');
+      /* กันตัวเลขในกราฟทับกัน: แต่ละสัปดาห์กว้างอย่างน้อย 8.5px (ตัวเลขแนวตั้งสูงสุด 7px) + แกน % 26px */
+      const weeks=block.querySelectorAll('[data-week-day]').length;
+      block.style.minWidth=Math.max(200, Math.ceil(26+weeks*8.5))+'px';
       const plot=block.querySelector('[data-gantt-plot]');
       if(!plot) return;
       plot.style.flex='0 0 auto';
@@ -5479,7 +5545,7 @@ class Component extends DCLogic {
     el.innerHTML =
       '<div style="border-left:4px solid '+c+';padding-left:8px;margin-bottom:7px">'+
         '<div style="font-family:var(--font-heading);font-size:13.5px;line-height:1.3">'+esc(p.contractNo||'ยังไม่ระบุเลขสัญญา')+'</div>'+
-        '<div style="font-size:11.5px;color:var(--color-neutral-800);margin-top:3px;line-height:1.35">'+esc(p.projectName||'')+'</div>'+
+        '<div style="font-size:11.5px;color:var(--color-neutral-800);margin-top:3px;line-height:1.35">'+esc(this.highwayTitle(p))+'</div>'+
       '</div>'+
       (()=>{ const u=this.projectUnit(p); if(!u) return '';
         return '<div style="margin-bottom:6px;display:flex;align-items:center;gap:5px;font-size:11px;color:var(--color-neutral-700)">'+
@@ -6557,7 +6623,10 @@ class Component extends DCLogic {
       const pr=this.progressOf(dp), stt=this.status(pr.diff);
       const rem=this.endOf(dp)? this.days(this.today(),this.endOf(dp)) : NaN;
       const apps=(dp.appointments||[]).slice().sort((a,b)=>String(a.date).localeCompare(String(b.date)));
-      out.detail={ projectName:this.apptTitle(dp), location:dp.location||'-', contractNo:dp.contractNo||'-',
+      /* หัวหน้าต่างรายละเอียด: ชื่อโครงการ (บรรทัดที่ 1–3) → ทางหลวงหมายเลข ตอน กม. (ตามที่กรอก ไม่ตัดคำ) → ที่ตั้ง */
+      const clean=v=>String(v||'').replace(/\s+/g,' ').trim();
+      out.detail={ nameLines:[dp.program1,dp.program2,dp.program3].map(clean).filter(Boolean).map(t=>({t})),
+        projectName:clean(dp.projectName)||this.apptTitle(dp), location:clean(dp.location), hasLocation:!!clean(dp.location), contractNo:dp.contractNo||'-',
         contractor:dp.contractor||'-', startTh:this.th(dp.startDate),
         endOrigTh:dp.endDateOrig?this.th(dp.endDateOrig):'-', endTh:dp.endDate? this.th(dp.endDate):'-',
         endNewTh:dp.endDate? this.th(dp.endDate):'-',
@@ -6751,7 +6820,7 @@ class Component extends DCLogic {
         _pid:p.id, _contractNo:p.contractNo, _value:this.num(p.contractValue), _start:p.startDate||'',
         _end:endIso||'', _remain:isNaN(remain)?0:remain, _plan:plan, _actual:actual, _diff:diff,
         _contractor:p.contractor||'', _fine:this.num(p.finePerDay), _fy:fy,
-        contractNo:p.contractNo, projectName:p.projectName, location:p.location,
+        contractNo:p.contractNo, projectName:this.highwayTitle(p), location:p.location,
         noColor: actual>=99.999? 'var(--c-ahead)' : 'var(--color-accent)',
         fiscalYear:fy||'-', budgetType:p.budgetType||'-', workType:p.workType||'-',
         value:this.n(p.contractValue), start:this.thShort(p.startDate), end:endIso? this.thShort(endIso):'-', endLines:this.endLines(p),
@@ -6838,7 +6907,7 @@ class Component extends DCLogic {
         startTh:this.th(p.startDate), endTh:this.th(this.endOf(p)),
         endOrigTh: p.endDateOrig? this.th(p.endDateOrig) : '-',
         endNewTh: p.endDate? this.th(p.endDate) : '-',
-        hasNewEnd: this.hasNewEnd(p),
+        hasNewEnd: this.hasNewEnd(p), noNewEnd: !this.hasNewEnd(p),
         endLabel1: this.hasNewEnd(p)? 'วันสิ้นสุดสัญญา(เดิม) :' : 'วันสิ้นสุดสัญญา :',
         end1: this.hasNewEnd(p)? this.th(p.endDateOrig) : (this.th(this.endOf(p))||'-'),
         endLabel2: this.hasNewEnd(p)? 'วันสิ้นสุดสัญญา(ใหม่) :' : '',
