@@ -1,6 +1,6 @@
 /* Service worker — lets the app open even without internet (it shows the last data saved on the device)
    Data requests to Supabase always go to the network; they are never cached here */
-const VERSION = '20261107134224';
+const VERSION = '20261109160419';
 const CACHE = 'hwprog-' + VERSION;
 const SHELL = ['./', './index.html', './config.js', './cloud.js', './manifest.json',
   './icons/icon-192.png', './icons/icon-512.png', './icons/icon-maskable-512.png', './icons/apple-touch-icon.png',

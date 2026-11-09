@@ -3739,7 +3739,7 @@ svg.leaflet-image-layer.leaflet-interactive path {
         <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;flex-wrap:wrap">
           <div class="hd" style="font-size:13px">% แผนงานของแต่ละสัปดาห์ (Action Plan)</div>
           <button sc-camel-on-click="{{ clearPlan }}" style="white-space:nowrap;background:transparent;color:var(--color-neutral-700);border:1px solid var(--color-divider);border-radius:999px;padding:4px 10px;font-size:12px;cursor:pointer">ล้างค่า</button>
-          <span class="lbl" style="font-size:11.5px;font-weight:400">{{ planWeekCount }} สัปดาห์ (วันจันทร์) · กรอกยอดรวมของเดือนในช่องสัปดาห์สุดท้าย (ไฮไลต์) ระบบเฉลี่ยลงสัปดาห์อื่นให้เอง</span>
+          <span class="lbl" style="font-size:11.5px;font-weight:400">{{ planWeekCount }} สัปดาห์ (วันจันทร์) · กรอกยอดรวมของเดือนในช่องสัปดาห์สุดท้าย (ไฮไลต์) ระบบเฉลี่ยลงสัปดาห์อื่นให้เอง · เดือนสุดท้ายครบ 100% อัตโนมัติ</span>
         </div>
         <div style="border:1px solid var(--color-divider);border-radius:var(--radius-md);padding:8px 10px;margin-bottom:10px">
           <div class="lbl" style="font-size:11.5px;font-weight:400;margin-bottom:2px">ตัวอย่างกราฟแผนงาน — ขยับตามตัวเลขที่กรอกทันที · รวม {{ draftPlanSum }} %</div>
@@ -3751,7 +3751,7 @@ svg.leaflet-image-layer.leaflet-interactive path {
         <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(122px,1fr));gap:6px;max-height:320px;overflow:auto;padding:2px">
           <sc-for list="{{ planWeeks }}" as="w" hint-placeholder-count="12">
             <label style="display:flex;flex-direction:column;gap:2px;border:1px solid {{ w.bd }};border-radius:var(--radius-md);padding:5px 8px;background:{{ w.bg }}">
-              <span class="lbl" style="font-size:11px;font-weight:400">{{ w.no }}. จ. {{ w.label }}</span>
+              <span class="lbl" style="font-size:11px;font-weight:400">{{ w.title }}</span>
               <sc-if value="{{ w.canEdit }}" hint-placeholder-val="{{ true }}">
                 <input sc-camel-input-mode="decimal" value="{{ w.value }}" sc-camel-on-change="{{ w.onChange }}" sc-camel-on-focus="{{ w.onFocus }}" sc-camel-on-blur="{{ w.onBlur }}" placeholder="—" style="border:0;border-bottom:1px solid var(--color-accent-400);background:transparent;padding:2px 0;font-size:13px;text-align:right;font-family:var(--font-body);font-weight:700;color:inherit">
               </sc-if>
@@ -4093,6 +4093,8 @@ class Component extends DCLogic {
   iso(d){ const m=(d.getMonth()+1+'').padStart(2,'0'), dd=(d.getDate()+'').padStart(2,'0'); return d.getFullYear()+'-'+m+'-'+dd; }
   th(iso){ if(!iso) return '-'; const d=this.d(iso); return d.getDate()+' '+this.MONTHS_S[d.getMonth()]+' '+(d.getFullYear()+543); }
   thShort(iso){ if(!iso) return '-'; const d=this.d(iso); return d.getDate()+' '+this.MONTHS_S[d.getMonth()]+' '+((d.getFullYear()+543)%100); }
+  DOW_S=['อา.','จ.','อ.','พ.','พฤ.','ศ.','ส.'];
+  thDowShort(iso){ if(!iso) return '-'; const d=this.d(iso); if(isNaN(d)) return '-'; return this.DOW_S[d.getDay()]+' '+this.thShort(iso); }
   dpField(key, iso, setIso){
     const open=this.state.dpKey===key;
     const base=(iso && /^\d{4}-\d{2}-\d{2}$/.test(iso))? iso : this.today();
@@ -4127,9 +4129,9 @@ class Component extends DCLogic {
   }
   thAbbr(iso){ if(!iso) return ''; const d=this.d(iso); if(isNaN(d)) return ''; return d.getDate()+' '+this.MONTHS_S[d.getMonth()]+' '+(d.getFullYear()+543); }
   ROLES_COMMITTEE=['ประธานกรรมการ','กรรมการ'];
-  WORK_UNITS=['M.','SQ.M.','CU.M.','TON','EACH','EA.','P.S.','L.S.'];
-  /* units saved before WORK_UNITS existed show under their new name; other old values (e.g. ท่อน) stay as typed */
-  WORK_UNIT_ALIASES={'ม.':'M.','ตร.ม.':'SQ.M.','ลบ.ม.':'CU.M.','ตัน':'TON','LS.':'L.S.','PS.':'P.S.'};
+  WORK_UNITS=['ม.','ตร.ม.','ลบ.ม.','ตัน','อัน','P.S.','L.S.'];
+  /* older saved units (English names, LS./PS.) show under their current name; other old values (e.g. ท่อน) stay as typed */
+  WORK_UNIT_ALIASES={'M.':'ม.','SQ.M.':'ตร.ม.','CU.M.':'ลบ.ม.','TON':'ตัน','EACH':'อัน','EA.':'อัน','LS.':'L.S.','PS.':'P.S.'};
   workUnit(u){ return this.WORK_UNIT_ALIASES[u] || u || ''; }
   POSITIONS=['ผส.ทล.5','รส.ทล.5','ผอ.ขท.อุตรดิตถ์ที่ 1','ผอ.ขท.อุตรดิตถ์ที่ 2','ผอ.ขท.พิษณุโลกที่ 1','ผอ.ขท.พิษณุโลกที่ 2','ผอ.ขท.พิจิตร','วิศวกรโยธาปฏิบัติการ','วิศวกรโยธาชำนาญการ','นายช่างโยธาปฏิบัติงาน','นายช่างโยธาชำนาญงาน','นายช่างโยธาอาวุโส','วว.ทล.5','วบ.ทล.5','วผ.ทล.5'];
   ROLES_ASSISTANT=['ผู้ช่วยช่างควบคุมงาน','ช่างควบคุมงาน','เจ้าหน้าที่ควบคุมงาน','ผู้ควบคุมงานด้านวัสดุ','ผู้ตรวจสอบคุณภาพ'];
@@ -4201,6 +4203,21 @@ class Component extends DCLogic {
     return 0;
   }
   planSum(p){ const keys=this.weeksOf(p); return keys.length? this.planAt(p,keys.length-1):0; }
+  /* the plan reaches 100% on the contract end date: once any earlier month has a plan, the last month's weeks share whatever is left up to 100 */
+  fillPlanEnd(d){
+    const ref=Object.assign({}, d, {endDate: d.endDateOrig || d.endDate || ''});
+    const keys=this.weeksOf(ref).slice(0, this.contractWeekCount(ref));
+    if(!keys.length) return d;
+    const mk=k=>String(k).slice(0,7), m=mk(keys[keys.length-1]);
+    const grp=keys.filter(k=>mk(k)===m), ws=d.weeks||{};
+    const prev=keys.filter(k=>mk(k)!==m).reduce((t,k)=>t+this.num((ws[k]||{}).planW),0);
+    if(prev<=0) return d;
+    const total=Math.max(0, Math.round((100-prev)*1000)/1000);
+    const each=Math.round((total/grp.length)*1000)/1000;
+    const nd=Object.assign({}, d, {weeks:Object.assign({}, ws)});
+    grp.forEach((k,j)=>{ nd.weeks[k]=Object.assign({plan:'',actual:{}}, ws[k]||{}, {planW: j===grp.length-1? Math.round((total-each*(grp.length-1))*1000)/1000 : each}); });
+    return nd;
+  }
   BUDGETS=['งบกรม','งบจังหวัด','งบกลุ่มจังหวัด','งบเพิ่มเติม'];
   OFFICE='สำนักงานทางหลวงที่ 5 (พิษณุโลก)';
   DISTRICTS={
@@ -4571,14 +4588,18 @@ class Component extends DCLogic {
   };
 
   /* ---------- chart ---------- */
+  /* 1 when the chart/schedule gets an extra first column for the contract start date (plan and actual both 0%) */
+  startCol(p, keys){ return (p && p.startDate && keys.length && p.startDate<keys[0])? 1 : 0; }
   chartEl(p, keys, selIdx){
-    const n=keys.length; if(n<2) return null;
+    const st=this.startCol(p,keys);
+    const n=keys.length+st; if(n<2) return null;
     const W=1180,L=94,R=30,T=12;
     const sp=(W-L-R)/(n-1), rot=sp<62, fz=rot? Math.max(8.5, Math.min(12, sp/2.6)) : 13;
     const lbl=Math.ceil(7*0.6*fz);
     const B=rot? 44+lbl+10 : 98, H=400-98+B;
     this._chartH=H;
-    const x=i=>L+i*(W-L-R)/(n-1);
+    /* x(-1) is the start-date column when there is one; week i sits at column i+st */
+    const x=i=>L+(i+st)*(W-L-R)/(n-1);
     const y=v=>T+(100-v)*(H-T-B)/100;
     const plans=keys.map((k,i)=>this.planAt(p,i));
     const last=this.lastReported(p);
@@ -4589,9 +4610,10 @@ class Component extends DCLogic {
       kids.push(E('line',{key:'g'+g,x1:L,x2:W-R,y1:y(g),y2:y(g),stroke:'var(--color-divider)',strokeWidth:1}));
       kids.push(E('text',{key:'gt'+g,x:L-6,y:y(g)+4,textAnchor:'end',fontSize:14,fill:'var(--color-neutral-600)'},g+'%'));
     }
-    keys.forEach((k,i)=>{
-      const d=this.d(k);
-      const showM = i===0 || this.d(keys[i-1]).getMonth()!==d.getMonth();
+    const cols=st? [p.startDate].concat(keys) : keys;
+    cols.forEach((k,ci)=>{
+      const d=this.d(k), i=ci-st;
+      const showM = ci===0 || this.d(cols[ci-1]).getMonth()!==d.getMonth();
       kids.push(E('line',{key:'vx'+i,x1:x(i),x2:x(i),y1:T,y2:H-B,stroke: showM?'var(--color-neutral-300)':'color-mix(in srgb, var(--color-text) 6%, transparent)',strokeWidth:1}));
       kids.push(E('text',{key:'dd'+i,x:x(i),y:H-B+13,textAnchor:'middle',fontSize:13,fill:'var(--color-neutral-600)'},d.getDate()));
       if(showM) kids.push(E('text',{key:'mm'+i,x:x(i),y:H-B+26,textAnchor:'start',fontSize:13,fill:'var(--color-neutral-800)',fontWeight:600},this.MONTHS_S[d.getMonth()]));
@@ -4599,12 +4621,26 @@ class Component extends DCLogic {
     kids.push(E('line',{key:'vsep',x1:L,x2:W-R,y1:H-B+34,y2:H-B+34,stroke:'var(--color-divider)',strokeWidth:1}));
     kids.push(E('text',{key:'vl1',x:2,y:H-B+(rot?44+lbl/2-4:48),textAnchor:'start',fontSize:14,fontWeight:600,fill:'var(--color-accent-2-700)'},'% แผน'));
     kids.push(E('text',{key:'vl2',x:2,y:H-B+(rot?44+lbl/2+14:66),textAnchor:'start',fontSize:14,fontWeight:700,fill:'var(--color-accent-700)'},'% ผลงาน'));
-    const gap=[];
+    const p0=st? [x(-1)+','+y(0)] : [];
+    const gap=p0.slice();
     for(let i=0;i<=last;i++) gap.push(x(i)+','+y(plans[i]));
     for(let i=last;i>=0;i--) gap.push(x(i)+','+y(acts[i]));
-    if(last>0) kids.push(E('polygon',{key:'gap',points:gap.join(' '),fill: acts[last]<plans[last]?'color-mix(in srgb, var(--color-accent) 16%, transparent)':'color-mix(in srgb, var(--color-accent-2) 20%, transparent)'}));
-    kids.push(E('polyline',{key:'plan',points:keys.map((k,i)=>x(i)+','+y(plans[i])).join(' '),fill:'none',stroke:'var(--color-accent-2-600)',strokeWidth:2.4}));
-    if(last>0) kids.push(E('polyline',{key:'act',points:keys.slice(0,last+1).map((k,i)=>x(i)+','+y(acts[i])).join(' '),fill:'none',stroke:'var(--color-accent)',strokeWidth:2.4}));
+    if(last+st>0) kids.push(E('polygon',{key:'gap',points:gap.join(' '),fill: acts[last]<plans[last]?'color-mix(in srgb, var(--color-accent) 16%, transparent)':'color-mix(in srgb, var(--color-accent-2) 20%, transparent)'}));
+    kids.push(E('polyline',{key:'plan',points:p0.concat(keys.map((k,i)=>x(i)+','+y(plans[i]))).join(' '),fill:'none',stroke:'var(--color-accent-2-600)',strokeWidth:2.4}));
+    if(last+st>0) kids.push(E('polyline',{key:'act',points:p0.concat(keys.slice(0,last+1).map((k,i)=>x(i)+','+y(acts[i]))).join(' '),fill:'none',stroke:'var(--color-accent)',strokeWidth:2.4}));
+    if(st){
+      const zero=this.n(0,3), sx=x(-1);
+      kids.push(E('circle',{key:'pc0',cx:sx,cy:y(0),r:2.6,fill:'var(--color-accent-2-600)'}));
+      kids.push(E('circle',{key:'ac0',cx:sx,cy:y(0),r:2.8,fill:'var(--color-accent)'}));
+      if(rot){
+        const y0=H-B+42, off=Math.min(sp/4, fz*0.75), px=sx-off, ax=sx+off;
+        kids.push(E('text',{key:'plv0',x:px,y:y0,transform:'rotate(-90 '+px+' '+y0+')',textAnchor:'end',dominantBaseline:'central',fontSize:fz,fontWeight:600,fill:'var(--color-accent-2-700)'},zero));
+        kids.push(E('text',{key:'alv0',x:ax,y:y0,transform:'rotate(-90 '+ax+' '+y0+')',textAnchor:'end',dominantBaseline:'central',fontSize:fz,fontWeight:700,fill:'var(--color-accent-700)'},zero));
+      } else {
+        kids.push(E('text',{key:'plv0',x:sx,y:H-B+48,textAnchor:'middle',fontSize:fz,fontWeight:600,fill:'var(--color-accent-2-700)'},zero));
+        kids.push(E('text',{key:'alv0',x:sx,y:H-B+66,textAnchor:'middle',fontSize:fz,fontWeight:700,fill:'var(--color-accent-700)'},zero));
+      }
+    }
     kids.push(E('line',{key:'sel',x1:x(selIdx),x2:x(selIdx),y1:T,y2:H-B,stroke:'var(--color-accent-700)',strokeWidth:1.4,strokeDasharray:'5 4'}));
     const anchor = x(selIdx) < L+56 ? 'start' : (x(selIdx) > W-R-56 ? 'end' : 'middle');
     kids.push(E('text',{key:'selt',x:x(selIdx),y:T+8,textAnchor:anchor,fontSize:13,fill:'var(--color-accent-700)',fontWeight:700},'สัปดาห์รายงาน'));
@@ -4753,28 +4789,31 @@ class Component extends DCLogic {
 
   ganttData(p, wk, on){
     if(!on) return {};
-    const keys=this.weeksOf(p), n=keys.length;
+    const keys=this.weeksOf(p), st=this.startCol(p,keys), n=keys.length+st;
     if(n<2) return {};
     const last=this.lastReported(p);
     const plans=keys.map((k,i)=>this.planAt(p,i));
     const acts=keys.map((k,i)=> i<=last? this.actualAt(p,i) : null);
-    const weekCols=keys.map((k,i)=>({ day:this.d(k).getDate(),
-      plan:this.n(plans[i],3), actual: i<=last? this.n(acts[i],3) : '-' }));
-    const groupBy=(fn)=>{ const out=[]; keys.forEach((k,i)=>{ const lab=fn(this.d(k));
+    const cols=st? [p.startDate].concat(keys) : keys;
+    const weekCols=(st? [{ day:this.d(p.startDate).getDate(), plan:this.n(0,3), actual:this.n(0,3) }] : []).concat(keys.map((k,i)=>({ day:this.d(k).getDate(),
+      plan:this.n(plans[i],3), actual: i<=last? this.n(acts[i],3) : '-' })));
+    const groupBy=(fn)=>{ const out=[]; cols.forEach((k,i)=>{ const lab=fn(this.d(k));
       const t=out[out.length-1]; if(t && t.label===lab) t.span++; else out.push({label:lab,span:1}); }); return out; };
     const monthCols=groupBy(d=>this.MONTHS_S[d.getMonth()]);
     const yearCols=groupBy(d=>'ปี '+(d.getFullYear()+543));
     const tmpl=(cols)=>cols.map(c=>c.span+'fr').join(' ');
     const E=React.createElement;
-    const x=i=>(i+0.5)/n*100, y=v=>100-v;
+    const x=i=>(i+st+0.5)/n*100, y=v=>100-v;
     const grid=[];
     for(let g=0;g<=100;g+=10) grid.push(E('line',{key:'h'+g,x1:0,x2:100,y1:y(g),y2:y(g),
       stroke:'var(--color-divider)',strokeWidth:0.5,vectorEffect:'non-scaling-stroke'}));
-    keys.forEach((k,i)=>grid.push(E('line',{key:'v'+i,x1:x(i),x2:x(i),y1:0,y2:100,
+    cols.forEach((k,ci)=>grid.push(E('line',{key:'v'+ci,x1:x(ci-st),x2:x(ci-st),y1:0,y2:100,
       stroke:'var(--color-divider)',strokeWidth:0.5,vectorEffect:'non-scaling-stroke'})));
-    const planPts=keys.map((k,i)=>x(i)+','+y(plans[i])).join(' ');
-    const actPts=keys.slice(0,last+1).map((k,i)=>x(i)+','+y(acts[i])).join(' ');
-    const dots=[];
+    const p0=st? [x(-1)+','+y(0)] : [];
+    const planPts=p0.concat(keys.map((k,i)=>x(i)+','+y(plans[i]))).join(' ');
+    const actPts=p0.concat(keys.slice(0,last+1).map((k,i)=>x(i)+','+y(acts[i]))).join(' ');
+    const dots=st? [E('circle',{key:'pd0',cx:x(-1),cy:y(0),r:0.9,fill:'var(--color-accent-2-600)',vectorEffect:'non-scaling-stroke'}),
+      E('circle',{key:'ad0',cx:x(-1),cy:y(0),r:1.3,fill:'var(--color-accent)',vectorEffect:'non-scaling-stroke'})] : [];
     keys.forEach((k,i)=>{
       dots.push(E('circle',{key:'pd'+i,cx:x(i),cy:y(plans[i]),r:0.9,
         fill:'var(--color-accent-2-600)',vectorEffect:'non-scaling-stroke'}));
@@ -4786,7 +4825,7 @@ class Component extends DCLogic {
       ...grid,
       E('polyline',{key:'pl',points:planPts,fill:'none',stroke:'var(--color-accent-2-600)',
         strokeWidth:1.6,strokeDasharray:'5 3',vectorEffect:'non-scaling-stroke'}),
-      last>0? E('polyline',{key:'ac',points:actPts,fill:'none',stroke:'var(--color-accent)',
+      last+st>0? E('polyline',{key:'ac',points:actPts,fill:'none',stroke:'var(--color-accent)',
         strokeWidth:2.4,vectorEffect:'non-scaling-stroke'}) : null,
       ...dots
     ]);
@@ -6229,7 +6268,8 @@ class Component extends DCLogic {
     delete d.isDraftNew;
     d.duration = this.durOf(d)||0;
     d.contractNo = this.composeContractNo(d);
-    const keys=this.weeksOf(d); d.weeks=d.weeks||{};
+    d.weeks=this.fillPlanEnd(d).weeks||{};
+    const keys=this.weeksOf(d);
     delete d.weeks['undefined'];
     keys.forEach(k=>{ if(!d.weeks[k]) d.weeks[k]={plan:'',actual:{}}; });
     (d.items||[]).forEach(it=>{ delete it.unitOther; it.unit=this.workUnit(String(it.unit||'').trim()); });
@@ -7348,28 +7388,34 @@ class Component extends DCLogic {
       out.itemTotals={ amount:this.n(tot,2), weight:tot? '100.000':'-',
         count:(d.items||[]).filter(x=>this.num(x.qty)>0).length };
       const planRef=Object.assign({}, d, {endDate: d.endDateOrig || d.endDate || ''});
+      const dp=this.fillPlanEnd(d);
       const dkeys=this.weeksOf(planRef), dcwc=this.contractWeekCount(planRef);
       out.noPlanWeeks=!dkeys.length;
       const pkeys=dkeys.filter((k,i)=>i<dcwc);
       const mKey=(k)=>String(k).slice(0,7);
       const mGroups={}; pkeys.forEach(k=>{ const m=mKey(k); (mGroups[m]=mGroups[m]||[]).push(k); });
       let cumSoFar=0;
-      out.planWeeks=pkeys.map((k,i)=>{
+      const endM=pkeys.length? mKey(pkeys[pkeys.length-1]) : '';
+      const startCard=(pkeys.length && d.startDate)? [{ title:'เริ่ม · '+this.thDowShort(d.startDate), canEdit:false, isAuto:true,
+        bd:'var(--color-accent-500)', bg:'var(--color-accent-100)', value:'', autoTxt:'0.000', hint:'วันเริ่มสัญญา · 0%',
+        onFocus:()=>{}, onBlur:()=>{}, onChange:()=>{} }] : [];
+      out.planWeeks=startCard.concat(pkeys.map((k,i)=>{
         const m=mKey(k), grp=mGroups[m], isLast=grp[grp.length-1]===k;
-        cumSoFar+=this.num(((d.weeks||{})[k]||{}).planW);
+        const isEnd=i===pkeys.length-1, canEdit=isLast && m!==endM;
+        cumSoFar+=this.num(((dp.weeks||{})[k]||{}).planW);
         const cum=Math.round(cumSoFar*1000)/1000;
         const monthSum=grp.reduce((t,kk)=>t+this.num(((d.weeks||{})[kk]||{}).planW),0);
         const prevCum=Math.round((cum-monthSum)*1000)/1000;
-        const w=(d.weeks&&d.weeks[k])||{};
+        const w=(dp.weeks&&dp.weeks[k])||{};
         const own=(w.planW===''||w.planW===undefined||w.planW===null)?'':w.planW;
-        return { no:i+1, label:this.thShort(k), canEdit:isLast, isAuto:!isLast,
+        return { title:(i+1)+'. '+this.thDowShort(k), canEdit, isAuto:!canEdit,
           bd: isLast? 'var(--color-accent-500)':'var(--color-divider)',
           bg: isLast? 'var(--color-accent-100)':'transparent',
           value: isLast? ((this.state.planFocus===m)? (this.state.planRaw||'') : (cum? this.n(cum,3):'')) : '',
           autoTxt: cum? this.n(cum,3) : '—',
           onFocus:()=>this.setState({planFocus:m, planRaw: cum? String(Math.round(cum*1000)/1000) : ''}),
           onBlur:()=>this.setState({planFocus:'', planRaw:''}),
-          hint: isLast? ('สะสมสิ้นเดือน · '+grp.length+' สัปดาห์') : ('สะสม · +'+this.n(this.num(own),3)),
+          hint: isEnd? 'วันสิ้นสุดสัญญา · 100%' : isLast? ('สะสมสิ้นเดือน · '+grp.length+' สัปดาห์') : ('สะสม · +'+this.n(this.num(own),3)),
           onChange:(e)=>{
             const raw=e.target.value;
             const target=raw===''? prevCum : this.num(raw);
@@ -7381,10 +7427,12 @@ class Component extends DCLogic {
               nd.weeks[kk].planW = (j===grp.length-1)? Math.round((total-each*(grp.length-1))*1000)/1000 : each;
             });
             this.setState({draft:nd, planFocus:m, planRaw:raw}); } };
-      });
+      }));
       out.planWeekCount=Math.max(0, Math.min(dkeys.length, dcwc));
-      out.draftPlanSum=this.n(this.planSum(d),3);
-      out.draftChart=this.chartEl(d, dkeys, Math.min(this.state.wk, Math.max(dkeys.length-1,0)));
+      /* same weeks as the cards (original end date), so an extended contract doesn't shift the preview */
+      const dpRef=Object.assign({}, dp, {endDate: planRef.endDate});
+      out.draftPlanSum=this.n(this.planSum(dpRef),3);
+      out.draftChart=this.chartEl(dpRef, dkeys, Math.min(this.state.wk, Math.max(dkeys.length-1,0)));
       out.addDraftWeek=()=>{ if(!d.startDate||!(d.endDateOrig||d.endDate)){ this.showNotice('กรุณาระบุวันเริ่มสัญญาและวันสิ้นสุดสัญญา (เดิม) ก่อน'); return; }
         const nd=JSON.parse(JSON.stringify(d)); nd.extraWeeks=(parseInt(nd.extraWeeks||0,10)||0)+1; this.setState({draft:nd}); };
       out.clearPlan=()=>this.askConfirm('ล้าง % แผนงานทุกสัปดาห์?', ()=>{
