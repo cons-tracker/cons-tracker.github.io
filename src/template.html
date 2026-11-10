@@ -316,8 +316,10 @@ textarea.input { min-height: 90px; resize: vertical; }
 }
 .tag-accent { background: var(--color-accent-100); color: var(--color-accent-800); }
 .tag-accent-2 { background: var(--color-accent-2-100); color: var(--color-accent-2-800); }
-.tag-neutral { background: var(--color-neutral-100); color: var(--color-neutral-800); }
-.tag-outline { border: 1px solid var(--color-accent); color: var(--color-accent); }
+/* ป้ายปีงบประมาณ: พื้นเหลืองอ่อน */
+.tag-neutral { background: #fff6cc; color: #000; }
+/* ป้ายที่มาของงบ: พื้นส้มอ่อน ตัวอักษรดำ ไม่มีกรอบ */
+.tag-outline { background: var(--color-accent-100); color: #000; border: none; }
 
 /* — navigation — */
 .nav {
@@ -1676,7 +1678,7 @@ svg.leaflet-image-layer.leaflet-interactive path {
     .hm-table td{font-size:9.5px !important;vertical-align:middle}
     .hm-table td .val{font-size:9.2px !important}
     .hm-table td:nth-child(5){font-size:9.2px !important}
-    .hm-table td:first-child .val{font-size:11.5px !important;font-weight:600}
+    .hm-table td:first-child .val{font-size:11.5px !important;font-weight:700 !important}
     .hm-table td .lbl{font-size:10px !important;line-height:1.32}
     .hm-table td:first-child > .lbl{font-size:9.2px !important;line-height:1.3}
     .hm-table td:first-child > div{margin-top:1px !important}
@@ -2127,25 +2129,64 @@ svg.leaflet-image-layer.leaflet-interactive path {
   </div>
 
   <sc-if value="{{ hasAlertsOver }}" hint-placeholder-val="{{ false }}">
-    <div class="hm-alert" style="background:#f3d4cf;border:1px solid #d79b91;border-left:4px solid #8f1d12;border-radius:var(--radius-md);padding:12px 16px;margin-bottom:12px">
-      <div class="hd" style="font-size:13.5px;color:#8f1d12;margin-bottom:6px">แจ้งเตือน — โครงการเกินอายุสัญญา (ผลงานยังไม่แล้วเสร็จ)</div>
+    <div class="hm-alert" style="background:#fde2e0;border:1px solid #efaea6;border-left:4px solid #b42318;border-radius:var(--radius-md);padding:12px 16px;margin-bottom:12px">
+      <div class="hd" style="font-size:13.5px;color:#7a1a10;margin-bottom:6px">แจ้งเตือน — โครงการเกินอายุสัญญา (ผลงานยังไม่แล้วเสร็จ)</div>
       <div style="display:flex;flex-direction:column;gap:4px">
         <sc-for list="{{ alertsOver }}" as="a" hint-placeholder-count="1">
-          <div style="font-size:13px;color:#8f1d12">
-            <span style="color:#8f1d12;font-weight:700">{{ a.contractNo }}</span>
+          <div style="font-size:13px;color:#7a1a10">
+            <span style="color:#7a1a10;font-weight:700">{{ a.contractNo }}</span>
             <span> — สิ้นสุดสัญญา {{ a.endTxt }} · เกิน {{ a.over }} วัน · ผลงาน {{ a.actual }}% · ค่าปรับสะสม {{ a.fineTxt }} บาท</span>
           </div>
         </sc-for>
       </div>
     </div>
   </sc-if>
+  <sc-if value="{{ hasAlertsFine }}" hint-placeholder-val="{{ false }}">
+    <div class="hm-alert" style="background:#fce4f0;border:1px solid #f0b0cf;border-left:4px solid #be185d;border-radius:var(--radius-md);padding:12px 16px;margin-bottom:12px">
+      <div class="hd" style="font-size:13.5px;color:#831843;margin-bottom:6px">แจ้งเตือน — โครงการค่าปรับเกิน 10% ของวงเงินค่างาน</div>
+      <div style="display:flex;flex-direction:column;gap:4px">
+        <sc-for list="{{ alertsFine }}" as="a" hint-placeholder-count="1">
+          <div style="font-size:13px;color:#831843">
+            <span style="color:#831843;font-weight:700">{{ a.contractNo }}</span>
+            <span> — ค่าปรับสะสม {{ a.fineTxt }} บาท = {{ a.pct }}% ของค่างาน {{ a.valueTxt }} บาท · เกินสัญญา {{ a.over }} วัน</span>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </sc-if>
+  <sc-if value="{{ hasAlertsHalf }}" hint-placeholder-val="{{ false }}">
+    <div class="hm-alert" style="background:#ffe7cf;border:1px solid #f8bb80;border-left:4px solid #c2410c;border-radius:var(--radius-md);padding:12px 16px;margin-bottom:12px">
+      <div class="hd" style="font-size:13.5px;color:#7c2d12;margin-bottom:6px">แจ้งเตือน — อายุสัญญาผ่านไป 1/2 แต่ผลงานไม่ถึง 25%</div>
+      <div style="display:flex;flex-direction:column;gap:4px">
+        <sc-for list="{{ alertsHalf }}" as="a" hint-placeholder-count="1">
+          <div style="font-size:13px;color:#7c2d12">
+            <span style="color:#7c2d12;font-weight:700">{{ a.contractNo }}</span>
+            <span> — ผ่านไป {{ a.elapsed }} / {{ a.dur }} วัน ({{ a.elapsedPct }}%) · ผลงาน {{ a.actual }}%</span>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </sc-if>
+  <sc-if value="{{ hasAlertsQuarter }}" hint-placeholder-val="{{ false }}">
+    <div class="hm-alert" style="background:#fef6bf;border:1px solid #e8d36e;border-left:4px solid #a16207;border-radius:var(--radius-md);padding:12px 16px;margin-bottom:12px">
+      <div class="hd" style="font-size:13.5px;color:#713f12;margin-bottom:6px">แจ้งเตือน — อายุสัญญาผ่านไป 1/4 แต่ผลงานไม่ถึง 10%</div>
+      <div style="display:flex;flex-direction:column;gap:4px">
+        <sc-for list="{{ alertsQuarter }}" as="a" hint-placeholder-count="1">
+          <div style="font-size:13px;color:#713f12">
+            <span style="color:#713f12;font-weight:700">{{ a.contractNo }}</span>
+            <span> — ผ่านไป {{ a.elapsed }} / {{ a.dur }} วัน ({{ a.elapsedPct }}%) · ผลงาน {{ a.actual }}%</span>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </sc-if>
   <sc-if value="{{ hasAlerts90 }}" hint-placeholder-val="{{ false }}">
-    <div class="hm-alert" style="background:var(--color-accent-200);border:1px solid var(--color-accent-400);border-left:4px solid var(--color-accent-700);border-radius:var(--radius-md);padding:12px 16px;margin-bottom:12px">
-      <div class="hd" style="font-size:13.5px;color:var(--color-accent-800);margin-bottom:6px">แจ้งเตือน — โครงการล่าช้าเกินเกณฑ์ (แผนงานครบ 100% แต่ผลงานไม่ถึง 90%)</div>
+    <div class="hm-alert" style="background:#f6e8d8;border:1px solid #dbbf9c;border-left:4px solid #92400e;border-radius:var(--radius-md);padding:12px 16px;margin-bottom:12px">
+      <div class="hd" style="font-size:13.5px;color:#5c2f0b;margin-bottom:6px">แจ้งเตือน — โครงการล่าช้าเกินเกณฑ์ (แผนงานครบ 100% แต่ผลงานไม่ถึง 90%)</div>
       <div style="display:flex;flex-direction:column;gap:4px">
         <sc-for list="{{ alerts90 }}" as="a" hint-placeholder-count="1">
-          <div style="font-size:13px;color:var(--color-accent-800)">
-            <span style="color:var(--color-accent-800);font-weight:700">{{ a.contractNo }}</span>
+          <div style="font-size:13px;color:#5c2f0b">
+            <span style="color:#5c2f0b;font-weight:700">{{ a.contractNo }}</span>
             <span> — ผลงาน {{ a.actual }}% / แผน {{ a.plan }}%</span>
           </div>
         </sc-for>
@@ -2153,12 +2194,12 @@ svg.leaflet-image-layer.leaflet-interactive path {
     </div>
   </sc-if>
   <sc-if value="{{ hasAlerts }}" hint-placeholder-val="{{ false }}">
-    <div class="hm-alert" style="background:var(--color-accent-100);border:1px solid var(--color-accent-300);border-left:4px solid var(--color-accent-700);border-radius:var(--radius-md);padding:12px 16px;margin-bottom:16px">
-      <div class="hd" style="font-size:13.5px;color:var(--color-accent-800);margin-bottom:6px">แจ้งเตือน — โครงการล่าช้าเกินเกณฑ์ {{ redThresholdTxt }}</div>
+    <div class="hm-alert" style="background:#fff0cc;border:1px solid #f2cd7a;border-left:4px solid #b45309;border-radius:var(--radius-md);padding:12px 16px;margin-bottom:16px">
+      <div class="hd" style="font-size:13.5px;color:#78350f;margin-bottom:6px">แจ้งเตือน — โครงการล่าช้าเกินเกณฑ์ {{ redThresholdTxt }}</div>
       <div style="display:flex;flex-direction:column;gap:4px">
         <sc-for list="{{ alerts }}" as="a" hint-placeholder-count="2">
-          <div style="font-size:13px;color:var(--color-accent-800)">
-            <span style="color:var(--color-accent-800);font-weight:600">{{ a.contractNo }}</span>
+          <div style="font-size:13px;color:#78350f">
+            <span style="color:#78350f;font-weight:600">{{ a.contractNo }}</span>
             <span> — ผลงาน {{ a.actual }}% / แผน {{ a.plan }}% {{ a.diffLabel }} </span>
             <span style="font-weight:700;color:{{ a.diffColor }}">{{ a.diffSigned }}</span>
           </div>
@@ -2175,6 +2216,9 @@ svg.leaflet-image-layer.leaflet-interactive path {
         <span class="lbl" style="font-size:11.5px;font-weight:400">{{ dash.watchCount }} สัญญา</span>
       </div>
       <div class="noprint" style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;margin-bottom:10px">
+        <button sc-camel-on-click="{{ dash.toggleSearch }}" aria-label="ค้นหาสัญญา" title="ค้นหาสัญญา" style="flex:0 0 auto;width:34px;height:34px;display:flex;align-items:center;justify-content:center;border:1px solid {{ dash.searchBd }};background:{{ dash.searchBg }};color:{{ dash.searchFg }};border-radius:999px;cursor:pointer">
+          <svg sc-camel-view-box="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"></circle><path d="M16 16l4.5 4.5"></path></svg>
+        </button>
         <sc-for list="{{ dash.watchFilters }}" as="wf" hint-placeholder-count="2">
           <label style="display:flex;flex-direction:column;gap:3px;min-width:0">
             <span class="lbl" style="font-size:11px">{{ wf.label }}</span>
@@ -2187,8 +2231,14 @@ svg.leaflet-image-layer.leaflet-interactive path {
         </sc-for>
         <button sc-camel-on-click="{{ dash.clearWatchFilters }}" style="border:1px solid var(--color-divider);background:var(--color-neutral-100);color:var(--color-neutral-800);border-radius:999px;padding:6px 14px;font-size:12px;font-family:var(--font-body);cursor:pointer">ล้างตัวกรอง</button>
       </div>
+      <sc-if value="{{ dash.searchOpen }}" hint-placeholder-val="{{ false }}">
+        <div class="noprint" style="display:flex;gap:6px;align-items:center;margin-bottom:10px">
+          <input value="{{ dash.query }}" sc-camel-on-change="{{ dash.setQuery }}" placeholder="ค้นหาเลขที่สัญญา / ชื่อโครงการ / ผู้รับจ้าง / สายทาง / ช่างควบคุมงาน" aria-label="ค้นหาสัญญา" style="flex:1 1 auto;min-width:0;border:1px solid var(--color-divider);border-radius:999px;padding:7px 14px;font-size:12.5px;font-family:var(--font-body);background:var(--color-neutral-100);color:var(--color-text)">
+          <button sc-camel-on-click="{{ dash.closeSearch }}" class="btn btn-secondary" style="white-space:nowrap;font-size:12px;cursor:pointer">ปิด</button>
+        </div>
+      </sc-if>
       <sc-if value="{{ dash.noWatch }}" hint-placeholder-val="{{ false }}">
-        <div class="lbl" style="font-size:12.5px;padding:6px 0">ยังไม่มีข้อมูลสัญญา</div>
+        <div class="lbl" style="font-size:12.5px;padding:6px 0">{{ dash.noWatchTxt }}</div>
       </sc-if>
       <sc-if value="{{ dash.hasWatch }}" hint-placeholder-val="{{ true }}">
       <div class="hm-table-wrap" style="overflow-x:auto">
@@ -2210,22 +2260,22 @@ svg.leaflet-image-layer.leaflet-interactive path {
             <sc-raw-th class="hd" style="text-align:center;padding:7px 8px;border:1px solid var(--color-divider);width:112px;font-size:12px">เริ่ม / สิ้นสุดสัญญา</sc-raw-th>
             <sc-raw-th class="hd" style="text-align:center;padding:7px 8px;border:1px solid var(--color-divider);width:74px;font-size:12px">อายุสัญญา</sc-raw-th>
             <sc-raw-th class="hd" style="text-align:left;padding:7px 8px;border:1px solid var(--color-divider);width:150px;font-size:12px">ผู้รับจ้าง</sc-raw-th>
-            <sc-raw-th class="hd" style="text-align:right;padding:7px 8px;border:1px solid var(--color-divider);width:92px;font-size:12px">ค่าปรับ/วัน</sc-raw-th>
-            <sc-raw-th class="hd" style="padding:7px 8px;border:1px solid var(--color-divider);width:82px;font-size:12px;color:var(--color-accent-2-700)">% แผน</sc-raw-th>
+            <sc-raw-th class="hd" style="text-align:right;padding:7px 8px;border:1px solid var(--color-divider);width:112px;font-size:12px;white-space:nowrap">ค่าปรับ(บาท)/วัน</sc-raw-th>
+            <sc-raw-th class="hd" style="padding:7px 8px;border:1px solid var(--color-divider);width:82px;font-size:12px;color:var(--color-accent-2-700)">% แผนงาน</sc-raw-th>
             <sc-raw-th class="hd" style="padding:7px 8px;border:1px solid var(--color-divider);width:82px;font-size:12px;color:var(--color-accent-700)">% ผลงาน</sc-raw-th>
             <sc-raw-th class="hd" style="padding:7px 8px;border:1px solid var(--color-divider);width:100px;font-size:12px">ผลต่าง</sc-raw-th>
             <sc-raw-th class="hd" style="text-align:left;padding:7px 8px;border:1px solid var(--color-divider);width:150px;font-size:12px">ผู้ควบคุมงาน</sc-raw-th>
-            <sc-raw-th class="hd" style="text-align:left;padding:7px 8px;border:1px solid var(--color-divider);width:240px;font-size:12px">หมายเหตุ</sc-raw-th>
+            <sc-raw-th class="hd" style="text-align:left;padding:7px 8px;border:1px solid var(--color-divider);width:220px;font-size:12px">หมายเหตุ</sc-raw-th>
           </sc-raw-tr>
         </sc-raw-thead>
         <sc-raw-tbody>
           <sc-for list="{{ dash.watch }}" as="w" hint-placeholder-count="4">
             <sc-raw-tr>
               <sc-raw-td style="padding:6px 8px;border:1px solid var(--color-divider)">
-                <span class="val">{{ w.contractNo }}</span>
+                <span class="val" sc-camel-on-click="{{ w.open }}" title="ดูรายละเอียดโครงการ" style="font-weight:700;cursor:pointer;color:var(--color-accent-800)" style-hover="text-decoration:underline">{{ w.contractNo }}</span>
                 <div class="lbl wk-prog-para" style="font-size:11.5px;margin-top:2px"><sc-for list="{{ w.projectParts }}" as="x" hint-placeholder-count="1"><span style="white-space:{{ x.ws }}">{{ x.t }}</span></sc-for></div>
                 <div style="display:flex;gap:4px;margin-top:4px;flex-wrap:wrap;align-items:center">
-                  <span class="lbl" style="font-size:10.5px;margin-right:2px">{{ w.district }}</span>
+                  <span class="tag" style="font-size:10.5px;background:#efe6fb;color:#000">{{ w.district }}</span>
                   <span class="tag tag-neutral" style="font-size:10.5px">ปีงบ {{ w.fiscalYear }}</span>
                   <span class="tag tag-outline" style="font-size:10.5px">{{ w.budgetType }}</span>
                   <span class="tag tag-accent-2" style="font-size:10.5px">{{ w.workType }}</span>
@@ -2242,9 +2292,9 @@ svg.leaflet-image-layer.leaflet-interactive path {
                 <span style="display:inline-block;padding:2px 9px;border-radius:999px;font-size:11.5px;font-weight:600;background:{{ w.bg }};color:{{ w.fg }}">{{ w.diff }}</span>
               </sc-raw-td>
               <sc-raw-td style="padding:6px 8px;border:1px solid var(--color-divider);font-size:11px;line-height:1.45">
-                <div class="lbl" style="font-size:10px;letter-spacing:.03em">ช่างควบคุมงาน</div>
+                <div class="lbl" style="font-size:12px;letter-spacing:.02em">ช่างควบคุมงาน</div>
                 <div class="val" style="font-size:11px">{{ w.supervisor }}</div>
-                <div class="lbl" style="font-size:10px;letter-spacing:.03em;margin-top:3px">ช่างควบคุมด้านวัสดุ</div>
+                <div class="lbl" style="font-size:12px;letter-spacing:.02em;margin-top:9px">ช่างควบคุมด้านวัสดุ</div>
                 <div class="val" style="font-size:11px">{{ w.material }}</div>
               </sc-raw-td>
               <sc-raw-td style="padding:6px 8px;border:1px solid var(--color-divider);font-size:11.5px;line-height:1.45;overflow-wrap:anywhere;height:1px">
@@ -2376,7 +2426,7 @@ svg.leaflet-image-layer.leaflet-interactive path {
           </sc-raw-th>
           <sc-raw-th style="padding:0;border:1px solid var(--color-divider);width:6%">
             <div sc-camel-on-click="{{ h5.click }}" class="hd" style="cursor:pointer;padding:9px 8px;font-size:12px;display:flex;gap:4px;justify-content:flex-end;align-items:center" style-hover="background:var(--color-accent-100)">
-              <span style="color:var(--color-accent-2-700)">% แผน</span><span style="font-size:10px;color:var(--color-accent-700)">{{ h5.arrow }}</span>
+              <span style="color:var(--color-accent-2-700)">% แผนงาน</span><span style="font-size:10px;color:var(--color-accent-700)">{{ h5.arrow }}</span>
             </div>
           </sc-raw-th>
           <sc-raw-th style="padding:0;border:1px solid var(--color-divider);width:6.5%">
@@ -2396,7 +2446,7 @@ svg.leaflet-image-layer.leaflet-interactive path {
           </sc-raw-th>
           <sc-raw-th style="padding:0;border:1px solid var(--color-divider);width:8.5%">
             <div sc-camel-on-click="{{ h9.click }}" class="hd" style="cursor:pointer;padding:9px 8px;font-size:12px;display:flex;gap:4px;justify-content:flex-end;align-items:center" style-hover="background:var(--color-accent-100)">
-              <span>ค่าปรับ/วัน</span><span style="font-size:10px;color:var(--color-accent-700)">{{ h9.arrow }}</span>
+              <span>ค่าปรับ(บาท)/วัน</span><span style="font-size:10px;color:var(--color-accent-700)">{{ h9.arrow }}</span>
             </div>
           </sc-raw-th>
           <sc-raw-th class="hd" style="padding:9px 8px;border:1px solid var(--color-divider);width:158px;font-size:12px;text-align:center">สถานะ</sc-raw-th>
@@ -2504,7 +2554,7 @@ svg.leaflet-image-layer.leaflet-interactive path {
       </sc-raw-tbody>
     </sc-raw-table>
   </div>
-  <div style="font-size:11.5px;color:var(--color-neutral-600);margin-top:8px">% แผน / % ผลงาน คิดถึงสัปดาห์ปัจจุบันของแต่ละโครงการ · เกณฑ์: ช้ากว่าแผนเกิน {{ amberThresholdTxt }} = เหลือง, เกิน {{ redThresholdTxt }} = แดง</div>
+  <div style="font-size:11.5px;color:var(--color-neutral-600);margin-top:8px">% แผนงาน / % ผลงาน คิดถึงสัปดาห์ปัจจุบันของแต่ละโครงการ · เกณฑ์: ช้ากว่าแผนเกิน {{ amberThresholdTxt }} = เหลือง, เกิน {{ redThresholdTxt }} = แดง</div>
 </div>
 </sc-if>
 
@@ -3122,15 +3172,10 @@ svg.leaflet-image-layer.leaflet-interactive path {
     <div style="display:flex;align-items:flex-start;gap:12px;padding:14px 20px;border-bottom:1px solid var(--color-divider)">
       <div style="flex:1;min-width:0">
         <div class="hd" style="font-size:16px;line-height:1.3">{{ detail.contractNo }}</div>
-        <div style="margin-top:3px">
-          <sc-for list="{{ detail.nameLines }}" as="nl" hint-placeholder-count="2">
-            <div class="lbl" style="font-size:12px;font-weight:400;line-height:1.35">{{ nl.t }}</div>
-          </sc-for>
-        </div>
-        <div class="lbl" style="font-size:12.5px;font-weight:600;margin-top:2px;line-height:1.35;color:var(--color-neutral-800)">{{ detail.projectName }}</div>
-        <sc-if value="{{ detail.hasLocation }}" hint-placeholder-val="{{ true }}">
-          <div class="lbl" style="font-size:12px;font-weight:400;margin-top:1px;line-height:1.35">{{ detail.location }}</div>
+        <sc-if value="{{ detail.hasProgram }}" hint-placeholder-val="{{ true }}">
+          <div class="lbl" style="font-size:12px;font-weight:400;margin-top:3px;line-height:1.45;text-align:justify;text-justify:inter-character">{{ detail.programTxt }}</div>
         </sc-if>
+        <div class="lbl" style="font-size:12.5px;font-weight:600;margin-top:3px;line-height:1.45;color:var(--color-neutral-800);text-align:justify;text-justify:inter-character">{{ detail.siteTxt }}</div>
       </div>
       <button sc-camel-on-click="{{ closeDetail }}" class="btn btn-secondary" style="white-space:nowrap;font-size:13px;cursor:pointer">ปิด</button>
     </div>
@@ -4675,7 +4720,7 @@ class Component extends DCLogic {
       if(showM) kids.push(E('text',{key:'mm'+i,x:x(i),y:H-B+26,textAnchor:'start',fontSize:13,fill:'var(--color-neutral-800)',fontWeight:600},this.MONTHS_S[d.getMonth()]));
     });
     kids.push(E('line',{key:'vsep',x1:L,x2:W-R,y1:H-B+34,y2:H-B+34,stroke:'var(--color-divider)',strokeWidth:1}));
-    kids.push(E('text',{key:'vl1',x:2,y:H-B+(rot?44+lbl/2-4:48),textAnchor:'start',fontSize:14,fontWeight:600,fill:'var(--color-accent-2-700)'},'% แผน'));
+    kids.push(E('text',{key:'vl1',x:2,y:H-B+(rot?44+lbl/2-4:48),textAnchor:'start',fontSize:14,fontWeight:600,fill:'var(--color-accent-2-700)'},'% แผนงาน'));
     kids.push(E('text',{key:'vl2',x:2,y:H-B+(rot?44+lbl/2+14:66),textAnchor:'start',fontSize:14,fontWeight:700,fill:'var(--color-accent-700)'},'% ผลงาน'));
     const p0=st? [x(-1)+','+y(0)] : [];
     const gap=p0.slice();
@@ -4770,8 +4815,10 @@ class Component extends DCLogic {
 
   /* ---------- printable sheet (read-only) ---------- */
   /* ชื่อโครงการ ทางหลวง และสถานที่ ต่อกันเป็นย่อหน้าเดียว แบ่งเป็นท่อน ๆ เพื่อไม่ให้ตัดบรรทัดกลางชื่อตอน ช่วง กม. ตำบล/อำเภอ/จังหวัด ปริมาณงานในวงเล็บ หรือระหว่างคำกับตัวเลข */
-  wkProjectParts(p, compact){
-    const txt=[p.program1,p.program2,p.program3,p.projectName,p.location].map(x=>String(x||'').trim()).filter(Boolean).join(' ').replace(/\s+/g,' ');
+  wkProjectParts(p, compact, noProgram){
+    /* noProgram: ไม่แสดงชื่อโครงการ — ทุกโครงการขึ้นต้นด้วย "ทางหลวงหมายเลข ... ตอนควบคุม ... ตอน ... กม." แล้วต่อด้วยที่ตั้ง
+       (highwayTitle ตัดคำนำหน้าก่อน "ทางหลวงหมายเลข" ออก และดึงเลขทางหลวงจากบรรทัดชื่อโครงการเมื่อช่องสายทางไม่มี) */
+    const txt=(noProgram? [this.highwayTitle(p),p.location] : [p.program1,p.program2,p.program3,p.projectName,p.location]).map(x=>String(x||'').trim()).filter(Boolean).join(' ').replace(/\s+/g,' ');
     /* compact: ท่อนสั้นลง สำหรับคอลัมน์แคบที่จัดชิดขอบสองข้าง — บรรทัดเต็มขึ้น ตัวอักษรจึงไม่ถูกยืดห่าง */
     const keep=compact
       ? /โลจิสติกส์|กม\.\S+(?:\s[-–])?|(?:ตำบล|อำเภอ|จังหวัด)\S{1,12}(?![ัิ-ฺ็-๎])|พ\.ศ\.\s?\d+|\(\S+\s\S+\)|[^\sัิ-ฺ็-๎]\S{0,7}\s\d[\d.,+]*(?:\s(?:กิโลเมตร|กม\.|แห่ง))?/g
@@ -5567,7 +5614,7 @@ class Component extends DCLogic {
         })()+
       '</div>'+
       '<div style="display:flex;gap:5px">'+
-        box('% แผน', this.n(pr.plan,2), 'var(--color-accent-2-700)')+
+        box('% แผนงาน', this.n(pr.plan,2), 'var(--color-accent-2-700)')+
         box('% ผลงาน', this.n(pr.actual,2), 'var(--color-accent-700)')+
         (()=>{ const dt=this.diffTint(pr.diff);
           return box('ผลต่าง', (pr.diff>0?'+':'')+this.n(pr.diff,2), dt?dt.fg:stt.fg, dt?dt.bg:stt.bg, dt?dt.bd:stt.bd); })()+
@@ -5787,11 +5834,19 @@ class Component extends DCLogic {
   uniqSorted(fn){ const seen=[]; this.projects().forEach(p=>{ const v=fn(p); if(v && seen.indexOf(v)<0) seen.push(v); });
     return seen.sort((a,b)=>a.localeCompare(b,'th')); }
   homeFilterPass(p){ const st=this.state;
+    if(st.hFy && this.fiscalYearOf(p)!==st.hFy) return false;
     if(st.hDist && this.distOf(p)!==st.hDist) return false;
     if(st.hSup && (p.supervisor||'')!==st.hSup) return false;
     return true; }
   setHomeFilter = (k) => (e) => { const o={}; o[k]=e.target.value; this.setState(o); };
-  clearHomeFilters = () => this.setState({hDist:'',hSup:''});
+  clearHomeFilters = () => this.setState({hFy:'',hDist:'',hSup:'',hq:''});
+  /* ค้นหาในตาราง "ทุกสัญญา" หน้าภาพรวม — กรองเฉพาะรายการในตาราง ไม่กระทบตัวเลขสรุปด้านบน */
+  toggleHomeSearch = () => { const open=!this.state.hSearchOpen; this.setState({hSearchOpen:open, hq:''});
+    if(open) setTimeout(()=>{ const el=document.querySelector('input[aria-label="ค้นหาสัญญา"]'); if(el) el.focus(); }, 60); };
+  closeHomeSearch = () => this.setState({hSearchOpen:false, hq:''});
+  homeQueryPass(p){ const q=String(this.state.hq||'').trim().toLowerCase();
+    if(!q) return true;
+    return (this.hayOf(p)+' '+[p.program3,p.materialInspector,p.fiscalYear,p.budgetType,p.workType].join(' ').toLowerCase()).indexOf(q)>=0; }
   sortBy = (k) => () => this.setState(st=>({ sortKey:k, sortDir: st.sortKey===k? -st.sortDir : 1 }));
   toggleSel = (id) => { const sel=Object.assign({},this.state.sel||{}); if(sel[id]) delete sel[id]; else sel[id]=true; this.setState({sel}); };
   hayOf(p){
@@ -6618,15 +6673,17 @@ class Component extends DCLogic {
     /* detail modal */
     const dp=this.byId(this.state.detailPid);
     out.showDetail=!!dp;
-    out.closeDetail=this.closeDetail;
-    if(dp){
+    out.closeDetail=this.closeDetail;    if(dp){
       const pr=this.progressOf(dp), stt=this.status(pr.diff);
       const rem=this.endOf(dp)? this.days(this.today(),this.endOf(dp)) : NaN;
       const apps=(dp.appointments||[]).slice().sort((a,b)=>String(a.date).localeCompare(String(b.date)));
-      /* หัวหน้าต่างรายละเอียด: ชื่อโครงการ (บรรทัดที่ 1–3) → ทางหลวงหมายเลข ตอน กม. (ตามที่กรอก ไม่ตัดคำ) → ที่ตั้ง */
+      /* หัวหน้าต่างรายละเอียด: ย่อหน้าที่ 1 = ชื่อโครงการ (บรรทัดที่ 1–3 ต่อกันเป็นข้อความเดียว)
+         ย่อหน้าที่ 2 = ทางหลวงหมายเลข ตอน กม. ต่อด้วยที่ตั้ง — ทั้งสองย่อหน้าจัดชิดซ้าย-ขวา (justify) */
       const clean=v=>String(v||'').replace(/\s+/g,' ').trim();
-      out.detail={ nameLines:[dp.program1,dp.program2,dp.program3].map(clean).filter(Boolean).map(t=>({t})),
-        projectName:clean(dp.projectName)||this.apptTitle(dp), location:clean(dp.location), hasLocation:!!clean(dp.location), contractNo:dp.contractNo||'-',
+      const programTxt=[dp.program1,dp.program2,dp.program3].map(clean).filter(Boolean).join(' ');
+      const siteName=clean(dp.projectName)||this.apptTitle(dp), siteLoc=clean(dp.location);
+      out.detail={ programTxt, hasProgram:!!programTxt,
+        siteTxt:(siteLoc && !siteName.includes(siteLoc))? (siteName+' '+siteLoc) : siteName, contractNo:dp.contractNo||'-',
         contractor:dp.contractor||'-', startTh:this.th(dp.startDate),
         endOrigTh:dp.endDateOrig?this.th(dp.endDateOrig):'-', endTh:dp.endDate? this.th(dp.endDate):'-',
         endNewTh:dp.endDate? this.th(dp.endDate):'-',
@@ -6797,7 +6854,7 @@ class Component extends DCLogic {
       out.appt={hasContract:false,contract:[],people:[],fields:[],readRows:[],emRows:[],projectOptions:[],statusOptions:[],hourOptions:[],minOptions:[],dateTh:'',newDateTh:'',dateF:_dp}; }
 
     /* overview */
-    const rows=[], alerts=[], alerts90=[], alertsOver=[];
+    const rows=[], alerts=[], alerts90=[], alertsOver=[], alertsFine=[], alertsHalf=[], alertsQuarter=[];
     let sumVal=0, late=0, ontime=0;
     const st8=this.state;
     const fyOpts=[], budgets=this.BUDGETS.slice(), works=this.WORKS.slice();
@@ -6842,6 +6899,18 @@ class Component extends DCLogic {
       });
       if(!isNaN(remain) && remain<0 && actual<99.999) alertsOver.push({contractNo:p.contractNo, actual:this.n(actual,3),
         endTxt:this.thShort(endIso), over:String(-remain), fineTxt:this.n(fa||0,0)});
+      /* ค่าปรับสะสมเกิน 10% ของค่างานตามสัญญา */
+      { const cv=this.num(p.contractValue);
+        if(fa>0 && cv>0 && fa>cv*0.10) alertsFine.push({contractNo:p.contractNo, fineTxt:this.n(fa,0), valueTxt:this.n(cv,0),
+          pct:this.n(fa*100/cv,2), over:isNaN(remain)? '-' : String(-remain)}); }
+      /* อายุสัญญาผ่านไปแล้ว 1/2 แต่ผลงานไม่ถึง 25% · ผ่านไป 1/4 แต่ผลงานไม่ถึง 10%
+         (สัญญาที่เข้าเกณฑ์ 1/2 แล้วแสดงเฉพาะกลุ่ม 1/2 ไม่แสดงซ้ำในกลุ่ม 1/4) */
+      { const dur=this.num(this.durOf(p)), el=p.startDate? this.days(p.startDate,this.today())+1 : NaN;
+        if(dur>0 && !isNaN(el) && el>0){
+          const a={contractNo:p.contractNo, elapsed:String(Math.min(el,dur)), dur:String(dur),
+            elapsedPct:this.n(Math.min(el,dur)*100/dur,1), actual:this.n(actual,3)};
+          if(el>=dur/2 && actual<25) alertsHalf.push(a);
+          else if(el>=dur/4 && actual<10) alertsQuarter.push(a); } }
       if(plan>=99.999 && actual<90) alerts90.push({contractNo:p.contractNo, plan:this.n(plan,3), actual:this.n(actual,3)});
       if(diff<=-redT) alerts.push({contractNo:p.contractNo, plan:this.n(plan,3), actual:this.n(actual,3),
         diff:this.n(-diff,3),
@@ -6861,11 +6930,11 @@ class Component extends DCLogic {
       ['value','ค่างานตามสัญญา','120px','right'],
       ['start','เริ่ม / สิ้นสุดสัญญา','128px','center'],
       ['remain','อายุสัญญา','108px','center'],
-      ['plan','% แผน','78px','right'],
+      ['plan','% แผนงาน','78px','right'],
       ['actual','% ผลงาน','86px','right'],
       ['diff','ผลต่าง','104px','center'],
       ['contractor','ผู้รับจ้าง','160px','left'],
-      ['fine','ค่าปรับ/วัน','116px','right']
+      ['fine','ค่าปรับ(บาท)/วัน','116px','right']
     ];
     HD.forEach((h,i)=>{ out['h'+(i+1)]={ arrow: st8.sortKey===h[0] ? (dir>0?'▲':'▼') : '', click:this.sortBy(h[0]) }; });
     const OPT=(list,all)=>[{v:'',t:all}].concat(list.map(v=>({v:v,t:v})));
@@ -6884,6 +6953,9 @@ class Component extends DCLogic {
     out.rows=rows; out.alerts=alerts; out.hasAlerts=alerts.length>0;
     out.alerts90=alerts90; out.hasAlerts90=alerts90.length>0;
     out.alertsOver=alertsOver; out.hasAlertsOver=alertsOver.length>0;
+    out.alertsFine=alertsFine; out.hasAlertsFine=alertsFine.length>0;
+    out.alertsHalf=alertsHalf; out.hasAlertsHalf=alertsHalf.length>0;
+    out.alertsQuarter=alertsQuarter; out.hasAlertsQuarter=alertsQuarter.length>0;
     out.kpi={count:projects.length, value:this.n(sumVal,0), late:late, ontime:ontime};
 
     /* project detail */
@@ -7186,10 +7258,10 @@ class Component extends DCLogic {
         const fy=this.fiscalYearOf(p)||'ไม่ระบุ';
         byYear[fy]=(byYear[fy]||0)+1;
         const stt=this.status(diff);
-        if(!this.homeFilterPass(p)) return;
+        if(!this.homeFilterPass(p) || !this.homeQueryPass(p)) return;
         const noteTxt=((p.weeks||{})[this.weeksOf(p)[li]]||{}).note || (p.note==='-'? '' : (p.note||'')) || '-';
         const statusBlocks=this.statusNote(p), hasStatus=statusBlocks.length>0;
-        watch.push({ diffN:diff, contractNo:p.contractNo, projectParts:this.wkProjectParts(p,true),
+        watch.push({ diffN:diff, contractNo:p.contractNo, open:this.openDetail(p.id), projectParts:this.wkProjectParts(p,true,true),
           supervisor:p.supervisor||'-', material:p.materialInspector||'-',
           note:(hasStatus&&noteTxt==='-')? '' : noteTxt,
           hasStatus, statusBlocks,
@@ -7247,7 +7319,7 @@ class Component extends DCLogic {
         overChart:this.donutEl(overGroups, projects.length, overdue, 'เกินอายุ'),
         overLegend:overGroups.map(g=>({label:g.label,count:g.count,color:g.color})),
         kpis:[
-          {label:'สัญญาทั้งหมด', value:String(projects.length), sub:'ทุกปีงบประมาณ', accent:'var(--color-neutral-900)'},
+          {label:'สัญญาทั้งหมด', value:String(projects.length), sub:this.state.hFy? ('ปีงบประมาณ '+this.state.hFy) : 'ทุกปีงบประมาณ', accent:'var(--color-neutral-900)'},
           {label:'สัญญาแล้วเสร็จ', value:String(doneN)+' สัญญา', sub:'ผลงานครบ 100%', accent:'var(--color-accent-2-700)'},
           {label:'เร็วกว่าแผน', value:String(aheadN)+' สัญญา', sub:'ผลงานสูงกว่าแผน (ยังไม่แล้วเสร็จ)', accent:'var(--c-ahead)'},
           {label:'ล่าช้ากว่าแผน', value:String(lateList.length)+' สัญญา', sub:'จากที่ยังไม่แล้วเสร็จ '+notDone+' สัญญา · ช้าเกิน '+amberT+'%', accent:'var(--c-late)'},
@@ -7255,12 +7327,22 @@ class Component extends DCLogic {
         ],
         watch:watchList,
         watchFilters:[
+          { label:'ปีงบประมาณ', value:this.state.hFy||'', onChange:this.setHomeFilter('hFy'),
+            options:[{v:'',t:'ทุกปีงบ'}].concat(this.uniqSorted(p=>this.fiscalYearOf(p)).reverse().map(v=>({v:v,t:'ปีงบ '+v}))) },
           { label:'แขวงทางหลวง', value:this.state.hDist||'', onChange:this.setHomeFilter('hDist'),
             options:[{v:'',t:'ทุกแขวง'}].concat(this.uniqSorted(p=>this.distOf(p)).map(v=>({v:v,t:'แขวงฯ'+v}))) },
           { label:'ช่างควบคุมงาน', value:this.state.hSup||'', onChange:this.setHomeFilter('hSup'),
             options:[{v:'',t:'ทุกคน'}].concat(this.uniqSorted(p=>p.supervisor||'').map(v=>({v:v,t:v}))) }
         ],
         clearWatchFilters:this.clearHomeFilters,
+        searchOpen:!!this.state.hSearchOpen,
+        toggleSearch:this.toggleHomeSearch, closeSearch:this.closeHomeSearch,
+        query:this.state.hq||'',
+        noWatchTxt:String(this.state.hq||'').trim()? 'ไม่พบสัญญาที่ตรงกับคำค้น' : 'ยังไม่มีข้อมูลสัญญา',
+        setQuery:(e)=>this.setState({hq:e.target.value}),
+        searchBd:this.state.hSearchOpen?'var(--color-accent)':'var(--color-divider)',
+        searchBg:this.state.hSearchOpen?'var(--color-accent)':'var(--color-neutral-100)',
+        searchFg:this.state.hSearchOpen?'var(--color-bg)':'var(--color-neutral-800)',
         watchCount:String(watchList.length),
         hasWatch:watchList.length>0,
         noWatch:watchList.length===0
