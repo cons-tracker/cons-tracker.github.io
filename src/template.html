@@ -2166,7 +2166,7 @@ svg.leaflet-image-layer.leaflet-interactive path {
   </sc-if>
   <sc-if value="{{ hasAlertsHalf }}" hint-placeholder-val="{{ false }}">
     <div class="hm-alert" style="background:#ffe7cf;border:1px solid #f8bb80;border-left:4px solid #c2410c;border-radius:var(--radius-md);padding:12px 16px;margin-bottom:12px">
-      <div class="hd" style="font-size:13.5px;color:#7c2d12;margin-bottom:6px">แจ้งเตือน — อายุสัญญาผ่านไป 1/2 แต่ผลงานไม่ถึง 25%</div>
+      <div class="hd" style="font-size:13.5px;color:#7c2d12;margin-bottom:6px">แจ้งเตือน — โครงการล่าช้าเกินเกณฑ์ (สัญญาผ่านไป 1/2 ของสัญญาผลงานน้อยกว่า 25%)</div>
       <div style="display:flex;flex-direction:column;gap:4px">
         <sc-for list="{{ alertsHalf }}" as="a" hint-placeholder-count="1">
           <div style="font-size:13px;color:#7c2d12">
@@ -2179,7 +2179,7 @@ svg.leaflet-image-layer.leaflet-interactive path {
   </sc-if>
   <sc-if value="{{ hasAlertsQuarter }}" hint-placeholder-val="{{ false }}">
     <div class="hm-alert" style="background:#fef6bf;border:1px solid #e8d36e;border-left:4px solid #a16207;border-radius:var(--radius-md);padding:12px 16px;margin-bottom:12px">
-      <div class="hd" style="font-size:13.5px;color:#713f12;margin-bottom:6px">แจ้งเตือน — อายุสัญญาผ่านไป 1/4 แต่ผลงานไม่ถึง 10%</div>
+      <div class="hd" style="font-size:13.5px;color:#713f12;margin-bottom:6px">แจ้งเตือน — โครงการล่าช้าเกินเกณฑ์ (สัญญาผ่านไป 1/4 ของสัญญาผลงานน้อยกว่า 10%)</div>
       <div style="display:flex;flex-direction:column;gap:4px">
         <sc-for list="{{ alertsQuarter }}" as="a" hint-placeholder-count="1">
           <div style="font-size:13px;color:#713f12">
@@ -2222,7 +2222,7 @@ svg.leaflet-image-layer.leaflet-interactive path {
   <div class="hm-list" style="display:grid;grid-template-columns:minmax(0,1fr);gap:14px">
     <div class="hm-list-card" style="background:var(--color-neutral-100);border:1px solid var(--color-divider);border-radius:var(--radius-lg);padding:14px 16px;min-width:0">
       <div class="hm-list-head" style="display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:10px">
-        <div class="hd" style="font-size:13px">ทุกสัญญา (เรียงตามแขวงทางหลวง แล้วตามเลขที่สัญญา)</div>
+        <div class="hd" style="font-size:13px">{{ dash.sortTitle }}</div>
         <span class="lbl" style="font-size:11.5px;font-weight:400">{{ dash.watchCount }} สัญญา</span>
       </div>
       <div class="noprint" style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;margin-bottom:10px">
@@ -2258,7 +2258,7 @@ svg.leaflet-image-layer.leaflet-interactive path {
           <sc-raw-tr class="hm-print-title">
             <sc-raw-th sc-camel-col-span="{{ 11 }}">
               <div style="display:flex;align-items:baseline;gap:10px">
-                <span class="hm-print-title-tx">ทุกสัญญา (เรียงตามแขวงทางหลวง แล้วตามเลขที่สัญญา)</span>
+                <span class="hm-print-title-tx">{{ dash.sortTitle }}</span>
                 <span class="lbl" style="font-weight:400">{{ dash.watchCount }} สัญญา</span>
                 <span class="lbl" style="font-weight:400;margin-left:auto">ข้อมูล ณ วันจันทร์ที่ {{ reportMonTh }}</span>
               </div>
@@ -2588,6 +2588,7 @@ svg.leaflet-image-layer.leaflet-interactive path {
             <button sc-camel-on-click="{{ exportScheduleAll }}" style="background:transparent;border:0;border-radius:var(--radius-sm);padding:8px 12px;font-size:13px;font-family:var(--font-body);color:var(--color-text);text-align:left;cursor:pointer" style-hover="background:var(--color-accent-100)">Schedule ทุกสัปดาห์ (A4 นอน)</button>
             <button sc-camel-on-click="{{ exportCurrent }}" style="background:transparent;border:0;border-radius:var(--radius-sm);padding:8px 12px;font-size:13px;font-family:var(--font-body);color:var(--color-text);cursor:pointer;text-align:left;white-space:nowrap" style-hover="background:var(--color-neutral-200)">รายงานประจำสัปดาห์</button>
             <button sc-camel-on-click="{{ exportItemsXlsx }}" style="background:transparent;border:0;border-radius:var(--radius-sm);padding:8px 12px;font-size:13px;font-family:var(--font-body);color:var(--color-text);cursor:pointer;text-align:left;white-space:nowrap" style-hover="background:var(--color-neutral-200)">รายการก่อสร้าง (Excel)</button>
+            <button sc-camel-on-click="{{ exportTuaDoc }}" style="background:transparent;border:0;border-radius:var(--radius-sm);padding:8px 12px;font-size:13px;font-family:var(--font-body);color:var(--color-text);cursor:pointer;text-align:left;white-space:nowrap" style-hover="background:var(--color-neutral-200)">นำเสนอถัวจ่าย (Word)</button>
             <div class="lbl" style="font-size:11px;letter-spacing:.05em;padding:8px 12px 3px">งานนำเสนอตรวจรับงาน</div>
             <button sc-camel-on-click="{{ pptxExport }}" style="background:transparent;border:0;border-radius:var(--radius-sm);padding:8px 12px 8px 22px;font-size:13px;font-family:var(--font-body);color:var(--color-text);text-align:left;cursor:pointer" style-hover="background:var(--color-accent-100)">งานนำเสนอ (.pptx)</button>
             <div class="lbl" style="font-size:11px;letter-spacing:.05em;padding:8px 12px 3px">ใบปะหน้าประจำสัปดาห์ (Word)</div>
@@ -5859,6 +5860,22 @@ class Component extends DCLogic {
     return true; }
   setHomeFilter = (k) => (e) => { const o={}; o[k]=e.target.value; this.setState(o); };
   clearHomeFilters = () => this.setState({hFy:'',hDist:'',hSup:'',hq:''});
+  /* การเรียงตาราง "ทุกสัญญา" หน้าภาพรวม — จำค่าที่เลือกไว้ในเครื่อง (ไม่ถูกล้างด้วยปุ่มล้างตัวกรอง) */
+  HOME_SORTS=[
+    {v:'dist', t:'แขวงทางหลวง', title:'เรียงตามแขวงทางหลวง'},
+    {v:'actual', t:'% ผลงาน (มาก → น้อย)', title:'เรียงตาม % ผลงาน จากมากไปน้อย'},
+    {v:'actualAsc', t:'% ผลงาน (น้อย → มาก)', title:'เรียงตาม % ผลงาน จากน้อยไปมาก'},
+    {v:'diff', t:'% ผลต่าง (มาก → น้อย)', title:'เรียงตาม % ผลต่าง จากมากไปน้อย'},
+    {v:'diffAsc', t:'% ผลต่าง (น้อย → มาก)', title:'เรียงตาม % ผลต่าง จากน้อยไปมาก'}
+  ];
+  homeSort(){
+    let v=this.state.hSort;
+    if(!v){ try{ v=localStorage.getItem('hwprog_hsort')||''; }catch(e){} }
+    return this.HOME_SORTS.some(s=>s.v===v)? v : 'dist';
+  }
+  setHomeSort = (e) => { const v=e.target.value;
+    try{ localStorage.setItem('hwprog_hsort', v); }catch(err){}
+    this.setState({hSort:v}); };
   /* ค้นหาในตาราง "ทุกสัญญา" หน้าภาพรวม — กรองเฉพาะรายการในตาราง ไม่กระทบตัวเลขสรุปด้านบน */
   toggleHomeSearch = () => { const open=!this.state.hSearchOpen; this.setState({hSearchOpen:open, hq:''});
     if(open) setTimeout(()=>{ const el=document.querySelector('input[aria-label="ค้นหาสัญญา"]'); if(el) el.focus(); }, 60); };
@@ -6067,8 +6084,20 @@ class Component extends DCLogic {
   }
   cmoney(v){ return (Number(v)||0).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}); }
   cdate(d){ return d? (d.getDate()+' '+this.MONTHS[d.getMonth()]+' '+(d.getFullYear()+543)) : ''; }
+  /* คำ/วลีที่ไม่ให้ Word ตัดบรรทัดกลางคำ (ตัวแบ่งคำของเบราว์เซอร์แยกเป็นหลายคำ เช่น ระยะ|เวลา) */
+  THAI_KEEP=['ระยะเวลา','ระยะทาง','ค่าปรับ','ค่างาน','ผู้รับจ้าง','ผู้ควบคุมงาน','ผู้ช่วยผู้ควบคุมงาน','ทางหลวง','งบประมาณ',
+    'ประจำปี','เริ่มสัญญา','สิ้นสุดสัญญา','ขยายสัญญา','ตอนควบคุม','ลงวันที่','สัญญาเลขที่','รายจ่าย','ก่อสร้าง','คณะกรรมการ',
+    'ตรวจรับพัสดุ','ประธานกรรมการ','ปฏิบัติงาน','ประสิทธิภาพ','โครงข่าย','คมนาคม','โลจิสติกส์','เศรษฐกิจ'];
+  thaiKeep(s){
+    if(String(s).indexOf('​')<0) return s;
+    if(!this._thaiKeepRe) this._thaiKeepRe=this.THAI_KEEP.map(w=>[new RegExp(Array.from(w).join('​?'),'g'), w]);
+    this._thaiKeepRe.forEach(([re,w])=>{ s=s.replace(re,w); });
+    return s;
+  }
   exportCoverDoc = (scope) => {
     this.setState({exportMenu:false});
+    /* วันที่ "๙ พฤศจิกายน ๒๕๖๙" ให้อยู่บรรทัดเดียวกันเสมอ (เว้นวรรคแบบไม่ตัดบรรทัด) */
+    const cdn=(d)=>this.cdate(d).replace(/ /g,' ');
     const p=this.byId(this.state.pid); if(!p) return;
     let weeks=this.coverWeeks(p);
     if(scope==='one'){
@@ -6079,8 +6108,17 @@ class Component extends DCLogic {
     if(!weeks.length){ this.showNotice('กรุณาระบุวันลงนามในสัญญา หรือวันเริ่มสัญญา ก่อนออกใบปะหน้า'); return; }
     const FN='<w:rFonts w:ascii="TH SarabunIT\u0e59" w:hAnsi="TH SarabunIT\u0e59" w:cs="TH SarabunIT\u0e59"/>';
     const esc=(t)=>String(t==null?'':t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    /* Word ตัดบรรทัดภาษาไทยกลางคำและยืดตัวอักษร จึงใส่ zero-width space ระหว่างคำไทย (แบ่งคำด้วย Intl.Segmenter ของเบราว์เซอร์) */
+    const SEG=(typeof Intl!=='undefined' && Intl.Segmenter)? new Intl.Segmenter('th',{granularity:'word'}) : null;
+    const TH=/[฀-๿]/;
+    const wrap=(t)=>{ t=String(t==null?'':t); if(!SEG || t.length<20 || !TH.test(t)) return t;
+      let out='', prev='';
+      for(const s of SEG.segment(t)){ const g=s.segment;
+        if(prev && TH.test(prev.slice(-1)) && TH.test(g.charAt(0))) out+='​';
+        out+=g; prev=g; }
+      return this.thaiKeep(out); };
     const R=(t,o)=>{ o=o||{}; const z=o.sz||32;
-      return '<w:r><w:rPr>'+FN+(o.b?'<w:b/><w:bCs/>':'')+'<w:sz w:val="'+z+'"/><w:szCs w:val="'+z+'"/><w:cs/></w:rPr><w:t xml:space="preserve">'+esc(t)+'</w:t></w:r>'; };
+      return '<w:r><w:rPr>'+FN+(o.b?'<w:b/><w:bCs/>':'')+'<w:sz w:val="'+z+'"/><w:szCs w:val="'+z+'"/><w:cs/></w:rPr><w:t xml:space="preserve">'+esc(wrap(t))+'</w:t></w:r>'; };
     const TAB='<w:r><w:rPr>'+FN+'</w:rPr><w:tab/></w:r>';
     const P=(runs,o)=>{ o=o||{};
       let pr='<w:pPr>';
@@ -6101,12 +6139,12 @@ class Component extends DCLogic {
     let chair=com.find(c=>c.role==='ประธานกรรมการ')||com[0]||null;
     const rest=com.filter(c=>c!==chair);
     const dirP=this.personBy('ผอ.ขท.'+dist);
-    const sign=p.contractDate? this.cdate(new Date(p.contractDate+'T00:00:00')) : '';
+    const sign=p.contractDate? cdn(new Date(p.contractDate+'T00:00:00')) : '';
     const body=['ตามสัญญาเลขที่ '+shortTxt, sign?('ลงวันที่ '+sign):'',
       'งบประมาณรายจ่ายประจำปีงบประมาณ พ.ศ. '+(p.fiscalYear||''),
       p.program1||'', p.jobCode?('รหัสงาน '+p.jobCode):'', p.program2||'', p.projectName||'',
-      'เริ่มสัญญาวันที่ '+this.cdate(p.startDate?new Date(p.startDate+'T00:00:00'):null),
-      (()=>{ const E=(x)=>x? this.cdate(new Date(x+'T00:00:00')) : '';
+      'เริ่มสัญญาวันที่ '+cdn(p.startDate?new Date(p.startDate+'T00:00:00'):null),
+      (()=>{ const E=(x)=>x? cdn(new Date(x+'T00:00:00')) : '';
         const o=E(p.endDateOrig), n=E(p.endDate);
         if(o&&n&&p.endDateOrig!==p.endDate) return 'สิ้นสุดสัญญาวันที่ '+o+' ขยายสัญญาสิ้นสุดวันที่ '+n;
         return 'สิ้นสุดสัญญาวันที่ '+(n||o); })(),
@@ -6143,16 +6181,19 @@ class Component extends DCLogic {
       x+=P(GAR(i)+R('บันทึกข้อความ',{b:true,sz:52}),{jc:'center',brk:i>0,after:320});
       x+=P(R('ส่วนราชการ',{b:true})+R('  แขวงทางหลวง'+dist));
       const noTxt=shortTxt.replace(/-/g,'/').split('/').map(s=>/^0+\d/.test(s)?String(parseInt(s,10)):s).join('/');
-      x+=P(R('ที่',{b:true})+R('  '+noTxt+'/')+TAB+R('วันที่',{b:true})+R('  '+this.cdate(w.send)),{tabs:'<w:tab w:val="left" w:pos="4016"/>'});
+      /* "วันที่" ตรงแนวตัว "ข" ของหัว "บันทึกข้อความ" (ขอบซ้าย 2.5 ซม. วัดใน Word ได้ 4656 twip จากขอบซ้าย);
+         เว้น 4 วรรคก่อนเลขวัน 3 วรรคหลังเลขวัน และ 3 วรรคก่อนปี */
+      const sd=w.send, sendTxt=sd? ('    '+sd.getDate()+'   '+this.MONTHS[sd.getMonth()]+'   '+(sd.getFullYear()+543)) : '';
+      x+=P(R('ที่',{b:true})+R('  '+noTxt+'/')+TAB+R('วันที่',{b:true})+R(sendTxt),{tabs:'<w:tab w:val="left" w:pos="4656"/>'});
       x+=P(R('เรื่อง',{b:true})+R('   รายงานการปฏิบัติงานประจำวันและประจำสัปดาห์'),{rule:true,after:80});
       x+=P(R('เรียน   ผอ.ขท.'+dist),{before:120});
       x+=P(R('ผู้ควบคุมขอรายงานการปฏิบัติงานของผู้รับจ้างดังต่อไปนี้'));
       x+=P('',{sz:12});
-      x+=P(R(body),{jc:'thaiDistribute',first:1417});
+      x+=P(R(body),{jc:'thaiDistribute',first:1134});
       x+=P('',{sz:12});
-      x+=P(R('รายงานการปฏิบัติงานสัปดาห์ที่ '+(w.no||(i+1))+' ระหว่างวันที่ '+this.cdate(w.s)+' – '+this.cdate(w.e)),{first:1417});
-      x+=P(R('จึงเรียนมาเพื่อโปรดทราบพร้อมรายละเอียดแนบ'),{first:1417,before:120});
-      x+=P('')+P('');
+      x+=P(R('รายงานการปฏิบัติงานสัปดาห์ที่ '+(w.no||(i+1))+' ระหว่างวันที่ '+cdn(w.s)+' – '+cdn(w.e)),{first:1134});
+      x+=P(R('จึงเรียนมาเพื่อโปรดทราบพร้อมรายละเอียดแนบ'),{first:1134,before:120});
+      x+=P('')+P('')+P('');
       x+='<w:p><w:pPr><w:spacing w:after="0" w:line="240" w:lineRule="auto"/><w:rPr>'+FN+'</w:rPr></w:pPr>'+
         TB(90, 157, 0, 180, ['('+(p.supervisor||'')+')', 'ผู้ควบคุมงาน'])+'</w:p>';
       return x;
@@ -6161,7 +6202,7 @@ class Component extends DCLogic {
     const docXml='<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'+
       '<w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing" xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w10="urn:schemas-microsoft-com:office:word" xmlns:o="urn:schemas-microsoft-com:office:office">'+
       '<w:body>'+pages+
-      '<w:sectPr><w:pgSz w:w="11906" w:h="16838" w:code="9"/><w:pgMar w:top="850" w:right="850" w:bottom="992" w:left="1701" w:header="720" w:footer="720" w:gutter="0"/><w:cols w:space="720"/><w:docGrid w:linePitch="381"/></w:sectPr>'+
+      '<w:sectPr><w:pgSz w:w="11906" w:h="16838" w:code="9"/><w:pgMar w:top="850" w:right="850" w:bottom="992" w:left="1418" w:header="720" w:footer="720" w:gutter="0"/><w:cols w:space="720"/><w:docGrid w:linePitch="381"/></w:sectPr>'+
       '</w:body></w:document>';
     const CT='<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Default Extension="png" ContentType="image/png"/><Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/><Override PartName="/word/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.styles+xml"/></Types>';
     const RELS='<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/></Relationships>';
@@ -6184,6 +6225,315 @@ class Component extends DCLogic {
       setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); },1500);
     }).catch(()=>this.showNotice('ไม่สามารถโหลดตราครุฑได้ กรุณาลองใหม่'));
   };
+
+  /* ===== นำเสนอถัวจ่าย (.docx): บันทึกข้อความขออนุมัติถัวจ่ายค่างาน ตามแบบ "บ.ถัวจ่าย" =====
+     ใช้รายการงานที่กรอกช่อง "ถัวจ่าย" ไว้และไม่เท่ากับปริมาณตามสัญญา แยกเป็นน้อยกว่า/มากกว่าสัญญา
+     ปริมาณที่เกิน 125 % ของสัญญาคิดค่างานแบบ Overrun: ไม่เกิน 125 % จ่าย 100 %, 125–150 % จ่าย 90 %, เกิน 150 % จ่าย 83 % */
+  tuaData(p){
+    const m2=(v)=>Math.round(v*100)/100, q3=(v)=>Math.round(v*1000)/1000;
+    const cut=(v)=>Math.round((v-0.001)*100)/100;   /* = ROUND(x-0.001,2) แบบในไฟล์ Excel */
+    const less=[], more=[];
+    (p.items||[]).forEach(it=>{
+      const raw=it.tua;
+      if(raw===undefined||raw===null||String(raw).trim()==='') return;
+      const q=this.num(it.qty), t=this.num(raw), pr=this.num(it.price);
+      if(!(q>0) || Math.abs(t-q)<1e-9) return;
+      const no=String(it.no||'').trim();
+      let name=String(it.name||'').replace(/\s+/g,' ').trim();
+      if(no && name.indexOf(no+' ')===0) name=name.slice(no.length+1).trim();
+      const r={no, name, unit:this.workUnit(it.unit), price:pr, q, t, cM:m2(q*pr)};
+      if(t<q){ r.fM=m2(t*pr); r.d=q3(q-t); r.dM=m2(r.cM-r.fM); less.push(r); return; }
+      r.ratio=t/q;
+      if(t>q*1.25+1e-9){
+        const b1=q3(q*1.25), b2=q3(q*1.5);
+        r.over=[[b1,1],[Math.min(t,b2)-b1,0.9],[Math.max(0,t-b2),0.83]]
+          .map(([a,f])=>{ a=q3(a); return {a, f, m: a>0? cut(a*pr*f) : 0}; });
+        r.fM=m2(r.over.reduce((s,x)=>s+x.m,0));
+      } else r.fM=m2(t*pr);
+      r.d=q3(t-q); r.dM=m2(r.fM-r.cM); more.push(r);
+    });
+    const sum=(a)=>m2(a.reduce((s,r)=>s+r.dM,0));
+    return {less, more, lessSum:sum(less), moreSum:sum(more)};
+  }
+  exportTuaDoc = () => {
+    this.setState({exportMenu:false});
+    const p=this.byId(this.state.pid); if(!p) return;
+    this.tuaDocBlob(p).then(res=>{
+      if(!res) return;
+      const a=document.createElement('a'); a.href=URL.createObjectURL(res.blob); a.download=res.name;
+      document.body.appendChild(a); a.click();
+      setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); },1500);
+    }).catch(()=>this.showNotice('ไม่สามารถโหลดตราครุฑได้ กรุณาลองใหม่'));
+  };
+  tuaDocBlob(p){
+    const T=this.tuaData(p);
+    if(!T.less.length && !T.more.length){
+      this.showNotice('โครงการนี้ยังไม่มีรายการถัวจ่าย — กรอกปริมาณในช่อง "ถัวจ่าย" ของรายการงานที่ปริมาณไม่ตรงกับสัญญาก่อน');
+      return Promise.resolve(null);
+    }
+    const FONT='TH Sarabun New';
+    const FN='<w:rFonts w:ascii="'+FONT+'" w:hAnsi="'+FONT+'" w:eastAsia="'+FONT+'" w:cs="'+FONT+'"/>';
+    const esc=(t)=>String(t==null?'':t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    /* Word ตัดบรรทัดภาษาไทยกลางคำได้ จึงใส่ zero-width space ระหว่างคำไทย (แบ่งคำด้วย Intl.Segmenter ของเบราว์เซอร์) */
+    const SEG=(typeof Intl!=='undefined' && Intl.Segmenter)? new Intl.Segmenter('th',{granularity:'word'}) : null;
+    const TH=/[฀-๿]/;
+    const wrap=(t)=>{ t=String(t==null?'':t); if(!SEG || t.length<20 || !TH.test(t)) return t;
+      let out='', prev='';
+      for(const s of SEG.segment(t)){ const g=s.segment;
+        if(prev && TH.test(prev.slice(-1)) && TH.test(g.charAt(0))) out+='​';
+        out+=g; prev=g; }
+      return this.thaiKeep(out); };
+    const R=(t,o)=>{ o=o||{}; const z=o.sz||32;
+      return '<w:r><w:rPr>'+FN+(o.b?'<w:b/><w:bCs/>':'')+(o.u?'<w:u w:val="single"/>':'')+'<w:sz w:val="'+z+'"/><w:szCs w:val="'+z+'"/><w:cs/></w:rPr><w:t xml:space="preserve">'+esc(wrap(t))+'</w:t></w:r>'; };
+    const TAB='<w:r><w:rPr>'+FN+'</w:rPr><w:tab/></w:r>';
+    const P=(runs,o)=>{ o=o||{}; const z=o.sz||32;
+      let pr='<w:pPr>';
+      if(o.keep) pr+='<w:keepNext/>';
+      if(o.brk) pr+='<w:pageBreakBefore/>';
+      if(o.rule) pr+='<w:pBdr><w:bottom w:val="single" w:sz="6" w:space="1" w:color="000000"/></w:pBdr>';
+      if(o.tabs) pr+='<w:tabs>'+o.tabs.map(t=>'<w:tab w:val="'+(t[1]||'left')+'" w:pos="'+t[0]+'"/>').join('')+'</w:tabs>';
+      pr+='<w:spacing w:before="'+(o.before||0)+'" w:after="'+(o.after||0)+'" w:line="240" w:lineRule="auto"/>';
+      pr+='<w:ind w:left="'+(o.left||0)+'" w:right="'+(o.right||0)+'"'+(o.first?' w:firstLine="'+o.first+'"':'')+(o.hang?' w:hanging="'+o.hang+'"':'')+'/>';
+      if(o.jc) pr+='<w:jc w:val="'+o.jc+'"/>';
+      pr+='<w:rPr>'+FN+'<w:sz w:val="'+z+'"/><w:szCs w:val="'+z+'"/></w:rPr></w:pPr>';
+      return '<w:p>'+pr+(runs||'')+'</w:p>'; };
+    /* ตารางไร้เส้น: แต่ละเซลล์ระบุตำแหน่งเริ่ม/สิ้นสุด (twip) แล้วสร้างกริดคอลัมน์ร่วมให้เอง เพื่อจัดตัวเลขให้ตรงแนวกันทั้งเอกสาร */
+    const W=9071, half=Math.round(W/2);
+    const C=(x0,x1,runs,o)=>({x0,x1,runs,o});
+    const TBL=(rows,opt)=>{ opt=opt||{};
+      const xs={}; xs[0]=1; xs[W]=1;
+      rows.forEach(r=>r.c.forEach(c=>{ xs[c.x0]=1; xs[c.x1]=1; }));
+      const grid=Object.keys(xs).map(Number).sort((a,b)=>a-b), mar=opt.mar||0;
+      let x='<w:tbl><w:tblPr><w:tblW w:w="'+W+'" w:type="dxa"/><w:tblLayout w:type="fixed"/>'
+        +'<w:tblCellMar><w:top w:w="0" w:type="dxa"/><w:left w:w="'+mar+'" w:type="dxa"/><w:bottom w:w="0" w:type="dxa"/><w:right w:w="'+mar+'" w:type="dxa"/></w:tblCellMar>'
+        +'<w:tblLook w:val="0000"/></w:tblPr><w:tblGrid>'+grid.slice(1).map((g,i)=>'<w:gridCol w:w="'+(g-grid[i])+'"/>').join('')+'</w:tblGrid>';
+      rows.forEach(r=>{
+        const cs=r.c.slice().sort((a,b)=>a.x0-b.x0), full=[]; let cur=0;
+        cs.forEach(c=>{ if(c.x0>cur) full.push({x0:cur,x1:c.x0}); full.push(c); cur=c.x1; });
+        if(cur<W) full.push({x0:cur,x1:W});
+        x+='<w:tr><w:trPr><w:cantSplit/></w:trPr>';
+        full.forEach(c=>{
+          const span=grid.indexOf(c.x1)-grid.indexOf(c.x0);
+          const o=Object.assign({sz:r.sz, before:r.before}, c.o||{}, {keep:!!r.keep});
+          x+='<w:tc><w:tcPr><w:tcW w:w="'+(c.x1-c.x0)+'" w:type="dxa"/>'+(span>1?'<w:gridSpan w:val="'+span+'"/>':'')
+            +(c.line?'<w:tcBorders><w:bottom w:val="'+c.line+'" w:sz="4" w:space="0" w:color="000000"/></w:tcBorders>':'')
+            +'</w:tcPr>'+(c.xml||P(c.runs||'',o))+'</w:tc>';
+        });
+        x+='</w:tr>';
+      });
+      return x+'</w:tbl>';
+    };
+    const GAR='<w:r><w:rPr>'+FN+'<w:noProof/></w:rPr><w:drawing><wp:anchor distT="0" distB="0" distL="114300" distR="114300" simplePos="0" relativeHeight="251660" behindDoc="0" locked="0" layoutInCell="1" allowOverlap="1"><wp:simplePos x="0" y="0"/><wp:positionH relativeFrom="column"><wp:posOffset>0</wp:posOffset></wp:positionH><wp:positionV relativeFrom="paragraph"><wp:posOffset>0</wp:posOffset></wp:positionV><wp:extent cx="533400" cy="517525"/><wp:effectExtent l="0" t="0" r="0" b="0"/><wp:wrapNone/><wp:docPr id="601" name="krut"/><wp:cNvGraphicFramePr/><a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"><a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:pic xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:nvPicPr><pic:cNvPr id="601" name="krut.png"/><pic:cNvPicPr/></pic:nvPicPr><pic:blipFill><a:blip r:embed="rId7"/><a:stretch><a:fillRect/></a:stretch></pic:blipFill><pic:spPr><a:xfrm><a:off x="0" y="0"/><a:ext cx="533400" cy="517525"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom></pic:spPr></pic:pic></a:graphicData></a:graphic></wp:anchor></w:drawing></w:r>';
+
+    const N3=(v)=>this.n(v,3), N2=(v)=>this.n(v,2);
+    const D=(x)=>x? this.cdate(new Date(x+'T00:00:00')) : '';
+    const dist=this.distOf(p), prov=String(dist).replace(/\s*ที่\s*\d+\s*$/,'').trim();
+    const shortTxt=String(p.contractNo||'').replace(/^\s*สัญญาเลขที่\s*/,'').replace(/\s*ลงวันที่[\s\S]*$/,'').replace(/\s+/g,'');
+    const noTxt=shortTxt.replace(/-/g,'/').split('/').map(s=>/^0+\d/.test(s)?String(parseInt(s,10)):s).join('/');
+    const signTxt=p.contractDate? D(p.contractDate) : ((String(p.contractNo||'').match(/ลงวันที่\s*(.+)$/)||[])[1]||'').trim();
+    const now=new Date(), monthYear=this.MONTHS[now.getMonth()]+' '+(now.getFullYear()+543);
+    const ROUND='ครั้งที่ 1';
+    /* ชื่อตามตำแหน่ง: ใช้คณะกรรมการของโครงการนี้ก่อน (ข้อมูลของสัญญา) ไม่พบจึงหาจากรายชื่อบุคลากร */
+    const normPos=(s)=>String(s||'').replace(/\s+/g,'');
+    const byPos=(pos)=>(p.committee||[]).find(c=>c && c.name && normPos(c.pos)===normPos(pos))
+      || this.personBy(pos) || null;
+    const dirP=byPos('ผอ.ขท.'+dist);
+    const chair=(p.committee||[]).find(c=>c && c.name && c.role==='ประธานกรรมการ')||null;
+
+    let x='';
+    /* ---- หัวบันทึกข้อความ ---- */
+    const L=(t)=>R(t,{b:1,sz:40});
+    x+=P(GAR+R('บันทึกข้อความ',{b:1,sz:58}),{jc:'center',before:60,after:200});
+    x+=P(L('ส่วนราชการ')+R('  ส่วนควบคุมงานก่อสร้างทาง     สำนักงานทางหลวงที่ 5 (พิษณุโลก)  โทร. 0-5530-2518'));
+    x+=P(L('ที่')+R('  สทล.5.7 /')+TAB+L('วันที่')+R('            '+monthYear),{tabs:[[4536]]});
+    x+=P(L('เรื่อง')+R('  ขออนุมัติถัวจ่ายค่างาน ('+ROUND+') สญ. '+noTxt),{rule:true,after:80});
+    x+=P(R('เรียน  ผอ.ขท.'+dist),{before:120,after:120});
+
+    /* ---- เนื้อความ ---- */
+    const endTxt=(()=>{ const o=D(p.endDateOrig), n=D(p.endDate);
+      if(o&&n&&p.endDateOrig!==p.endDate) return 'วันสิ้นสุดสัญญา '+o+' ขยายสัญญาสิ้นสุดวันที่ '+n;
+      return (n||o)? 'วันสิ้นสุดสัญญา '+(n||o) : ''; })();
+    const body1=['ตามสัญญาเลขที่ '+shortTxt, signTxt?('ลงวันที่ '+signTxt):'',
+      p.program1, p.program2, p.program3, p.projectName, p.location,
+      p.startDate?('วันเริ่มสัญญา '+D(p.startDate)):'', endTxt,
+      'ระยะเวลาทำการ '+(this.durOf(p)||p.duration||0)+' วัน',
+      'ค่างานตามสัญญา '+this.cmoney(p.contractValue)+' บาท',
+      'ค่าปรับตามสัญญาวันละ '+this.cmoney(p.finePerDay)+' บาท',
+      'โดยมี '+(p.contractor||'..............................')+' เป็นผู้รับจ้าง นั้น'
+    ].map(s=>String(s||'').replace(/\s+/g,' ').trim()).filter(Boolean).join(' ');
+    x+=P(R(body1),{first:1417,jc:'thaiDistribute'});
+    x+=P(R('จากการตรวจสอบแบบก่อสร้างและปริมาณงานที่ก่อสร้างจริงในสนามไม่ตรงกับปริมาณงานในสัญญา เนื่องจากงานบางรายการจะต้องเข้าดำเนินการก่อสร้างจึงจะตรวจสอบปริมาณงานที่เกิดขึ้นจริงได้ จึงมีบางรายการที่ดำเนินการก่อสร้างน้อยกว่าสัญญา และบางรายการมีความจำเป็นต้องดำเนินการก่อสร้างเพิ่มเติมจากปริมาณงานที่ระบุในสัญญา เพื่อให้การก่อสร้างครบถ้วนถูกต้องและเกิดประโยชน์ต่อประชาชนผู้ใช้เส้นทางและทางราชการ จึงจำเป็นต้องถัวจ่ายรายการน้อยกว่าในสัญญาไปจ่ายรายการที่มากกว่า ในการถัวจ่ายครั้งนี้ ไม่เกินวงเงินงบประมาณที่ได้รับ โดยปริมาณงานที่ผู้รับจ้างจะต้องดำเนินการจะมีปริมาณงานไม่เกินดังนี้'),
+      {first:1417,jc:'thaiDistribute',before:120});
+
+    /* ---- รายการน้อยกว่า/มากกว่าสัญญา ---- */
+    const block=(r,i,kind)=>{
+      const rows=[];
+      rows.push({keep:1, before:140, c:[
+        C(0,510,R((i+1)+'.'),{jc:'right'}),
+        C(567,2041,R('รายการที่ '+r.no)),
+        C(2041,6650,R(r.name),{right:113}),
+        C(6650,8350,R((r.unit||'หน่วย')+'ละ  '+N2(r.price)),{jc:'right'}),
+        C(8350,W,R('บาท'),{left:113})]});
+      const line=(lab,qty,mon,o)=>({keep:1, c:[
+        C(567,2700,R(lab,o)), C(2700,2950,R('=',o),{jc:'center'}),
+        C(2950,4650,R(N3(qty),o),{jc:'right'}), C(4650,5550,R(r.unit,o),{left:113}),
+        C(5550,6450,R('เป็นเงิน',o)), C(6450,8350,R(N2(mon),o),{jc:'right'}), C(8350,W,R('บาท',o),{left:113})]});
+      rows.push(line('ปริมาณงานในสัญญา',r.q,r.cM));
+      rows.push(line('ปริมาณงานในสนาม',r.t,r.fM));
+      rows.push(line(kind==='less'?'น้อยกว่าสัญญา':'มากกว่าสัญญา',r.d,r.dM,{b:1}));
+      rows.push({keep:1, c:[C(567,W,R('ปริมาณงานได้จากการตรวจสอบและคำนวณตามสภาพในสนาม'))]});
+      if(kind==='more'){
+        rows.push({keep:1, c:[C(567,2700,R('ปริมาณงาน')), C(2700,2950,R('='),{jc:'center'}),
+          C(2950,4650,R(this.n(r.ratio*100,3)+' %'),{jc:'right'}), C(4650,W,R('ของปริมาณงานในสัญญา'),{left:113})]});
+        if(r.over){
+          rows.push({keep:1, before:60, c:[C(567,W,R('กรณีจ่ายค่างาน Overrun',{b:1}))]});
+          const labs=['ปริมาณงานที่ไม่เกิน 125 % จ่ายค่างานที่ 100 %','ปริมาณงานระหว่าง 125 % ถึง 150 % จ่ายค่างานที่ 90 %','ปริมาณงานที่มากกว่า 150 % จ่ายค่างานที่ 83 %'];
+          const s={sz:28};
+          r.over.forEach((v,k)=>{
+            rows.push({keep:1, sz:28, c:[C(850,W,R((k+1)+') '+labs[k],s))]});
+            rows.push({keep:1, sz:28, c:[
+              C(2700,2950,R('=',s),{jc:'center'}), C(2950,4250,R(v.a?N3(v.a):'-',s),{jc:'right'}),
+              C(4250,4450,R('x',s),{jc:'center'}), C(4450,5550,R(N2(r.price),s),{jc:'right'}),
+              C(5550,5750,R('x',s),{jc:'center'}), C(5750,6250,R(v.f.toFixed(2),s),{jc:'right'}),
+              C(6250,6450,R('=',s),{jc:'center'}), C(6450,8350,R(v.a?N2(v.m):'-',s),{jc:'right'}),
+              C(8350,W,R('บาท',s),{left:113})]});
+          });
+          rows.push({keep:1, c:[ C(4650,6250,R('รวมจ่าย',{b:1}),{jc:'right'}), C(6250,6450,R('=',{b:1}),{jc:'center'}),
+            Object.assign(C(6450,8350,R(N2(r.fM),{b:1}),{jc:'right'}),{line:'double'}), C(8350,W,R('บาท',{b:1}),{left:113})]});
+        }
+      }
+      rows[rows.length-1].keep=0;
+      return rows;
+    };
+    const section=(list,kind)=>{
+      if(!list.length) return '';
+      const sum=kind==='less'? T.lessSum : T.moreSum, b={b:1};
+      let rows=[]; list.forEach((r,i)=>{ rows=rows.concat(block(r,i,kind)); });
+      rows.push({before:200, c:[
+        C(0,3800,R(kind==='less'?'รวมปริมาณงานที่น้อยกว่าสัญญา':'รวมปริมาณงานที่มากกว่าสัญญา',b)),
+        C(3800,4250,R(String(list.length),b),{jc:'right'}), C(4250,5550,R('รายการ',b),{left:113}),
+        C(5550,6450,R('เป็นเงิน',b)), C(6450,8350,R(N2(sum),b),{jc:'right'}),
+        C(8350,W,R('บาท',b),{left:113})]});
+      return P(R(kind==='less'?'ปริมาณงานที่น้อยกว่าสัญญา':'ปริมาณงานที่มากกว่าสัญญา',{b:1,u:1}),{left:567,before:240,keep:1})+TBL(rows);
+    };
+    x+=section(T.less,'less');
+    x+=section(T.more,'more');
+
+    /* ---- สรุป ---- */
+    const remain=Math.round((T.lessSum-T.moreSum)*100)/100;
+    x+=P(R('สรุปปริมาณงานที่มากกว่าและน้อยกว่าในสัญญาได้ดังนี้'),{first:1417,before:280,keep:1});
+    const sumRow=(lab,n,v,keep)=>({keep, c:[ C(850,3900,R(lab)), C(3900,4250,R(String(n)),{jc:'right'}),
+      C(4250,5550,R('รายการ'),{left:113}), C(5550,6450,R('เป็นเงิน')), C(6450,8350,R(N2(v)),{jc:'right'}), C(8350,W,R('บาท'),{left:113})]});
+    x+=TBL([sumRow('ปริมาณงานน้อยกว่าสัญญา',T.less.length,T.lessSum,1), sumRow('ปริมาณงานมากกว่าสัญญา',T.more.length,T.moreSum,0)]);
+    /* "ก - ข = ค" ให้อยู่บรรทัดเดียวกัน (ใช้ non-breaking hyphen ของ Word) */
+    const NBH='<w:r><w:rPr>'+FN+'<w:sz w:val="32"/><w:szCs w:val="32"/><w:cs/></w:rPr><w:noBreakHyphen/></w:r>';
+    const tail= remain>=0
+      ? R('คงเหลือเงินทั้งสิ้น '+N2(T.lessSum)+' ')+NBH+R(' '+N2(T.moreSum)+' = '+N2(remain)+' บาท')
+      : R('ซึ่งค่างานที่มากกว่าสัญญาสูงกว่าค่างานที่น้อยกว่าสัญญาเป็นเงิน '+N2(-remain)+' บาท');
+    x+=P(R('ดังนั้นจึงขออนุมัตินำค่างานที่มีปริมาณงานน้อยกว่าสัญญาเป็นเงิน '+N2(T.lessSum)+' บาท มาถัวจ่ายค่างานที่มีปริมาณงานมากกว่าสัญญาเป็นเงิน '+N2(T.moreSum)+' บาท'),
+      {first:1417,jc:'thaiDistribute',before:120,keep:1});
+    x+=P(tail);
+    x+=P(R('จึงเรียนมาเพื่อโปรดพิจารณาอนุมัติการดำเนินการทำงานของผู้ควบคุมงาน และการถัวจ่ายตามรายละเอียดและบัญชีสรุปปริมาณงานและค่างานที่แนบมาพร้อมนี้ต่อไป'),
+      {first:1417,jc:'thaiDistribute',before:120,keep:1});
+
+    /* ---- ลงนามผู้ควบคุมงาน ---- */
+    const DOTS='..................................................';
+    const sig=(name,lines,o)=>{ o=o||{};
+      const ls=['( '+(String(name||'').trim()||'..............................')+' )'].concat(lines.filter(Boolean));
+      return P(R(DOTS),{jc:'center',before:o.before||0,keep:1})
+        +ls.map((t,k)=>P(R(t),{jc:'center',keep:o.keepAll||k<ls.length-1})).join(''); };
+    const signers=[{name:p.supervisor, role:'ผู้ควบคุมงาน'}]
+      .concat((p.assistants||[]).filter(a=>a&&a.name).map(a=>({name:a.name, role:a.role||'ผู้ช่วยผู้ควบคุมงาน'})))
+      .concat(p.materialInspector? [{name:p.materialInspector, role:'ผู้ควบคุมคุณภาพวัสดุ'}] : []);
+    const per=signers.length===4? 2 : Math.min(signers.length,3), cw=Math.floor(W/per), sRows=[];
+    for(let i=0;i<signers.length;i+=per){
+      const grp=signers.slice(i,i+per), off=Math.round((W-grp.length*cw)/2), last=i+per>=signers.length;
+      sRows.push({c:grp.map((s,k)=>({x0:off+k*cw, x1:off+(k+1)*cw,
+        xml:sig(s.name,[s.role],{before:i===0?600:400, keepAll:!last})}))});
+    }
+    x+=TBL(sRows);
+
+    const dirName=dirP? dirP.name : '';
+    /* ---- เกษียณหนังสือ (หน้าใหม่) ตามแบบ "ถัวจ่าย พล.1-51-69" ---- */
+    const nm=(o)=>o? o.name : '';
+    const psP=byPos('ผส.ทล.5'), vbP=byPos('วบ.ทล.5');
+    /* หัว "เรียน ..." + บรรทัด "- ..." (ย่อหน้าแขวนให้บรรทัดที่ตัดขึ้นใหม่ตรงกับข้อความ) */
+    const txt=(head,lines,o)=>{ o=o||{}; const ind=o.ind===undefined? 567 : o.ind;
+      /* บรรทัดที่ไม่ขึ้นต้นด้วย "- " = ข้อความต่อจากบรรทัดก่อน ขึ้นบรรทัดใหม่ตรงแนวข้อความ */
+      return P(R(head),{keep:1,before:o.before||0})+lines.map(t=>!/^- /.test(t)? P(R(t),{left:ind+170,jc:'left',keep:1}) :
+        P(R(t.replace(/^- /,'- ')),{left:ind+170,hang:170,jc:'thaiDistribute',keep:1})).join(''); };
+    const LDOTS='............................................';
+    const member=(c,before)=>P(R('ลงชื่อ'+LDOTS+'กรรมการ'),{jc:'center',before,keep:1})
+      +P(R('( '+(String(c.name||'').trim()||'..............................')+' )'),{jc:'center',keep:1})
+      +P(R(c.pos||''),{jc:'center'});
+    const pair=(a,b,before)=>({c:[{x0:0,x1:half,xml:a},{x0:half,x1:W,xml:b}], before});
+
+    x+=P('',{brk:true,sz:8});
+    /* 1) ผอ.ขท. เสนอประธานและคณะกรรมการ */
+    x+=txt('เรียน  ประธานกรรมการตรวจรับพัสดุและคณะกรรมการฯ',['- เพื่อโปรดพิจารณา']);
+    x+=TBL([{c:[{x0:0,x1:half,xml:sig(dirName,['ผอ.ขท.'+dist],{before:600})}]}],{mar:113});
+    /* 2) คณะกรรมการตรวจรับพัสดุ เสนอ ผส.ทล.5 */
+    x+=txt('เรียน  ผส.ทล.5',['- คณะกรรมการตรวจรับพัสดุได้ร่วมกันพิจารณาแล้วเห็นชอบตาม      ผู้ควบคุมงานเสนอ',
+      'และการถัวจ่ายค่างานไม่เกินวงเงินตามสัญญา',
+      '- พิจารณาดำเนินการต่อไป'],{before:480});
+    x+=P(R('ลงชื่อ'+LDOTS+'ประธานกรรมการตรวจรับพัสดุ'),{jc:'center',before:720,keep:1});
+    x+=P(R('( '+(nm(chair)||'..............................')+' )'+(chair&&chair.pos? '   '+chair.pos : '')),{jc:'center'});
+    const mem=(p.committee||[]).filter(c=>c && c.name && c!==chair), mRows=[];
+    for(let i=0;i<mem.length;i+=2){
+      const a=member(mem[i],480), b=mem[i+1]? member(mem[i+1],480) : P('');
+      mRows.push(pair(a,b));
+    }
+    if(mRows.length) x+=TBL(mRows,{mar:113});
+    /* 3) ผส.ทล.5 → วบ.ทล.5 และ วบ.ทล.5 */
+    x+=TBL([
+      pair(txt('เรียน  วบ.ทล.5',['- พิจารณาและตรวจสอบ'],{ind:0,before:720}), txt('เรียน',['- เพื่อพิจารณาและตรวจสอบ'],{ind:0,before:720})),
+      pair(sig(nm(psP),['ผส.ทล.5'],{before:900}), sig(nm(vbP),['วบ.ทล.5'],{before:900}))
+    ],{mar:113});
+    /* 4) วบ.ทล.5 ↔ ผส.ทล.5 */
+    x+=P('',{sz:8});
+    x+=TBL([
+      pair(txt('เรียน  วบ.ทล.5',[],{ind:0,before:720}), txt('เรียน  ผส.ทล.5',[],{ind:0,before:720})),
+      pair(P(''), sig(nm(vbP),['วบ.ทล.5'],{before:2400}))
+    ],{mar:113});
+    /* 5) ผส.ทล.5 → ผอ.ขท. และ ผอ.ขท. อนุมัติ */
+    x+=P('',{sz:8});
+    x+=TBL([
+      pair(txt('เรียน  ผอ.ขท.'+dist,['- เห็นชอบตามเสนอ','- ดำเนินการตามระเบียบต่อไป'],{ind:0,before:960}),
+        txt('เรียน  ทพ.ขท , ผู้ควบคุมงาน',['- อนุมัติ','- ดำเนินการตามระเบียบต่อไป'],{ind:0,before:960})),
+      pair(sig(nm(psP),['ผส.ทล.5'],{before:900}), sig(dirName,['ผอ.ขท.'+dist],{before:900}))
+    ],{mar:113});
+    x+=P('',{sz:8});
+
+    const NSW='xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"';
+    const XML='<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
+    const docXml=XML+'<w:document '+NSW+' xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing" xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture">'
+      +'<w:body>'+x
+      +'<w:sectPr><w:headerReference w:type="default" r:id="rId8"/><w:pgSz w:w="11906" w:h="16838" w:code="9"/><w:pgMar w:top="1134" w:right="1134" w:bottom="1134" w:left="1701" w:header="567" w:footer="567" w:gutter="0"/><w:cols w:space="720"/><w:titlePg/><w:docGrid w:linePitch="381"/></w:sectPr>'
+      +'</w:body></w:document>';
+    /* เลขหน้าแบบหนังสือราชการ "- 2 -" กึ่งกลางหัวกระดาษ (ไม่แสดงหน้าแรก) */
+    const hr=(t)=>'<w:r><w:rPr>'+FN+'<w:sz w:val="32"/><w:szCs w:val="32"/></w:rPr>'+t+'</w:r>';
+    const HDR=XML+'<w:hdr '+NSW+'><w:p><w:pPr><w:jc w:val="center"/></w:pPr>'+hr('<w:t xml:space="preserve">- </w:t>')
+      +hr('<w:fldChar w:fldCharType="begin"/>')+hr('<w:instrText xml:space="preserve"> PAGE </w:instrText>')+hr('<w:fldChar w:fldCharType="separate"/>')
+      +hr('<w:t>2</w:t>')+hr('<w:fldChar w:fldCharType="end"/>')+hr('<w:t xml:space="preserve"> -</w:t>')+'</w:p></w:hdr>';
+    const CT=XML+'<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Default Extension="png" ContentType="image/png"/><Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/><Override PartName="/word/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.styles+xml"/><Override PartName="/word/header1.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.header+xml"/></Types>';
+    const RELS=XML+'<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/></Relationships>';
+    const DRELS=XML+'<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/><Relationship Id="rId7" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/krut.png"/><Relationship Id="rId8" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/header" Target="header1.xml"/></Relationships>';
+    const STYLES=XML+'<w:styles '+NSW+'><w:docDefaults><w:rPrDefault><w:rPr>'+FN+'<w:sz w:val="32"/><w:szCs w:val="32"/><w:lang w:val="en-US" w:eastAsia="en-US" w:bidi="th-TH"/></w:rPr></w:rPrDefault><w:pPrDefault><w:pPr><w:spacing w:after="0" w:line="240" w:lineRule="auto"/></w:pPr></w:pPrDefault></w:docDefaults><w:style w:type="paragraph" w:default="1" w:styleId="Normal"><w:name w:val="Normal"/><w:qFormat/></w:style></w:styles>';
+    const enc=new TextEncoder();
+    const short=shortTxt.replace(/[\/\\:*?"<>|]/g,'-');
+    return fetch((window.__resources&&window.__resources.garuda)||'garuda.png').then(r=>r.arrayBuffer()).then(ab=>({
+      name:'นำเสนอถัวจ่าย '+(short||'โครงการ')+'.docx',
+      blob:this.zipStore([
+        {name:'[Content_Types].xml', data:enc.encode(CT)},
+        {name:'_rels/.rels', data:enc.encode(RELS)},
+        {name:'word/document.xml', data:enc.encode(docXml)},
+        {name:'word/styles.xml', data:enc.encode(STYLES)},
+        {name:'word/header1.xml', data:enc.encode(HDR)},
+        {name:'word/_rels/document.xml.rels', data:enc.encode(DRELS)},
+        {name:'word/media/krut.png', data:new Uint8Array(ab)}
+      ])
+    }));
+  }
 
   /* ===== งานนำเสนอตรวจรับงาน (.pptx) ===== */
   loadPptxLib(){
@@ -6589,6 +6939,7 @@ class Component extends DCLogic {
       exportCoverOne: this.exportCoverOne,
       exportCoverAll: this.exportCoverAll,
       exportItemsXlsx: this.exportItemsXlsx,
+      exportTuaDoc: this.exportTuaDoc,
       openPeople: this.openPeople,
       closePeople: this.closePeople,
       peopleOpen: !!this.state.peopleOpen,
@@ -7322,7 +7673,7 @@ class Component extends DCLogic {
         if(!this.homeFilterPass(p) || !this.homeQueryPass(p)) return;
         const noteTxt=((p.weeks||{})[this.weeksOf(p)[li]]||{}).note || (p.note==='-'? '' : (p.note||'')) || '-';
         const statusBlocks=this.statusNote(p), hasStatus=statusBlocks.length>0;
-        watch.push({ diffN:diff, contractNo:p.contractNo, open:this.openDetail(p.id), projectParts:this.wkProjectParts(p,true,true),
+        watch.push({ diffN:diff, actualN:actual, contractNo:p.contractNo, open:this.openDetail(p.id), projectParts:this.wkProjectParts(p,true,true),
           supervisor:p.supervisor||'-', material:p.materialInspector||'-',
           note:(hasStatus&&noteTxt==='-')? '' : noteTxt,
           hasStatus, statusBlocks,
@@ -7338,10 +7689,18 @@ class Component extends DCLogic {
           diff:(diff>=0?'+':'')+this.n(diff,3), bg:stt.bg, fg:stt.fg,
           remain: isNaN(rm)? '-' : (rm>=0? ((rm+1)+' วัน') : ('เกิน '+(-rm)+' วัน')) });
       });
-      /* เรียงตามแขวง → ปีของสัญญา → เลขที่สัญญา (เช่น อต.1/ 46 / 2569 ก่อน อต.1/ 47 / 2569) */
+      /* การเรียงตามที่เลือก: แขวง → ปีของสัญญา → เลขที่ (เช่น อต.1/ 46 / 2569 ก่อน อต.1/ 47 / 2569),
+         % ผลงาน หรือ % ผลต่าง (ผลงาน - แผน) ทั้งจากมากไปน้อยและน้อยไปมาก */
       const cKey=(c)=>{ const m=String(c||'').match(/(\d+)\s*\/\s*(\d{4})/); return m? [+m[2], +m[1]] : [Infinity, Infinity]; };
-      watch.sort((x,y)=>{ const a=cKey(x.contractNo), b=cKey(y.contractNo);
-        return (x.distRank-y.distRank) || (a[0]-b[0]) || (a[1]-b[1]) || String(x.contractNo||'').localeCompare(String(y.contractNo||''),'th') || (x.diffN-y.diffN); });
+      const byNo=(x,y)=>{ const a=cKey(x.contractNo), b=cKey(y.contractNo);
+        return (a[0]-b[0]) || (a[1]-b[1]) || String(x.contractNo||'').localeCompare(String(y.contractNo||''),'th'); };
+      const sortKey=this.homeSort();
+      watch.sort((x,y)=>{
+        if(sortKey==='diff') return (y.diffN-x.diffN) || (y.actualN-x.actualN) || (x.distRank-y.distRank) || byNo(x,y);
+        if(sortKey==='diffAsc') return (x.diffN-y.diffN) || (x.actualN-y.actualN) || (x.distRank-y.distRank) || byNo(x,y);
+        if(sortKey==='actual') return (y.actualN-x.actualN) || (y.diffN-x.diffN) || (x.distRank-y.distRank) || byNo(x,y);
+        if(sortKey==='actualAsc') return (x.actualN-y.actualN) || (x.diffN-y.diffN) || (x.distRank-y.distRank) || byNo(x,y);
+        return (x.distRank-y.distRank) || byNo(x,y) || (x.diffN-y.diffN); });
       const COLORS=['var(--color-accent)','var(--color-accent-2-600)','var(--color-accent-400)','var(--color-neutral-600)'];
       const maxV=Math.max.apply(null,[1].concat(Object.keys(byBudget).map(k=>byBudget[k].value)));
       const doneN=projects.filter(p=>this.actualAt(p,this.lastReported(p))>=99.999).length;
@@ -7396,8 +7755,11 @@ class Component extends DCLogic {
           { label:'แขวงทางหลวง', value:this.state.hDist||'', onChange:this.setHomeFilter('hDist'),
             options:[{v:'',t:'ทุกแขวง'}].concat(this.uniqSorted(p=>this.distOf(p)).map(v=>({v:v,t:'แขวงฯ'+v}))) },
           { label:'ช่างควบคุมงาน', value:this.state.hSup||'', onChange:this.setHomeFilter('hSup'),
-            options:[{v:'',t:'ทุกคน'}].concat(this.uniqSorted(p=>p.supervisor||'').map(v=>({v:v,t:v}))) }
+            options:[{v:'',t:'ทุกคน'}].concat(this.uniqSorted(p=>p.supervisor||'').map(v=>({v:v,t:v}))) },
+          { label:'เรียงตาม', value:this.homeSort(), onChange:this.setHomeSort,
+            options:this.HOME_SORTS.map(s=>({v:s.v,t:s.t})) }
         ],
+        sortTitle:'ทุกสัญญา ('+(this.HOME_SORTS.find(s=>s.v===this.homeSort())||this.HOME_SORTS[0]).title+')',
         clearWatchFilters:this.clearHomeFilters,
         searchOpen:!!this.state.hSearchOpen,
         toggleSearch:this.toggleHomeSearch, closeSearch:this.closeHomeSearch,
