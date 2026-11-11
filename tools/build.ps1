@@ -16,6 +16,17 @@ if ($ix -lt 0) { throw 'template block not found in src/bundle-base.html' }
 $ser = New-Object System.Web.Script.Serialization.JavaScriptSerializer
 $ser.MaxJsonLength = [int]::MaxValue
 $tpl = [IO.File]::ReadAllText($tplPath, [Text.Encoding]::UTF8)
+# Hide the raw template (<x-dc>: every dialog open, {{ }} placeholders) until the app replaces it with #dc-root,
+# and keep the orange splash on screen meanwhile, so nothing flashes between the splash and the app
+$bootCss = @"
+<style id="boot-hide">
+x-dc{display:none!important}
+body:has(> x-dc){margin:0;min-height:100vh;background:#c67139 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 400'%3E%3Cpath d='M120 300 L180 100 L220 100 L280 300 Z' fill='%23fff7ee'/%3E%3Crect x='194' y='130' width='12' height='30' fill='%23c67139'/%3E%3Crect x='194' y='185' width='12' height='35' fill='%23c67139'/%3E%3Crect x='194' y='245' width='12' height='40' fill='%23c67139'/%3E%3C/svg%3E") center/min(100vw,100vh) no-repeat}
+</style>
+"@
+$headEnd = $tpl.IndexOf('</head>')
+if ($headEnd -lt 0) { throw '</head> not found in src/template.html' }
+$tpl = $tpl.Substring(0, $headEnd) + $bootCss + $tpl.Substring($headEnd)
 $json = $ser.Serialize($tpl)
 if ($json -match '</script') { throw 'template json contains </script>' }
 $lines[$ix + 1] = $json
