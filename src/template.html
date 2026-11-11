@@ -316,8 +316,10 @@ textarea.input { min-height: 90px; resize: vertical; }
 }
 .tag-accent { background: var(--color-accent-100); color: var(--color-accent-800); }
 .tag-accent-2 { background: var(--color-accent-2-100); color: var(--color-accent-2-800); }
-/* ป้ายปีงบประมาณ: พื้นเหลืองอ่อน */
-.tag-neutral { background: #fff6cc; color: #000; }
+/* ป้ายปีงบประมาณ: พื้นม่วงอ่อน */
+.tag-neutral { background: #ece2fb; color: #000; }
+/* ป้ายชนิดงาน: พื้นน้ำตาลอ่อน */
+.tag-work { background: #ecdcc8; color: #000; }
 /* ป้ายที่มาของงบ: พื้นส้มอ่อน ตัวอักษรดำ ไม่มีกรอบ */
 .tag-outline { background: var(--color-accent-100); color: #000; border: none; }
 
@@ -1572,6 +1574,13 @@ svg.leaflet-image-layer.leaflet-interactive path {
   ::-webkit-scrollbar-thumb{background:var(--color-neutral-400);border-radius:999px}
   /* รายงานประจำสัปดาห์: A4 แนวตั้ง หน้าละ 4 โครงการ — พื้นที่พิมพ์ 190x277mm (ขอบ 10mm) = 718x1047px */
   .hm-print-title,.hm-sizer,.hm-logo{display:none}
+  /* หัวแดชบอร์ดตอนส่งออก PDF: เพิ่มชื่อหน่วยงาน และแสดงวันที่ข้อมูลเป็นวันจันทร์ถัดไป */
+  .hm-org,.hm-date-print{display:none}
+  @media print{
+    .hm-org{display:block;font-size:12.5px;font-weight:400;margin-top:1px}
+    .hm-date-screen{display:none}
+    .hm-date-print{display:inline}
+  }
   .printsheet.hm-print.hm-exporting{width:1600px !important;max-width:none !important;margin:0 !important}
   .hm-exporting .hm-table-wrap{overflow:visible !important}
   .wk-scroll{overflow-x:auto;padding:2px 2px 8px}
@@ -2059,8 +2068,9 @@ svg.leaflet-image-layer.leaflet-interactive path {
     <div>
       <div class="hd hm-title" style="font-size:clamp(14px,3.2vw,17px);line-height:1.2">แดชบอร์ดภาพรวม</div>
       <div class="lbl hm-subtitle" style="font-size:clamp(13px,3.4vw,16px);font-weight:400;margin-top:1px">สรุปภาพรวมโครงการก่อสร้างทาง</div>
+      <div class="lbl hm-org">ส่วนควบคุมงานก่อสร้างทาง &nbsp;สำนักงานทางหลวงที่ 5 (พิษณุโลก)</div>
     </div>
-    <div class="lbl hm-date" style="font-size:12px;font-weight:400;margin-left:auto;padding-bottom:4px">ข้อมูล ณ วันที่ {{ todayTh }}</div>
+    <div class="lbl hm-date" style="font-size:12px;font-weight:400;margin-left:auto;padding-bottom:4px"><span class="hm-date-screen">ข้อมูล ณ วันที่ {{ todayTh }}</span><span class="hm-date-print">ข้อมูล ณ วันจันทร์ที่ {{ reportMonTh }}</span></div>
     <div class="noprint" style="display:flex;gap:8px;padding-bottom:2px;flex:0 0 auto">
       <button sc-camel-on-click="{{ exportHomePdf }}" style="white-space:nowrap;border:1px solid var(--color-accent);background:var(--color-accent);color:var(--color-bg);border-radius:999px;padding:7px 16px;font-family:var(--font-body);font-size:12.5px;font-weight:700;cursor:pointer">ส่งออก PDF</button>
       <button sc-camel-on-click="{{ exportHomeJpg }}" style="white-space:nowrap;border:1px solid var(--color-divider);background:var(--color-neutral-100);color:var(--color-neutral-800);border-radius:999px;padding:7px 16px;font-family:var(--font-body);font-size:12.5px;font-weight:700;cursor:pointer">ส่งออก PNG</button>
@@ -2212,7 +2222,7 @@ svg.leaflet-image-layer.leaflet-interactive path {
   <div class="hm-list" style="display:grid;grid-template-columns:minmax(0,1fr);gap:14px">
     <div class="hm-list-card" style="background:var(--color-neutral-100);border:1px solid var(--color-divider);border-radius:var(--radius-lg);padding:14px 16px;min-width:0">
       <div class="hm-list-head" style="display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:10px">
-        <div class="hd" style="font-size:13px">ทุกสัญญา (เรียงตามความล่าช้า)</div>
+        <div class="hd" style="font-size:13px">ทุกสัญญา (เรียงตามแขวงทางหลวง แล้วตามความล่าช้า)</div>
         <span class="lbl" style="font-size:11.5px;font-weight:400">{{ dash.watchCount }} สัญญา</span>
       </div>
       <div class="noprint" style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;margin-bottom:10px">
@@ -2248,9 +2258,9 @@ svg.leaflet-image-layer.leaflet-interactive path {
           <sc-raw-tr class="hm-print-title">
             <sc-raw-th sc-camel-col-span="{{ 11 }}">
               <div style="display:flex;align-items:baseline;gap:10px">
-                <span class="hm-print-title-tx">ทุกสัญญา (เรียงตามความล่าช้า)</span>
+                <span class="hm-print-title-tx">ทุกสัญญา (เรียงตามแขวงทางหลวง แล้วตามความล่าช้า)</span>
                 <span class="lbl" style="font-weight:400">{{ dash.watchCount }} สัญญา</span>
-                <span class="lbl" style="font-weight:400;margin-left:auto">ข้อมูล ณ วันที่ {{ todayTh }}</span>
+                <span class="lbl" style="font-weight:400;margin-left:auto">ข้อมูล ณ วันจันทร์ที่ {{ reportMonTh }}</span>
               </div>
             </sc-raw-th>
           </sc-raw-tr>
@@ -2275,10 +2285,10 @@ svg.leaflet-image-layer.leaflet-interactive path {
                 <span class="val" sc-camel-on-click="{{ w.open }}" title="ดูรายละเอียดโครงการ" style="font-weight:700;cursor:pointer;color:var(--color-accent-800)" style-hover="text-decoration:underline">{{ w.contractNo }}</span>
                 <div class="lbl wk-prog-para" style="font-size:11.5px;margin-top:2px"><sc-for list="{{ w.projectParts }}" as="x" hint-placeholder-count="1"><span style="white-space:{{ x.ws }}">{{ x.t }}</span></sc-for></div>
                 <div style="display:flex;gap:4px;margin-top:4px;flex-wrap:wrap;align-items:center">
-                  <span class="tag" style="font-size:10.5px;background:#efe6fb;color:#000">{{ w.district }}</span>
+                  <span class="tag" style="font-size:10.5px;background:{{ w.distBg }};color:#000">{{ w.district }}</span>
                   <span class="tag tag-neutral" style="font-size:10.5px">ปีงบ {{ w.fiscalYear }}</span>
                   <span class="tag tag-outline" style="font-size:10.5px">{{ w.budgetType }}</span>
-                  <span class="tag tag-accent-2" style="font-size:10.5px">{{ w.workType }}</span>
+                  <span class="tag tag-work" style="font-size:10.5px">{{ w.workType }}</span>
                 </div>
               </sc-raw-td>
               <sc-raw-td style="padding:6px 8px;border:1px solid var(--color-divider);text-align:right;font-size:11.5px;font-variant-numeric:tabular-nums;">{{ w.valueTxt }}</sc-raw-td>
@@ -2467,7 +2477,7 @@ svg.leaflet-image-layer.leaflet-interactive path {
               <div style="display:flex;gap:4px;margin-top:4px;flex-wrap:wrap">
                 <span class="tag tag-neutral" style="font-size:10.5px">ปีงบ {{ r.fiscalYear }}</span>
                 <span class="tag tag-outline" style="font-size:10.5px">{{ r.budgetType }}</span>
-                <span class="tag tag-accent-2" style="font-size:10.5px">{{ r.workType }}</span>
+                <span class="tag tag-work" style="font-size:10.5px">{{ r.workType }}</span>
               </div>
             </sc-raw-td>
             <sc-raw-td style="padding:7px 8px;border:1px solid var(--color-divider);text-align:right;vertical-align:top;font-variant-numeric:tabular-nums">{{ r.value }}</sc-raw-td>
@@ -4233,6 +4243,8 @@ class Component extends DCLogic {
   }
   days(a,b){ return Math.round((this.d(b)-this.d(a))/86400000); }
   today(){ return this.iso(new Date()); }
+  /* วันจันทร์ถัดไปสำหรับ "ข้อมูล ณ วันที่" ในรายงาน PDF (ถ้าวันนี้เป็นวันจันทร์ ใช้วันนี้) เช่น ศ. 13 พ.ย. → จ. 16 พ.ย. */
+  nextMonday(){ const d=new Date(); d.setDate(d.getDate()+(8-d.getDay())%7); return this.iso(d); }
 
   endOf(p){ return (p&&(p.endDate||p.endDateOrig))||''; }
   hasNewEnd(p){ return !!(p && p.endDateOrig && p.endDate && p.endDateOrig!==p.endDate); }
@@ -4325,6 +4337,12 @@ class Component extends DCLogic {
     const m=t.match(/แขวงทางหลวง\s*([^\s].*?)\s*(?:สำนักงาน|สำนัก|$)/);
     return (m&&m[1])? m[1].trim() : '';
   }
+  /* ลำดับและสีป้ายแขวงทางหลวง (ใช้เรียงตารางสัญญา/โครงการในหน้าแดชบอร์ด) */
+  DISTRICT_ORDER=['พิจิตร','พิษณุโลกที่ 1','พิษณุโลกที่ 2','อุตรดิตถ์ที่ 1','อุตรดิตถ์ที่ 2'];
+  DISTRICT_COLORS={'พิจิตร':'#ffe0c2','พิษณุโลกที่ 1':'#fff3b0','พิษณุโลกที่ 2':'#d6f2d0','อุตรดิตถ์ที่ 1':'#fde0ec','อุตรดิตถ์ที่ 2':'#d6ecfb'};
+  distKey(d){ const k=String(d||'').replace(/\s+/g,''); return this.DISTRICT_ORDER.find(x=>x.replace(/\s+/g,'')===k)||''; }
+  distRank(d){ const i=this.DISTRICT_ORDER.indexOf(this.distKey(d)); return i<0? this.DISTRICT_ORDER.length : i; }
+  distColor(d){ return this.DISTRICT_COLORS[this.distKey(d)] || '#ececec'; }
   setDistrict = (e) => { const d=Object.assign({}, this.state.draft); d.district=e.target.value; d.section='';
     d.dept='แขวงทางหลวง'+d.district+'  '+this.OFFICE; d.contractNo=this.composeContractNo(d); this.setState({draft:d}); };
   WORKS=['งานก่อสร้าง','งานบูรณะ','งานบำรุง','งานฟื้นฟู','งานสะพาน'];
@@ -6461,6 +6479,7 @@ class Component extends DCLogic {
     const out = {
       deptName: this.props.deptName ?? dept,
       todayTh: this.th(this.today()),
+      reportMonTh: this.th(this.nextMonday()),
       redThresholdTxt: redT.toFixed(0)+'%',
       amberThresholdTxt: amberT.toFixed(0)+'%',
       isHome: this.state.view==='home',
@@ -7266,7 +7285,7 @@ class Component extends DCLogic {
           note:(hasStatus&&noteTxt==='-')? '' : noteTxt,
           hasStatus, statusBlocks,
           noteJustify:hasStatus? 'flex-start' : 'center',
-          district:'แขวงฯ'+this.distOf(p),
+          district:'แขวงฯ'+this.distOf(p), distRank:this.distRank(this.distOf(p)), distBg:this.distColor(this.distOf(p)),
           fiscalYear:p.fiscalYear||'-', budgetType:p.budgetType||'-', workType:p.workType||'-',
           valueTxt:this.n(p.contractValue), startTxt:this.thShort(p.startDate)||'-', endTxt:this.endOf(p)? this.thShort(this.endOf(p)) : '-', endLines:this.endLines(p),
           durTxt:(this.durOf(p)||p.duration||'-')+' วัน', contractor:p.contractor||'-', fineTxt:this.n(p.finePerDay),
@@ -7277,7 +7296,7 @@ class Component extends DCLogic {
           diff:(diff>=0?'+':'')+this.n(diff,3), bg:stt.bg, fg:stt.fg,
           remain: isNaN(rm)? '-' : (rm>=0? ((rm+1)+' วัน') : ('เกิน '+(-rm)+' วัน')) });
       });
-      watch.sort((x,y)=>x.diffN-y.diffN);
+      watch.sort((x,y)=>(x.distRank-y.distRank) || (x.diffN-y.diffN));
       const COLORS=['var(--color-accent)','var(--color-accent-2-600)','var(--color-accent-400)','var(--color-neutral-600)'];
       const maxV=Math.max.apply(null,[1].concat(Object.keys(byBudget).map(k=>byBudget[k].value)));
       const doneN=projects.filter(p=>this.actualAt(p,this.lastReported(p))>=99.999).length;
