@@ -2222,7 +2222,7 @@ svg.leaflet-image-layer.leaflet-interactive path {
   <div class="hm-list" style="display:grid;grid-template-columns:minmax(0,1fr);gap:14px">
     <div class="hm-list-card" style="background:var(--color-neutral-100);border:1px solid var(--color-divider);border-radius:var(--radius-lg);padding:14px 16px;min-width:0">
       <div class="hm-list-head" style="display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:10px">
-        <div class="hd" style="font-size:13px">ทุกสัญญา (เรียงตามแขวงทางหลวง แล้วตามความล่าช้า)</div>
+        <div class="hd" style="font-size:13px">ทุกสัญญา (เรียงตามแขวงทางหลวง แล้วตามเลขที่สัญญา)</div>
         <span class="lbl" style="font-size:11.5px;font-weight:400">{{ dash.watchCount }} สัญญา</span>
       </div>
       <div class="noprint" style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;margin-bottom:10px">
@@ -2258,7 +2258,7 @@ svg.leaflet-image-layer.leaflet-interactive path {
           <sc-raw-tr class="hm-print-title">
             <sc-raw-th sc-camel-col-span="{{ 11 }}">
               <div style="display:flex;align-items:baseline;gap:10px">
-                <span class="hm-print-title-tx">ทุกสัญญา (เรียงตามแขวงทางหลวง แล้วตามความล่าช้า)</span>
+                <span class="hm-print-title-tx">ทุกสัญญา (เรียงตามแขวงทางหลวง แล้วตามเลขที่สัญญา)</span>
                 <span class="lbl" style="font-weight:400">{{ dash.watchCount }} สัญญา</span>
                 <span class="lbl" style="font-weight:400;margin-left:auto">ข้อมูล ณ วันจันทร์ที่ {{ reportMonTh }}</span>
               </div>
@@ -2475,6 +2475,7 @@ svg.leaflet-image-layer.leaflet-interactive path {
               <div class="lbl" style="color:var(--color-neutral-800);margin-top:2px;line-height:1.35">{{ r.projectName }}</div>
               <div class="lbl" style="font-size:11.5px;margin-top:1px">{{ r.location }}</div>
               <div style="display:flex;gap:4px;margin-top:4px;flex-wrap:wrap">
+                <span class="tag" style="font-size:10.5px;background:{{ r.distBg }};color:#000">{{ r.district }}</span>
                 <span class="tag tag-neutral" style="font-size:10.5px">ปีงบ {{ r.fiscalYear }}</span>
                 <span class="tag tag-outline" style="font-size:10.5px">{{ r.budgetType }}</span>
                 <span class="tag tag-work" style="font-size:10.5px">{{ r.workType }}</span>
@@ -6204,9 +6205,21 @@ class Component extends DCLogic {
   dvRoundTxt(d,i){ return 'ครั้งที่ '+((d&&d.no)||(i+1))+((d&&d.final)?' (งวดสุดท้าย)':''); }
 
   PPT_THEMES={
-    official:{ label:'ขาวทางการ', bg:'FFFFFF', ink:'000000', sub:'000000', line:'000000', head:'FFFFFF', accent:'000000', font:'TH SarabunPSK' },
-    organic:{ label:'Organic', bg:'F5EAD8', ink:'201E1D', sub:'6B6259', line:'C9BCA6', head:'EFE4D2', accent:'C67139', font:'TH SarabunIT๙' }
+    official:{ label:'ขาวทางการ', bg:'FFFFFF', ink:'000000', sub:'404040', line:'7F7F7F', head:'F2F2F2', accent:'000000', font:'TH Sarabun New' },
+    district:{ label:'สีตามแขวง', bg:'FFFFFF', ink:'000000', sub:'404040', line:'000000', head:'ECECEC', accent:'000000', title:'000000', font:'TH Sarabun New' }
   };
+  /* ธีม "สีตามแขวง": เฉพาะพื้นหัวตาราง/แถวยอดรวม/ท้ายสไลด์ = สีป้ายแขวง (หัวเรื่องและเส้นตารางคงเป็นสีดำ) */
+  PPT_DISTRICT={
+    'พิจิตร':        { head:'FFE0C2' },
+    'พิษณุโลกที่ 1':  { head:'FFF3B0' },
+    'พิษณุโลกที่ 2':  { head:'D6F2D0' },
+    'อุตรดิตถ์ที่ 1':  { head:'FDE0EC' },
+    'อุตรดิตถ์ที่ 2':  { head:'D6ECFB' }
+  };
+  pptDistrictTheme(p){
+    const c=this.PPT_DISTRICT[this.distKey(this.distOf(p))]||{};
+    return Object.assign({}, this.PPT_THEMES.district, c);
+  }
 
   async pptxThemeFromFile(file){
     const buf=new Uint8Array(await file.arrayBuffer());
@@ -6230,7 +6243,7 @@ class Component extends DCLogic {
       const m2=xml.match(new RegExp('<a:'+tag+'>[\\s\\S]{0,400}?<a:latin typeface="([^"]+)"')); return m2? m2[1]:null; };
     const ink=col('dk1')||'000000', bg=col('lt1')||'FFFFFF', acc=col('accent1')||ink;
     return { label:'จากไฟล์: '+(file.name||'template.pptx'), bg, ink, sub:ink, line:acc, head:bg, accent:acc,
-      font: fnt('majorFont')||fnt('minorFont')||'TH SarabunPSK' };
+      font: fnt('majorFont')||fnt('minorFont')||'TH Sarabun New' };
   }
 
   pptxExport = () => {
@@ -6253,43 +6266,70 @@ class Component extends DCLogic {
     try{ Pptx=await this.loadPptxLib(); }
     catch(e){ return fail('สร้างไฟล์ไม่สำเร็จ: โหลดไลบรารีไม่ได้ (ต้องเชื่อมต่ออินเทอร์เน็ต)'); }
 
-    const TH = (g.tpl==='custom' && g.custom)? g.custom : (this.PPT_THEMES[g.tpl]||this.PPT_THEMES.official);
-    const FONT=TH.font, INK=TH.ink, LINE=TH.line, HEAD=TH.head, SUB=TH.sub, BG=TH.bg;
+    const TH = (g.tpl==='custom' && g.custom)? g.custom
+      : g.tpl==='district'? this.pptDistrictTheme(p)
+      : (this.PPT_THEMES[g.tpl]||this.PPT_THEMES.official);
+    const FONT=TH.font, INK=TH.ink, LINE=TH.line, HEAD=TH.head, SUB=TH.sub, BG=TH.bg, TTL=TH.title||TH.ink;
     const M=this.cmoney.bind(this), N=(v,d)=>this.n(v,d===undefined?3:d);
     const dl=this.dvList(p), di=g.di, cur = di>=0? dl[di] : null;
     const RD = cur? this.dvRoundTxt(cur,di) : 'ครั้งที่ 1';
     const items=(p.items||[]).filter(it=>this.num(it.qty)>0 && g.sel[it.no]);
     if(!items.length) return fail('ยังไม่ได้เลือกรายการ');
     const short=String(p.contractNo||'').replace(/\s+/g,' ').trim();
-    const foot=[p.dept||'','ส่วนควบคุมงานก่อสร้างทาง',this.OFFICE].filter(Boolean);
+    /* ท้ายสไลด์: แขวง / ส่วนควบคุมงานก่อสร้างทาง / สำนักงานทางหลวง (ไม่ซ้ำชื่อสำนักงาน) */
+    const dist=this.distOf(p);
+    const deptTxt=String(p.dept||'').replace(/\s+/g,' ').trim();
+    const foot=[dist? ('แขวงทางหลวง'+dist) : deptTxt.replace(/\s*สำนัก.*$/,''),'ส่วนควบคุมงานก่อสร้างทาง',this.OFFICE].filter(Boolean);
 
     const pptx=new Pptx();
-    pptx.layout='LAYOUT_4x3';
+    pptx.layout='LAYOUT_4x3';   /* 10 x 7.5 นิ้ว */
     pptx.author=this.OFFICE;
     pptx.title='ตรวจรับงาน '+short;
-    const T=(o)=>Object.assign({fontFace:FONT,color:INK,fontSize:18},o||{});
-    const C=(t,o)=>({text:String(t==null?'':t),options:Object.assign({fontFace:FONT,fontSize:15,color:INK},o||{})});
+    /* ฟอนต์ TH Sarabun New ตัวเล็กกว่าฟอนต์อังกฤษขนาดเดียวกัน จึงใช้ขนาดใหญ่ขึ้นทั้งชุด */
+    /* lang th-TH ให้ PowerPoint ตัดบรรทัดตามคำภาษาไทย ไม่ตัดกลางคำ */
+    const T=(o)=>Object.assign({fontFace:FONT,color:INK,fontSize:24,isTextBox:true,lang:'th-TH'},o||{});
+    const C=(t,o)=>({text:String(t==null?'':t),options:Object.assign({fontFace:FONT,fontSize:22,color:INK,lang:'th-TH'},o||{})});
     const S=()=>{ const x=pptx.addSlide(); x.background={color:BG}; return x; };
-    const foots=(x)=>x.addText(foot.join('\n'),T({x:5.1,y:6.35,w:4.5,h:0.95,fontSize:13,color:SUB,align:'right',lineSpacingMultiple:1.08}));
-    const head=(x,t,sz)=>x.addText(t,T({x:0.4,y:0.28,w:9.2,h:0.85,fontSize:sz||20,bold:true,valign:'top'}));
-    const tbl=(x,rows,cw,y,fs)=>x.addTable(rows,{x:0.5,y:y||1.4,w:cw.reduce((m,v)=>m+v,0),colW:cw,
-      border:{type:'solid',pt:0.75,color:LINE},fontFace:FONT,fontSize:fs||15,color:INK,valign:'middle',margin:[3,5,3,5],autoPage:false});
+    const Y0=1.3, YB=6.45, XL=0.5, WC=9.0;   /* พื้นที่เนื้อหา: ใต้หัวเรื่อง ถึงเหนือท้ายสไลด์ */
+    /* นับความยาวข้อความแบบไม่นับสระบน-ล่างและวรรณยุกต์ (ไม่กินที่ในแนวนอน) */
+    const vlen=(t)=>String(t||'').replace(/[ัิ-ฺ็-๎]/g,'').length;
+    /* ท้ายสไลด์: ตาราง 1 แถว แบ่งช่องเท่ากัน (แขวง | ส่วนควบคุมฯ | สำนักงาน) พื้นเทาอ่อนแบบหัวตาราง */
+    const foots=(x)=>{ const cw=foot.map(()=>WC/foot.length);
+      x.addTable([foot.map(t=>C(t,{fontSize:16,color:INK,fill:HEAD,align:'center'}))],
+        {x:XL,y:6.85,w:WC,colW:cw,rowH:[0.42],border:{type:'solid',pt:1.5,color:'FFFFFF'},valign:'middle',margin:[2,6,2,6],autoPage:false}); };
+    /* หัวเรื่อง: ชื่อสั้นใช้ตัวใหญ่ 1 บรรทัด ชื่อยาวลดขนาดลงและขึ้นได้ 2-3 บรรทัด แล้วเลื่อนตารางลงตามความสูงหัวเรื่อง */
+    let yTop=Y0;
+    const head=(x,t)=>{ const n=vlen(t);
+      const lines=(s)=>Math.max(1,Math.ceil(n*0.5*s/72/WC));
+      const opt=[[32,1],[28,1],[24,2],[22,2],[20,3]].find(o=>lines(o[0])<=o[1]) || [20,3];
+      const s=opt[0], h=Math.max(0.85, Math.min(opt[1],lines(s))*s*1.3/72+0.1);
+      x.addText(t,T({x:XL,y:0.3,w:WC,h:h,fontSize:s,bold:true,valign:'middle',color:TTL,margin:0}));
+      yTop=Math.max(Y0, 0.3+h+0.15); };
+    /* ตาราง: วางใต้หัวเรื่อง ความสูงแถวยืดให้เต็มพื้นที่เนื้อหา แต่ไม่เกิน maxH ต่อแถว */
+    const tbl=(x,rows,cw,fs,maxH)=>{
+      const w=cw.reduce((m,v)=>m+v,0), rh=Math.min(maxH||0.6,(YB-yTop)/rows.length);
+      x.addTable(rows,{x:(10-w)/2,y:yTop,w:w,colW:cw,rowH:rows.map(()=>rh),
+        border:{type:'solid',pt:0.75,color:LINE},fontFace:FONT,fontSize:fs||22,color:INK,valign:'middle',margin:[3,8,3,8],autoPage:false});
+    };
+    const itemName=(it)=>{ const nm=String(it.name||'').replace(/\s+/g,' ').trim(); return /^งาน/.test(nm)? nm : ('งาน '+nm); };
 
     /* 1 — ปก */
     {
       const x=S();
-      x.addText('ตรวจรับงาน'+RD,T({x:0.4,y:0.45,w:9.2,h:0.7,fontSize:30,bold:true,align:'center'}));
-      x.addText(short+(p.contractDate?('   ลงวันที่ '+(this.th(p.contractDate)||'')):''),
-        T({x:0.4,y:1.2,w:9.2,h:0.45,fontSize:19,align:'center',color:SUB}));
+      x.addText('ตรวจรับงาน'+RD,T({x:XL,y:0.85,w:WC,h:0.95,fontSize:44,bold:true,align:'center',valign:'middle',color:TTL,margin:0}));
+      const dated=/ลงวันที่/.test(short) || !p.contractDate;
+      x.addText(short+(dated? '' : ('  ลงวันที่ '+(this.th(p.contractDate)||''))),
+        T({x:XL,y:1.85,w:WC,h:0.6,fontSize:28,bold:true,align:'center',valign:'middle',color:SUB,margin:0}));
       const para=['งบประมาณรายจ่ายประจำปีงบประมาณ พ.ศ. '+(p.fiscalYear||''),
         p.program1,p.program2,p.program3,p.jobCode?('รหัสงาน '+p.jobCode):'',p.projectName,p.location]
-        .filter(Boolean).join(' ');
-      x.addText(para,T({x:0.65,y:1.95,w:8.7,h:3.9,fontSize:20,align:'center',valign:'top',lineSpacingMultiple:1.3}));
+        .filter(Boolean).join(' ').replace(/\s+/g,' ');
+      const n=vlen(para);
+      x.addText(para,T({x:0.7,y:2.65,w:8.6,h:3.5,fontSize: n<=330? 26 : n<=430? 24 : 22,align:'center',valign:'middle',lineSpacingMultiple:1.12,margin:0}));
       foots(x);
     }
     /* 2 — ข้อมูลสัญญา */
     {
-      const x=S(); head(x,'ข้อมูลสัญญา',22);
+      const x=S(); head(x,'ข้อมูลสัญญา');
       const r=[['วันเริ่มสัญญา',this.th(p.startDate)||'-']];
       if(this.hasNewEnd(p)) r.push(['วันสิ้นสุดสัญญา (เดิม)',this.th(p.endDateOrig)||'-']);
       r.push([this.hasNewEnd(p)? 'วันสิ้นสุดสัญญา (ใหม่)' : 'วันสิ้นสุดสัญญา',this.th(this.endOf(p))||'-'],
@@ -6297,16 +6337,15 @@ class Component extends DCLogic {
         ['เงินค่างาน',M(p.contractValue)+' บาท'],
         ['ค่าปรับวันละ',M(p.finePerDay)+' บาท'],
         ['ผู้รับจ้าง',p.contractor||'-']);
-      tbl(x,r.map(v=>[C(v[0],{bold:true,fill:HEAD}),C(v[1])]),[3.1,5.9],1.3,17);
+      tbl(x,r.map(v=>[C(v[0],{bold:true,fill:HEAD}),C(v[1])]),[3.0,6.0],24,0.62);
       foots(x);
     }
     /* 3 — คณะกรรมการ */
     {
-      const x=S(); head(x,'คณะกรรมการตรวจรับพัสดุ',22);
-      const H={bold:true,fill:HEAD};
-      const rows=[[C('ที่',Object.assign({align:'center'},H)),C('ชื่อ - นามสกุล',H),C('ตำแหน่ง',H),C('หน้าที่',H)]];
+      const x=S(); head(x,'คณะกรรมการตรวจรับพัสดุ');
+      const rows=[];   /* ไม่แสดงแถวหัวตาราง (ที่ / ชื่อ - นามสกุล / ตำแหน่ง / หน้าที่) */
       (p.committee||[]).filter(c=>c.name).forEach((c,i)=>rows.push([C(i+1,{align:'center'}),C(c.name||''),C(c.pos||''),C(c.role||'')]));
-      tbl(x,rows,[0.7,3.5,2.9,1.9],1.3,15);
+      if(rows.length) tbl(x,rows,[0.7,3.1,3.5,1.7],22,0.58);
       foots(x);
     }
     /* 4..N — รายการ + สไลด์รูป */
@@ -6316,29 +6355,30 @@ class Component extends DCLogic {
       const now = di>=0? this.dvQty(p,di,it.no):0;
       const cum = prev+now;
       const x=S();
-      head(x,(i+1)+'. รายการที่ '+(it.no||(i+1))+' งาน  '+(it.name||''),18);
+      head(x,(i+1)+'. รายการที่ '+(it.no||(i+1))+'  '+itemName(it));
       const H={bold:true,fill:HEAD,align:'center'};
+      const R={align:'right'}, RB={align:'right',bold:true};
       const rows=[
         [C('',{fill:HEAD}),C('ค่างานในสัญญาต่อหน่วย',H),C('ปริมาณงาน',H),C('เป็นเงิน',H)],
         [C(''),C(M(pr)+' บาท',{align:'center',bold:true}),C(this.workUnit(it.unit),{align:'center'}),C('บาท',{align:'center'})],
-        [C('ตามสัญญา'),C(''),C(N(q),{align:'right'}),C(M(q*pr),{align:'right'})],
-        [C('ถัวจ่าย'),C(''),C(tua? N(tua):'-',{align:'right'}),C(tua? M(tua*pr):'-',{align:'right'})],
-        [C('ส่งงานถึงงวดที่แล้ว'),C(''),C(prev? N(prev):'-',{align:'right'}),C(prev? M(prev*pr):'-',{align:'right'})],
-        [C('ส่งงานงวดนี้'),C(''),C(now? N(now):'-',{align:'right'}),C(now? M(now*pr):'-',{align:'right'})],
-        [C('รวมส่งงานถึงงวดนี้',{bold:true}),C(''),C(cum? N(cum):'-',{align:'right',bold:true}),C(cum? M(cum*pr):'-',{align:'right',bold:true})],
-        [C('คิดเป็น'),C(''),C(q? N(cum*100/q)+' %':'-',{align:'right'}),C('ของสัญญา',{align:'center',color:SUB})],
-        [C('คิดเป็น'),C(''),C(tua? N(cum*100/tua)+' %':'-',{align:'right'}),C('ของถัวจ่าย',{align:'center',color:SUB})],
+        [C('ตามสัญญา'),C(''),C(N(q),R),C(M(q*pr),R)],
+        [C('ถัวจ่าย'),C(''),C(tua? N(tua):'-',R),C(tua? M(tua*pr):'-',R)],
+        [C('ส่งงานถึงงวดที่แล้ว'),C(''),C(prev? N(prev):'-',R),C(prev? M(prev*pr):'-',R)],
+        [C('ส่งงานงวดนี้'),C(''),C(now? N(now):'-',R),C(now? M(now*pr):'-',R)],
+        [C('รวมส่งงานถึงงวดนี้',{bold:true,fill:HEAD}),C('',{fill:HEAD}),C(cum? N(cum):'-',Object.assign({fill:HEAD},RB)),C(cum? M(cum*pr):'-',Object.assign({fill:HEAD},RB))],
+        [C('คิดเป็น'),C(''),C(q? N(cum*100/q)+' %':'-',R),C('ของสัญญา',{align:'center',color:SUB})],
+        [C('คิดเป็น'),C(''),C(tua? N(cum*100/tua)+' %':'-',R),C('ของถัวจ่าย',{align:'center',color:SUB})],
         [C('ส่งมอบงานตามรายการนี้'),C(RD,{align:'center',colspan:3,bold:true})]
       ];
-      tbl(x,rows,[2.9,2.4,1.85,1.85],1.35,15);
+      tbl(x,rows,[2.8,2.6,1.8,1.8],22,0.5);
       foots(x);
       if(g.photoItem){
         const y=S();
-        head(y,'งาน  '+(it.name||''),18);
+        head(y,itemName(it));
         foots(y);
       }
     });
-    if(g.photoDone){ const x=S(); head(x,'งานแล้วเสร็จ',20); foots(x); }
+    if(g.photoDone){ const x=S(); head(x,'งานแล้วเสร็จ'); foots(x); }
     /* สรุป PAYMENT */
     {
       const amt=items.reduce((t,it)=>t+(di>=0? this.dvQty(p,di,it.no):0)*this.num(it.price),0);
@@ -6347,19 +6387,20 @@ class Component extends DCLogic {
       const pay=amt-retain-adv-fine;
       const cumAll=items.reduce((t,it)=>t+(di>=0? this.dvCum(p,di,it.no):0)*this.num(it.price),0);
       const cv=this.num(p.contractValue);
-      const x=S(); head(x,'สรุป PAYMENT  ส่งงาน'+RD,22);
-      const money=(v)=>C(v? M(v):'-',{align:'right',bold:true});
+      const x=S(); head(x,'สรุป PAYMENT  ส่งงาน'+RD);
+      const money=(v,o)=>C(v? M(v):'-',Object.assign({align:'right',bold:true},o||{}));
+      const HF={fill:HEAD};
       const rows=[
-        [C('รวมเงินตามรายการที่ขอเบิก  '+items.length+'  รายการ',{bold:true,fill:HEAD}),money(amt),C('บาท',{align:'center',fill:HEAD})],
+        [C('รวมเงินตามรายการที่ขอเบิก  '+items.length+'  รายการ',{bold:true,fill:HEAD}),money(amt,HF),C('บาท',{align:'center',fill:HEAD})],
         [C('หัก เงินประกันผลงาน  '+N(rt,0)+'  %'),money(retain),C('บาท',{align:'center'})],
         [C('หัก เงินค่าจ่ายล่วงหน้า  '+N(ad,0)+'  %'),money(adv),C('บาท',{align:'center'})],
         [C('หัก เงินค่าปรับ วันละ '+M(p.finePerDay)+' บาท  จำนวน '+(fd? N(fd,0):'-')+' วัน'),money(fine),C('บาท',{align:'center'})],
-        [C('คงเป็นเงินที่ต้องจ่าย',{bold:true,fill:HEAD}),money(pay),C('บาท',{align:'center',fill:HEAD})],
+        [C('คงเป็นเงินที่ต้องจ่าย',{bold:true,fill:HEAD}),money(pay,HF),C('บาท',{align:'center',fill:HEAD})],
         [C('วงเงินค่างานก่อสร้างโครงการนี้'),money(cv),C('บาท',{align:'center'})],
         [C('รวมเป็นเงินที่สะสม'+RD),money(cumAll),C('บาท',{align:'center'})],
         [C('คงเหลือ',{bold:true}),money(cv-cumAll),C('บาท',{align:'center'})]
       ];
-      tbl(x,rows,[5.6,2.4,1.0],1.4,16);
+      tbl(x,rows,[5.6,2.4,1.0],22,0.6);
       foots(x);
     }
 
@@ -6598,7 +6639,7 @@ class Component extends DCLogic {
         busyTxt: pg.busy? '\u0e01\u0e33\u0e25\u0e31\u0e07\u0e2a\u0e23\u0e49\u0e32\u0e07\u0e44\u0e1f\u0e25\u0e4c\u2026':'\u0e2a\u0e23\u0e49\u0e32\u0e07\u0e44\u0e1f\u0e25\u0e4c .pptx',
         noRounds: pdl.length===0,
         rounds: pdl.map((d,i)=>Object.assign({label:this.dvRoundTxt(d,i), pick:()=>setG({di:i})}, PB(pg.di===i))),
-        tpls: [{k:'official',label:this.PPT_THEMES.official.label},{k:'organic',label:this.PPT_THEMES.organic.label}]
+        tpls: [{k:'official',label:this.PPT_THEMES.official.label},{k:'district',label:this.PPT_THEMES.district.label}]
           .map(t=>Object.assign({label:t.label, pick:()=>setG({tpl:t.k})}, PB(pg.tpl===t.k))),
         customLabel: pg.custom? pg.custom.label : '\u0e22\u0e31\u0e07\u0e44\u0e21\u0e48\u0e44\u0e14\u0e49\u0e2d\u0e31\u0e1b\u0e42\u0e2b\u0e25\u0e14\u0e44\u0e1f\u0e25\u0e4c',
         customBg: pg.tpl==='custom'? 'var(--color-accent-100)':'transparent',
@@ -6898,6 +6939,7 @@ class Component extends DCLogic {
         _contractor:p.contractor||'', _fine:this.num(p.finePerDay), _fy:fy,
         contractNo:p.contractNo, projectName:this.highwayTitle(p), location:p.location,
         noColor: actual>=99.999? 'var(--c-ahead)' : 'var(--color-accent)',
+        district:this.distOf(p)? 'แขวงฯ'+this.distOf(p) : 'แขวงฯ -', distBg:this.distColor(this.distOf(p)),
         fiscalYear:fy||'-', budgetType:p.budgetType||'-', workType:p.workType||'-',
         value:this.n(p.contractValue), start:this.thShort(p.startDate), end:endIso? this.thShort(endIso):'-', endLines:this.endLines(p),
         duration:(this.durOf(p)||'-'),
@@ -7296,7 +7338,10 @@ class Component extends DCLogic {
           diff:(diff>=0?'+':'')+this.n(diff,3), bg:stt.bg, fg:stt.fg,
           remain: isNaN(rm)? '-' : (rm>=0? ((rm+1)+' วัน') : ('เกิน '+(-rm)+' วัน')) });
       });
-      watch.sort((x,y)=>(x.distRank-y.distRank) || (x.diffN-y.diffN));
+      /* เรียงตามแขวง → ปีของสัญญา → เลขที่สัญญา (เช่น อต.1/ 46 / 2569 ก่อน อต.1/ 47 / 2569) */
+      const cKey=(c)=>{ const m=String(c||'').match(/(\d+)\s*\/\s*(\d{4})/); return m? [+m[2], +m[1]] : [Infinity, Infinity]; };
+      watch.sort((x,y)=>{ const a=cKey(x.contractNo), b=cKey(y.contractNo);
+        return (x.distRank-y.distRank) || (a[0]-b[0]) || (a[1]-b[1]) || String(x.contractNo||'').localeCompare(String(y.contractNo||''),'th') || (x.diffN-y.diffN); });
       const COLORS=['var(--color-accent)','var(--color-accent-2-600)','var(--color-accent-400)','var(--color-neutral-600)'];
       const maxV=Math.max.apply(null,[1].concat(Object.keys(byBudget).map(k=>byBudget[k].value)));
       const doneN=projects.filter(p=>this.actualAt(p,this.lastReported(p))>=99.999).length;
