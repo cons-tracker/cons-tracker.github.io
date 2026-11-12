@@ -60,13 +60,20 @@ if (-not $html.Contains($marker)) { throw 'render marker not found' }
 $html = $html.Replace($marker, "    try { if (window.__cloudReady) { setStatus('กำลังโหลดข้อมูล…'); await window.__cloudReady; } } catch (e) { console.warn(e); }`n" + $marker)
 $html = $html.Replace('<div id="__bundler_loading">Unpacking...</div>', '<div id="__bundler_loading">กำลังโหลด…</div>')
 
-[IO.File]::WriteAllText($out, $html, (New-Object Text.UTF8Encoding($false)))
+# OneDrive sometimes holds the file open while syncing: retry a few times before giving up
+function Write-Retry([string]$path, [string]$text) {
+  for ($i = 1; $i -le 8; $i++) {
+    try { [IO.File]::WriteAllText($path, $text, (New-Object Text.UTF8Encoding($false))); return }
+    catch { if ($i -eq 8) { throw }; Start-Sleep -Milliseconds 750 }
+  }
+}
+Write-Retry $out $html
 
 # 3) Bump the service worker version so devices pull the new version
 $sw = Join-Path $root 'web\sw.js'
 $swText = [IO.File]::ReadAllText($sw, [Text.Encoding]::UTF8)
 $stamp = (Get-Date).ToString('yyyyMMddHHmmss')
 $swText = [regex]::Replace($swText, "const VERSION = '[^']*';", "const VERSION = '$stamp';")
-[IO.File]::WriteAllText($sw, $swText, (New-Object Text.UTF8Encoding($false)))
+Write-Retry $sw $swText
 
 "built web/index.html ($((Get-Item $out).Length) bytes), sw version $stamp"

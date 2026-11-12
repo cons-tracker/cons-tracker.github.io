@@ -1573,7 +1573,7 @@ svg.leaflet-image-layer.leaflet-interactive path {
   ::-webkit-scrollbar{height:10px;width:10px}
   ::-webkit-scrollbar-thumb{background:var(--color-neutral-400);border-radius:999px}
   /* รายงานประจำสัปดาห์: A4 แนวตั้ง หน้าละ 4 โครงการ — พื้นที่พิมพ์ 190x277mm (ขอบ 10mm) = 718x1047px */
-  .hm-print-title,.hm-sizer,.hm-logo{display:none}
+  .hm-print-title,.hm-sizer,.hm-logo,.hm-dist-row{display:none}
   /* หัวแดชบอร์ดตอนส่งออก PDF: เพิ่มชื่อหน่วยงาน และแสดงวันที่ข้อมูลเป็นวันจันทร์ถัดไป */
   .hm-org,.hm-date-print{display:none}
   @media print{
@@ -1671,7 +1671,10 @@ svg.leaflet-image-layer.leaflet-interactive path {
     .hm-list{display:block !important;break-before:page;page-break-before:always}
     .hm-list-card{border:0 !important;padding:0 !important;border-radius:0 !important}
     .hm-list-head{display:none !important} /* หัวข้อย้ายไปอยู่ใน thead เพื่อให้ซ้ำทุกแผ่น และไม่แยกจากตาราง */
-    .hm-print-title,.hm-sizer{display:table-row !important}
+    .hm-print-title,.hm-sizer,.hm-dist-row{display:table-row !important}
+    /* ตารางละแขวง: แขวงถัดไปขึ้นหน้าใหม่ · แถบชื่อแขวงอยู่ใน thead ใต้หัวรายงาน เหนือหัวคอลัมน์ */
+    .hm-table.hm-grp-brk{break-before:page;page-break-before:always}
+    .hm-table .hm-dist-row th{font-size:11px !important;padding:5px 6px !important;text-align:left !important}
     .hm-table .hm-sizer th{padding:0 !important;border:0 !important;height:0;font-size:0 !important;line-height:0} /* แถวล่องหนกำหนดความกว้างคอลัมน์ (table-layout:fixed อ่านจากแถวแรก) */
     .hm-table .hm-print-title th{padding:0 0 7px !important;border:0 !important;border-bottom:2px solid var(--color-accent) !important;background:#fff;font-size:11px !important;font-weight:400;text-align:left !important;white-space:normal}
     .hm-print-title-tx{font-size:16px;font-weight:700;color:var(--color-text)}
@@ -1703,8 +1706,9 @@ svg.leaflet-image-layer.leaflet-interactive path {
     .hm-table th:nth-child(7),.hm-table th:nth-child(8),.hm-table th:nth-child(9),.hm-table th:nth-child(6){white-space:nowrap}
     /* คอลัมน์ตัวเลข ผู้รับจ้าง และผู้ควบคุมงานกว้างพอดีเนื้อหา ส่วนที่เหลือให้ช่องสัญญา / โครงการ */
     .hm-table .hm-sizer th,.hm-table thead tr:last-child th{width:1% !important}
-    .hm-table .hm-sizer th:first-child,.hm-table thead tr:last-child th:first-child{width:auto !important}
-    .hm-table .hm-sizer th:nth-child(11),.hm-table thead tr:last-child th:nth-child(11){width:11% !important}
+    /* ช่องสัญญา/โครงการ 360 px (ชื่อโครงการยาว) · หมายเหตุ 200 px */
+    .hm-table .hm-sizer th:first-child,.hm-table thead tr:last-child th:first-child{width:360px !important}
+    .hm-table .hm-sizer th:nth-child(11),.hm-table thead tr:last-child th:nth-child(11){width:200px !important}
   }
   .leaflet-tile-pane{filter:saturate(.28) brightness(1.16) contrast(.88)}
   .leaflet-container{font-family:var(--font-body)}
@@ -2253,7 +2257,8 @@ svg.leaflet-image-layer.leaflet-interactive path {
       </sc-if>
       <sc-if value="{{ dash.hasWatch }}" hint-placeholder-val="{{ true }}">
       <div class="hm-table-wrap" style="overflow-x:auto">
-      <sc-raw-table class="hm-table" style="border-collapse:collapse;width:100%;min-width:1500px;font-size:12.5px">
+      <sc-for list="{{ dash.watchGroups }}" as="gr" hint-placeholder-count="1">
+      <sc-raw-table class="hm-table {{ gr.cls }}" style="border-collapse:collapse;width:100%;min-width:1500px;font-size:12.5px">
         <sc-raw-thead>
           <sc-raw-tr class="hm-sizer"><sc-raw-th></sc-raw-th><sc-raw-th></sc-raw-th><sc-raw-th></sc-raw-th><sc-raw-th></sc-raw-th><sc-raw-th></sc-raw-th><sc-raw-th></sc-raw-th><sc-raw-th></sc-raw-th><sc-raw-th></sc-raw-th><sc-raw-th></sc-raw-th><sc-raw-th></sc-raw-th><sc-raw-th></sc-raw-th></sc-raw-tr>
           <sc-raw-tr class="hm-print-title">
@@ -2265,8 +2270,16 @@ svg.leaflet-image-layer.leaflet-interactive path {
               </div>
             </sc-raw-th>
           </sc-raw-tr>
+          <sc-if value="{{ gr.hasHead }}" hint-placeholder-val="{{ false }}">
+            <sc-raw-tr class="hm-dist-row">
+              <sc-raw-th sc-camel-col-span="{{ 11 }}" style="padding:6px 8px;border:1px solid var(--color-divider);background:{{ gr.bg }}">
+                <span style="font-weight:700;font-size:13px;color:#000">{{ gr.title }}</span>
+                <span class="lbl" style="font-weight:400;margin-left:8px">{{ gr.count }}</span>
+              </sc-raw-th>
+            </sc-raw-tr>
+          </sc-if>
           <sc-raw-tr style="background:var(--color-neutral-200)">
-            <sc-raw-th class="hd" style="text-align:left;padding:7px 8px;border:1px solid var(--color-divider);font-size:12px">สัญญา / โครงการ</sc-raw-th>
+            <sc-raw-th class="hd" style="text-align:left;padding:7px 8px;border:1px solid var(--color-divider);width:360px;font-size:12px">สัญญา / โครงการ</sc-raw-th>
             <sc-raw-th class="hd" style="text-align:right;padding:7px 8px;border:1px solid var(--color-divider);width:110px;font-size:12px">ค่างานตามสัญญา</sc-raw-th>
             <sc-raw-th class="hd" style="text-align:center;padding:7px 8px;border:1px solid var(--color-divider);width:112px;font-size:12px">เริ่ม / สิ้นสุดสัญญา</sc-raw-th>
             <sc-raw-th class="hd" style="text-align:center;padding:7px 8px;border:1px solid var(--color-divider);width:74px;font-size:12px">อายุสัญญา</sc-raw-th>
@@ -2276,11 +2289,11 @@ svg.leaflet-image-layer.leaflet-interactive path {
             <sc-raw-th class="hd" style="padding:7px 8px;border:1px solid var(--color-divider);width:82px;font-size:12px;color:var(--color-accent-700)">% ผลงาน</sc-raw-th>
             <sc-raw-th class="hd" style="padding:7px 8px;border:1px solid var(--color-divider);width:100px;font-size:12px">ผลต่าง</sc-raw-th>
             <sc-raw-th class="hd" style="text-align:left;padding:7px 8px;border:1px solid var(--color-divider);width:150px;font-size:12px">ผู้ควบคุมงาน</sc-raw-th>
-            <sc-raw-th class="hd" style="text-align:left;padding:7px 8px;border:1px solid var(--color-divider);width:220px;font-size:12px">หมายเหตุ</sc-raw-th>
+            <sc-raw-th class="hd" style="text-align:left;padding:7px 8px;border:1px solid var(--color-divider);width:200px;font-size:12px">หมายเหตุ</sc-raw-th>
           </sc-raw-tr>
         </sc-raw-thead>
         <sc-raw-tbody>
-          <sc-for list="{{ dash.watch }}" as="w" hint-placeholder-count="4">
+          <sc-for list="{{ gr.rows }}" as="w" hint-placeholder-count="4">
             <sc-raw-tr>
               <sc-raw-td style="padding:6px 8px;border:1px solid var(--color-divider)">
                 <span class="val" sc-camel-on-click="{{ w.open }}" title="ดูรายละเอียดโครงการ" style="font-weight:700;cursor:pointer;color:var(--color-accent-800)" style-hover="text-decoration:underline">{{ w.contractNo }}</span>
@@ -2337,6 +2350,7 @@ svg.leaflet-image-layer.leaflet-interactive path {
           </sc-for>
         </sc-raw-tbody>
       </sc-raw-table>
+      </sc-for>
       </div>
       </sc-if>
     </div>
@@ -2404,9 +2418,10 @@ svg.leaflet-image-layer.leaflet-interactive path {
   <div class="noprint" style="display:flex;align-items:center;gap:var(--space-2);margin-bottom:var(--space-2);flex-wrap:wrap">
     <button sc-camel-on-click="{{ selectAll }}" class="btn btn-secondary" style="white-space:nowrap;font-size:12.5px;cursor:pointer">เลือกทั้งหมดที่กรองอยู่</button>
     <span style="font-size:12.5px;color:var(--color-neutral-700)">เลือกแล้ว {{ selCount }} โครงการ</span>
-    <div style="margin-left:auto;display:flex;gap:var(--space-2)">
+    <div style="margin-left:auto;display:flex;gap:var(--space-2);flex-wrap:wrap;justify-content:flex-end">
       <button sc-camel-on-click="{{ exportSelected }}" class="btn btn-primary" style="white-space:nowrap;font-size:12.5px;cursor:pointer">Export รายงานสัปดาห์ (ที่เลือก)</button>
-      <button sc-camel-on-click="{{ exportAll }}" class="btn" style="white-space:nowrap;font-size:12.5px;cursor:pointer;background:#f2c94c;color:#3d2e05;border:1px solid #d9ac2a;font-weight:700" style-hover="background:#e6b93a">Export ทุกโครงการ</button>
+      <button sc-camel-on-click="{{ exportAll }}" class="btn" style="white-space:nowrap;font-size:12.5px;cursor:pointer;background:#f2c94c;color:#3d2e05;border:1px solid #d9ac2a;font-weight:700" style-hover="background:#e6b93a">Export รายงานสัปดาห์ทุกโครงการ</button>
+      <button sc-camel-on-click="{{ monthlyPptxExport }}" class="btn" style="white-space:nowrap;font-size:12.5px;cursor:pointer;background:#cfe6fb;color:#1f3b63;border:1px solid #8fbfe8;font-weight:700" style-hover="background:#b9dbf8">งานนำเสนอประชุมประจำเดือน (.pptx)</button>
     </div>
   </div>
   <div style="background:var(--color-neutral-100);border:1px solid var(--color-divider);border-radius:var(--radius-lg);overflow-x:auto">
@@ -2590,8 +2605,9 @@ svg.leaflet-image-layer.leaflet-interactive path {
             <button sc-camel-on-click="{{ exportCurrent }}" style="background:transparent;border:0;border-radius:var(--radius-sm);padding:8px 12px;font-size:13px;font-family:var(--font-body);color:var(--color-text);cursor:pointer;text-align:left;white-space:nowrap" style-hover="background:var(--color-neutral-200)">รายงานประจำสัปดาห์</button>
             <button sc-camel-on-click="{{ exportItemsXlsx }}" style="background:transparent;border:0;border-radius:var(--radius-sm);padding:8px 12px;font-size:13px;font-family:var(--font-body);color:var(--color-text);cursor:pointer;text-align:left;white-space:nowrap" style-hover="background:var(--color-neutral-200)">รายการก่อสร้าง (Excel)</button>
             <button sc-camel-on-click="{{ exportTuaDoc }}" style="background:transparent;border:0;border-radius:var(--radius-sm);padding:8px 12px;font-size:13px;font-family:var(--font-body);color:var(--color-text);cursor:pointer;text-align:left;white-space:nowrap" style-hover="background:var(--color-neutral-200)">นำเสนอถัวจ่าย (Word)</button>
-            <div class="lbl" style="font-size:11px;letter-spacing:.05em;padding:8px 12px 3px">งานนำเสนอตรวจรับงาน</div>
-            <button sc-camel-on-click="{{ pptxExport }}" style="background:transparent;border:0;border-radius:var(--radius-sm);padding:8px 12px 8px 22px;font-size:13px;font-family:var(--font-body);color:var(--color-text);text-align:left;cursor:pointer" style-hover="background:var(--color-accent-100)">งานนำเสนอ (.pptx)</button>
+            <div class="lbl" style="font-size:11px;letter-spacing:.05em;padding:8px 12px 3px">งานนำเสนอ</div>
+            <button sc-camel-on-click="{{ pptxExport }}" style="background:transparent;border:0;border-radius:var(--radius-sm);padding:8px 12px 8px 22px;font-size:13px;font-family:var(--font-body);color:var(--color-text);text-align:left;cursor:pointer" style-hover="background:var(--color-accent-100)">งานนำเสนอตรวจรับงาน (.pptx)</button>
+            <button sc-camel-on-click="{{ monthlyPptxExport }}" style="background:transparent;border:0;border-radius:var(--radius-sm);padding:8px 12px 8px 22px;font-size:13px;font-family:var(--font-body);color:var(--color-text);text-align:left;cursor:pointer;white-space:nowrap" style-hover="background:var(--color-accent-100)">งานนำเสนอประชุมประจำเดือน (.pptx)</button>
             <div class="lbl" style="font-size:11px;letter-spacing:.05em;padding:8px 12px 3px">ใบปะหน้าประจำสัปดาห์ (Word)</div>
             <button sc-camel-on-click="{{ exportCoverOne }}" style="background:transparent;border:0;border-radius:var(--radius-sm);padding:8px 12px 8px 22px;font-size:13px;font-family:var(--font-body);color:var(--color-text);cursor:pointer;text-align:left;white-space:nowrap" style-hover="background:var(--color-neutral-200)">เฉพาะสัปดาห์ที่เลือก</button>
             <button sc-camel-on-click="{{ exportCoverAll }}" style="background:transparent;border:0;border-radius:var(--radius-sm);padding:8px 12px 8px 22px;font-size:13px;font-family:var(--font-body);color:var(--color-text);cursor:pointer;text-align:left;white-space:nowrap" style-hover="background:var(--color-neutral-200)">ทุกสัปดาห์ถึงปัจจุบัน</button>
@@ -3970,6 +3986,68 @@ svg.leaflet-image-layer.leaflet-interactive path {
 </div>
 </sc-if>
 
+<sc-if value="{{ mpOpen }}" hint-placeholder-val="{{ false }}">
+<div class="noprint" style="position:fixed;inset:0;background:color-mix(in srgb, var(--color-neutral-900) 50%, transparent);z-index:1200;display:flex;align-items:flex-start;justify-content:center;padding:clamp(10px,3vw,26px) clamp(8px,3vw,16px);overflow:auto">
+  <div style="background:var(--color-neutral-100);border-radius:var(--radius-lg);width:100%;max-width:520px;box-shadow:var(--shadow-lg);display:flex;flex-direction:column">
+    <div style="display:flex;align-items:center;gap:10px;padding:14px 18px;border-bottom:1px solid var(--color-divider)">
+      <div class="hd" style="font-size:15px">งานนำเสนอประชุมประจำเดือน (PowerPoint)</div>
+      <button sc-camel-on-click="{{ mp.close }}" style="margin-left:auto;background:transparent;border:1px solid var(--color-divider);border-radius:999px;padding:5px 13px;font-family:var(--font-body);font-size:12.5px;color:var(--color-text);cursor:pointer">ปิด</button>
+    </div>
+    <div style="padding:16px 18px;display:flex;flex-direction:column;gap:16px">
+      <div>
+        <div class="hd" style="font-size:12.5px;margin-bottom:7px">ปีงบประมาณ</div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          <sc-for list="{{ mp.years }}" as="y" hint-placeholder-count="2">
+            <button sc-camel-on-click="{{ y.pick }}" style="white-space:nowrap;border-radius:999px;padding:6px 14px;font-size:12.5px;font-family:var(--font-body);cursor:pointer;border:1px solid {{ y.bd }};background:{{ y.bg }};color:{{ y.fg }}">{{ y.label }}</button>
+          </sc-for>
+        </div>
+      </div>
+      <div>
+        <div class="hd" style="font-size:12.5px;margin-bottom:7px">วันที่ประชุม</div>
+        <div style="position:relative;max-width:240px">
+          <button sc-camel-on-click="{{ mp.dateF.toggle }}" style="width:100%;display:flex;align-items:center;justify-content:space-between;gap:8px;border:1px solid var(--color-divider);border-radius:999px;padding:8px 13px;font-size:13px;background:var(--color-bg);color:var(--color-text);cursor:pointer;font-family:var(--font-body);text-align:left">
+            <span>{{ mp.dateF.displayTxt }}</span>
+            <svg sc-camel-view-box="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="3"></rect><path d="M8 3v4M16 3v4M3 11h18"></path></svg>
+          </button>
+          <sc-if value="{{ mp.dateF.open }}" hint-placeholder-val="{{ false }}">
+            <div sc-camel-on-click="{{ mp.dateF.close }}" style="position:fixed;inset:0;z-index:1300"></div>
+            <div style="position:absolute;z-index:1301;top:calc(100% + 6px);left:0;width:266px;background:var(--color-bg);border:1px solid var(--color-divider);border-radius:var(--radius-md);box-shadow:var(--shadow-lg);padding:10px 11px 8px">
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:7px">
+                <button sc-camel-on-click="{{ mp.dateF.prev }}" aria-label="เดือนก่อน" style="width:26px;height:26px;display:flex;align-items:center;justify-content:center;border:1px solid var(--color-divider);background:var(--color-neutral-100);border-radius:999px;cursor:pointer;color:var(--color-text)">
+                  <svg sc-camel-view-box="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"></path></svg>
+                </button>
+                <div class="hd" style="font-size:13px">{{ mp.dateF.monthTh }}</div>
+                <button sc-camel-on-click="{{ mp.dateF.next }}" aria-label="เดือนถัดไป" style="width:26px;height:26px;display:flex;align-items:center;justify-content:center;border:1px solid var(--color-divider);background:var(--color-neutral-100);border-radius:999px;cursor:pointer;color:var(--color-text)">
+                  <svg sc-camel-view-box="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"></path></svg>
+                </button>
+              </div>
+              <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:2px">
+                <sc-for list="{{ mp.dateF.dowNames }}" as="dw" hint-placeholder-count="7">
+                  <div class="lbl" style="font-size:10.5px;text-align:center;padding:2px 0">{{ dw }}</div>
+                </sc-for>
+              </div>
+              <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px">
+                <sc-for list="{{ mp.dateF.cells }}" as="cd" hint-placeholder-count="42">
+                  <button sc-camel-on-click="{{ cd.pick }}" style="border:0;border-radius:999px;padding:5px 0;font-size:12px;cursor:pointer;font-family:var(--font-body);background:{{ cd.bg }};color:{{ cd.fg }};font-weight:{{ cd.fw }}">{{ cd.day }}</button>
+                </sc-for>
+              </div>
+              <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:8px;padding-top:7px;border-top:1px solid var(--color-divider)">
+                <button sc-camel-on-click="{{ mp.dateF.goToday }}" style="border:0;background:transparent;color:var(--color-accent-700);font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font-body)">วันนี้</button>
+              </div>
+            </div>
+          </sc-if>
+        </div>
+      </div>
+      <div class="lbl" style="font-size:11.5px;font-weight:400;line-height:1.65">{{ mp.summary }}<br>ในไฟล์มี: ปก · สรุปภาพรวมทุกแขวง · แต่ละแขวง (สรุป + แผนที่ตำแหน่งโครงการ + สไลด์รายสัญญาที่ยังไม่แล้วเสร็จ) · ปิดท้าย — ช่องรูปภาพเว้นไว้ให้ใส่รูปเองใน PowerPoint</div>
+    </div>
+    <div style="padding:12px 18px 16px;display:flex;gap:8px;justify-content:flex-end;border-top:1px solid var(--color-divider)">
+      <button sc-camel-on-click="{{ mp.close }}" class="btn btn-secondary" style="white-space:nowrap;font-size:13px;cursor:pointer">ยกเลิก</button>
+      <button sc-camel-on-click="{{ mp.build }}" disabled="{{ mp.busy }}" class="btn" style="white-space:nowrap;font-size:13px;cursor:pointer;background:#cfe6fb;color:#1f3b63;border:1px solid #8fbfe8;font-weight:700" style-hover="background:#b9dbf8">{{ mp.busyTxt }}</button>
+    </div>
+  </div>
+</div>
+</sc-if>
+
 
 </x-dc>
 <script type="text/x-dc" data-dc-script="" data-props="{&quot;deptName&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;สำนักงานทางหลวงที่ 5 ( พิษณุโลก)&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;หัวรายงาน&quot;},&quot;redThreshold&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:15,&quot;min&quot;:1,&quot;max&quot;:50,&quot;unit&quot;:&quot;%&quot;,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;เกณฑ์แจ้งเตือน&quot;},&quot;amberThreshold&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:5,&quot;min&quot;:1,&quot;max&quot;:30,&quot;unit&quot;:&quot;%&quot;,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;เกณฑ์แจ้งเตือน&quot;}}">
@@ -5337,10 +5415,18 @@ class Component extends DCLogic {
     const home=this.state.view==='home'; /* หน้าภาพรวมออกแบบไว้สำหรับแนวนอน จึงล็อกแนวกระดาษและเติมเลขหน้า */
     const size=weekly? 'A4' : (this.state.paper||'A4'), o=weekly? 'portrait' : (home? 'landscape' : (this.state.orient||'landscape'));
     el.textContent=home
-      ? '@page{size:'+size+' '+o+';margin:9mm 6mm 12mm;@bottom-right{content:"หน้า " counter(page) " / " counter(pages);font-size:9px;color:#645c50}}'
+      /* กล่องขอบที่เหลือใส่ช่องว่างทับไว้ เพื่อไม่ให้เบราว์เซอร์พิมพ์วันที่/ชื่อหน้า/URL ลงใน PDF — เหลือเฉพาะเลขหน้าของระบบ */
+      ? '@page{size:'+size+' '+o+';margin:9mm 6mm 12mm;'
+        + ['top-left','top-center','top-right','bottom-left','bottom-center'].map(b=>'@'+b+'{content:"\\00a0"}').join('')
+        + '@bottom-right{content:"หน้า " counter(page) " / " counter(pages);font-size:9px;color:#645c50}}'
       : '@page{size:'+size+' '+o+';margin:'+(weekly?'0':'6mm')+'}'; /* รายงานประจำสัปดาห์: ขอบ 0 เพื่อไม่ให้เบราว์เซอร์พิมพ์วันที่/ชื่อหน้า/URL/เลขหน้า — ขอบ 10mm ย้ายไปเป็น padding ของแผ่นแทน */
   }
-  exportHomePdf = () => { this.syncPage(); setTimeout(()=>window.print(),60); };
+  /* ส่งออก PDF หน้าภาพรวม: บังคับเรียงตามแขวง → เลขสัญญา (แต่ละแขวงขึ้นหน้าใหม่) ระหว่างพิมพ์ แล้วคืนการเรียงเดิมของจอ */
+  exportHomePdf = () => {
+    const done=()=>{ window.removeEventListener('afterprint',done); if(this.state.hPrintDist) this.setState({hPrintDist:false}); };
+    this.setState({hPrintDist:true}, ()=>{ this.syncPage();
+      setTimeout(()=>{ window.addEventListener('afterprint',done); window.print(); setTimeout(done,0); },80); });
+  };
   exportHomeJpg = () => this.exportImages('ภาพรวมโครงการ');
   openRoles = () => this.setState({roleDialog:true, loginU:'', loginP:'', loginErr:false});
   closeRoles = () => this.setState({roleDialog:false, loginErr:false});
@@ -5872,6 +5958,7 @@ class Component extends DCLogic {
     {v:'diffAsc', t:'% ผลต่าง (น้อย → มาก)', title:'เรียงตาม % ผลต่าง จากน้อยไปมาก'}
   ];
   homeSort(){
+    if(this.state.hPrintDist) return 'dist';   /* ส่งออก PDF: เรียงตามแขวง → เลขสัญญาเสมอ ไม่ว่าบนจอเลือกเรียงแบบไหน */
     let v=this.state.hSort;
     if(!v){ try{ v=localStorage.getItem('hwprog_hsort')||''; }catch(e){} }
     return this.HOME_SORTS.some(s=>s.v===v)? v : 'dist';
@@ -6893,6 +6980,389 @@ class Component extends DCLogic {
       this.setState({pptDlg:null});
     }catch(err){ fail('สร้างไฟล์ไม่สำเร็จ: '+((err&&err.message)||err)); }
   };
+
+  /* ===== งานนำเสนอประชุมประจำเดือน (.pptx) =====
+     ลำดับสไลด์ตามรูปแบบรายงานการประชุม: ปก → สรุปทุกแขวง → แต่ละแขวง (สรุป + แผนที่ + รายสัญญาที่ยังไม่แล้วเสร็จ) → ปิดท้าย */
+  monthlyYears(){
+    const ys=[]; this.projects().forEach(p=>{ if(p.isDraftNew) return; const y=this.fiscalYearOf(p); if(y && ys.indexOf(y)<0) ys.push(y); });
+    return ys.sort();
+  }
+  monthlyProjects(fy){ return this.projects().filter(p=>!p.isDraftNew && (!fy || fy==='all' || this.fiscalYearOf(p)===fy)); }
+  monthlyPptxExport = () => {
+    const ys=this.monthlyYears();
+    if(!this.monthlyProjects('all').length){ this.setState({exportMenu:false}); this.showNotice('ยังไม่มีโครงการ'); return; }
+    this.setState({exportMenu:false, mpDlg:{fy:ys.length? ys[ys.length-1] : 'all', date:this.today(), busy:false}});
+  };
+  closeMpDlg = () => this.setState({mpDlg:null});
+  buildMonthlyPptx = async () => {
+    const g=this.state.mpDlg; if(!g || g.busy) return;
+    const setBusy=(b)=>this.setState({mpDlg:Object.assign({},this.state.mpDlg||g,{busy:b})});
+    const fail=(m)=>{ setBusy(false); this.showNotice(m); };
+    setBusy(true);
+    let Pptx;
+    try{ Pptx=await this.loadPptxLib(); }
+    catch(e){ return fail('สร้างไฟล์ไม่สำเร็จ: โหลดไลบรารีไม่ได้ (ต้องเชื่อมต่ออินเทอร์เน็ต)'); }
+    let LOGO=null; try{ LOGO=await this.pptLogo(); }catch(e){ console.warn(e); }
+    try{
+      const pptx=await this.monthlyDeck(Pptx,LOGO,g);
+      const blob=await this.monthlyBlob(pptx);
+      const a=document.createElement('a');
+      a.href=URL.createObjectURL(blob);
+      a.download='รายงานความก้าวหน้าโครงการ '+(g.fy==='all'? 'ทุกปี' : ('ปี '+g.fy))+' (ประชุม '+this.thAbbr(g.date||this.today())+').pptx';
+      document.body.appendChild(a); a.click();
+      setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); },2000);
+      this.setState({mpDlg:null});
+    }catch(err){ console.error(err); fail('สร้างไฟล์ไม่สำเร็จ: '+((err&&err.message)||err)); }
+  };
+
+  /* เขียนไฟล์ แล้วแก้ช่องใส่รูป (idx 100-103 ของเค้าโครง CONTRACT) ให้เป็นชนิด "รูปภาพ" (type="pic")
+     pptxgenjs เขียนชนิดนี้ไม่ได้ ถ้าไม่แก้ PowerPoint จะถือเป็นช่องเนื้อหาทั่วไป รูปจะย่อให้พอดีกรอบแทนการครอปให้เต็ม
+     ใช้ JSZip ที่มากับ pptxgen.bundle.js และบีบอัดไฟล์ไปในตัว */
+  async monthlyBlob(pptx){
+    const raw=await pptx.write({outputType:'blob'});
+    const JZ=window.JSZip; if(!JZ) return raw;
+    try{
+      const zip=await JZ.loadAsync(raw);
+      const names=Object.keys(zip.files).filter(n=>/^ppt\/(slides|slideLayouts)\/[^/]+\.xml$/.test(n));
+      for(const n of names){ const t=await zip.file(n).async('string');
+        if(!/<p:ph\s+idx="10[0-3]"/.test(t)) continue;
+        zip.file(n,t.replace(/<p:ph(\s+)idx="(10[0-3])"/g,'<p:ph type="pic"$1idx="$2"')); }
+      return await zip.generateAsync({type:'blob',compression:'DEFLATE',compressionOptions:{level:6},
+        mimeType:'application/vnd.openxmlformats-officedocument.presentationml.presentation'});
+    }catch(e){ console.warn(e); return raw; }
+  }
+
+  /* แผนที่ตำแหน่งโครงการเป็นรูป PNG: ต่อแผ่นแผนที่ OpenStreetMap ลง canvas แล้ววาดหมุดหมายเลข + ป้ายเลขที่สัญญา
+     LW x LH = ขนาดแผนที่ (พิกเซลแผนที่) วาดลง canvas ขยาย 2 เท่า ให้ตัวหนังสือบนแผนที่อ่านได้เมื่อขึ้นจอ */
+  async pptMapPng(pts,LW,LH){
+    const S=2, c=document.createElement('canvas'); c.width=LW*S; c.height=LH*S;
+    const g=c.getContext('2d'); g.fillStyle='#e8ecf0'; g.fillRect(0,0,c.width,c.height);
+    const wp=(lat,lng,z)=>{ const s=256*Math.pow(2,z), r=lat*Math.PI/180;
+      return {x:(lng+180)/360*s, y:(1-Math.log(Math.tan(r)+1/Math.cos(r))/Math.PI)/2*s}; };
+    const box=(z)=>{ const a=pts.map(p=>wp(p.lat,p.lng,z)), xs=a.map(o=>o.x), ys=a.map(o=>o.y);
+      return {a, x1:Math.min.apply(null,xs), x2:Math.max.apply(null,xs), y1:Math.min.apply(null,ys), y2:Math.max.apply(null,ys)}; };
+    let z=12;
+    if(pts.length>1){ for(z=14;z>6;z--){ const b=box(z); if(b.x2-b.x1<=LW-260 && b.y2-b.y1<=LH-140) break; } }
+    const b=box(z), x0=(b.x1+b.x2)/2-LW/2, y0=(b.y1+b.y2)/2-LH/2 + 14, n=Math.pow(2,z);
+    const jobs=[];
+    for(let tx=Math.floor(x0/256); tx<=Math.floor((x0+LW)/256); tx++)
+      for(let ty=Math.floor(y0/256); ty<=Math.floor((y0+LH)/256); ty++){
+        if(ty<0||ty>=n) continue;
+        jobs.push(new Promise(res=>{ const im=new Image(); im.crossOrigin='anonymous';
+          const to=setTimeout(res,10000);
+          im.onload=()=>{ clearTimeout(to); g.drawImage(im,(tx*256-x0)*S,(ty*256-y0)*S,256*S,256*S); res(); };
+          im.onerror=()=>{ clearTimeout(to); res(); };
+          im.src='https://tile.openstreetmap.org/'+z+'/'+(((tx%n)+n)%n)+'/'+ty+'.png'; }));
+      }
+    await Promise.all(jobs);
+    const FF='"TH Sarabun New","Sarabun","Leelawadee UI",Tahoma,sans-serif';
+    /* กันป้ายทับกัน: จองพื้นที่หมุดทุกอันก่อน แล้ววางป้ายขวา → ซ้าย → ถ้าทับทั้งคู่ไม่แสดงป้าย (หมายเลขยังตรงกับรายการข้างแผนที่) */
+    const taken=pts.map((p,i)=>{ const o=b.a[i], x=(o.x-x0)*S, y=(o.y-y0)*S, R=15*S; return {x1:x-R,y1:y-2*R-9*S,x2:x+R,y2:y}; });
+    const hit=(r)=>taken.some(t=>r.x1<t.x2 && r.x2>t.x1 && r.y1<t.y2 && r.y2>t.y1);
+    pts.forEach((p,i)=>{
+      const o=b.a[i], x=(o.x-x0)*S, y=(o.y-y0)*S, R=15*S, cy=y-R-9*S;
+      /* หมุดรูปหยดน้ำ */
+      g.beginPath(); g.moveTo(x,y); g.lineTo(x-R*0.62,cy+R*0.78); g.arc(x,cy,R,Math.PI*0.72,Math.PI*0.28); g.closePath();
+      g.shadowColor='rgba(0,0,0,.35)'; g.shadowBlur=6*S; g.shadowOffsetY=2*S;
+      g.fillStyle=p.color; g.fill(); g.shadowColor='transparent';
+      g.lineWidth=2.5*S; g.strokeStyle='#ffffff'; g.stroke();
+      g.fillStyle='#ffffff'; g.font='bold '+(17*S)+'px '+FF; g.textAlign='center'; g.textBaseline='middle';
+      g.fillText(String(p.n),x,cy+1*S);
+      /* ป้ายเลขที่สัญญา ข้างหมุด (ชิดขอบขวาแล้วย้ายไปซ้าย) */
+      g.font='bold '+(17*S)+'px '+FF;
+      const t=p.label, tw=g.measureText(t).width, ph=26*S, pw=tw+16*S, ly=cy-ph/2;
+      const at=(lx)=>({x1:lx,y1:ly,x2:lx+pw,y2:ly+ph});
+      const lx=[x+R+6*S, x-R-6*S-pw].find(v=>v>=4*S && v+pw<=c.width-4*S && !hit(at(v)));
+      if(lx===undefined) return;
+      taken.push(at(lx));
+      g.fillStyle='rgba(255,255,255,.94)'; g.strokeStyle=p.color; g.lineWidth=2*S;
+      g.beginPath(); if(g.roundRect) g.roundRect(lx,ly,pw,ph,5*S); else g.rect(lx,ly,pw,ph); g.fill(); g.stroke();
+      g.fillStyle='#1E2733'; g.textAlign='left'; g.fillText(t,lx+8*S,ly+ph/2+1*S);
+    });
+    g.font=(11*S)+'px Arial,sans-serif'; g.textAlign='right'; g.textBaseline='bottom';
+    const at='© OpenStreetMap contributors', aw=g.measureText(at).width;
+    g.fillStyle='rgba(255,255,255,.8)'; g.fillRect(c.width-aw-12*S,c.height-16*S,aw+12*S,16*S);
+    g.fillStyle='#444'; g.fillText(at,c.width-6*S,c.height-2*S);
+    return c.toDataURL('image/jpeg',0.86);   /* JPEG: ไฟล์เล็กกว่า PNG หลายเท่า */
+  }
+
+  async monthlyDeck(Pptx,LOGO,g){
+    const FONT='TH Sarabun New';
+    const NAVY='1F3B63', GOLD='C9A04A', INK='1E2733', SUB='5B6675', LINE='D5DBE3', SOFT='F3F5F8';
+    const GREEN='2E8B57', RED='C0392B', AMBER='B7791F', DONE='4A7A3A', LEFT='D9822B';
+    const amberT=this.num(this.props.amberThreshold ?? 5);
+    const fyTxt=g.fy==='all'? 'ทุกปีงบประมาณ' : ('งาน พ.ร.บ. '+g.fy);
+    const meetTxt=this.cdate(this.d(g.date||this.today()));
+    const all=this.monthlyProjects(g.fy);
+    if(!all.length) throw new Error('ไม่มีโครงการในปีงบประมาณที่เลือก');
+    const isDone=(p)=>this.actualAt(p,this.lastReported(p))>=99.999;
+    const cKey=(c)=>{ const m=String(c||'').match(/(\d+)\s*\/\s*(\d{4})/); return m? [+m[2], +m[1]] : [Infinity, Infinity]; };
+    const byNo=(x,y)=>{ const a=cKey(x.contractNo), b=cKey(y.contractNo); return (a[0]-b[0]) || (a[1]-b[1]) || String(x.contractNo||'').localeCompare(String(y.contractNo||''),'th'); };
+    const shortNo=(p)=>String(p.contractNo||'').replace(/^\s*สัญญาเลขที่\s*/,'').replace(/\s*ลงวันที่.*$/,'').replace(/\s*\/\s*/g,'/').trim()||'-';
+    const dateOf=(p)=>p.contractDate? this.cdate(this.d(p.contractDate)) : ((String(p.contractNo||'').match(/ลงวันที่\s*(.+)$/)||[])[1]||'');
+    const full=(iso)=>iso? this.cdate(this.d(iso)) : '-';
+    const pc=(v)=>this.n(v,3)+' %';
+    const tone=(diff)=> diff>=0? GREEN : (diff>-amberT? AMBER : RED);
+    const distName=(d)=>this.distKey(d)||d;
+    const groups={};
+    all.forEach(p=>{ const d=distName(this.distOf(p))||'ไม่ระบุแขวง'; (groups[d]=groups[d]||[]).push(p); });
+    Object.keys(groups).forEach(k=>groups[k].sort(byNo));
+    const order=this.DISTRICT_ORDER.concat(Object.keys(groups).filter(k=>this.DISTRICT_ORDER.indexOf(k)<0));
+    const abbr=(d)=>(this.DIST_ABBR[d]||d).replace(/\/$/,'');
+
+    const pptx=new Pptx();
+    pptx.layout='LAYOUT_WIDE';   /* 13.333 x 7.5 นิ้ว (16:9) */
+    pptx.author=this.OFFICE;
+    pptx.title='รายงานความก้าวหน้าโครงการก่อสร้างทาง '+fyTxt;
+    pptx.theme={headFontFace:FONT, bodyFontFace:FONT};
+    const SW=13.333, SH=7.5, XL=0.5, WC=SW-1.0;
+    const T=(o)=>Object.assign({fontFace:FONT,color:INK,fontSize:18,lang:'th-TH',margin:0,isTextBox:true,valign:'middle'},o||{});
+    const R=(t,o)=>({text:String(t==null?'':t),options:Object.assign({fontFace:FONT,color:INK,lang:'th-TH'},o||{})});
+    const C=(t,o)=>({text:String(t==null?'':t),options:Object.assign({fontFace:FONT,fontSize:17,color:INK,lang:'th-TH',valign:'middle'},o||{})});
+    const box=(x,o)=>x.addShape('rect',Object.assign({line:{color:'FFFFFF',width:0}},o));
+    /* โลโก้กรมทางหลวงวางเป็นรูปธรรมดาในแต่ละสไลด์ ลาก/ย่อ/ลบได้เองใน PowerPoint */
+    const LG={w:0.82}; LG.h=LOGO? LG.w*LOGO.r : 0; LG.x=SW-0.42-LG.w; LG.y=0.16;
+    /* โลโก้เป็น JPEG ลงพื้นสีเดียวกับสไลด์ (ไฟล์เล็กกว่า PNG พื้นใสหลายเท่า):
+       มุมขวาบนสไลด์เนื้อหา = 240 px พื้นขาว · ปก/ปิดท้าย = 600 px พื้นน้ำเงิน */
+    const flat=(W,bg)=>new Promise(res=>{ if(!LOGO) return res(null); const im=new Image();
+      im.onload=()=>{ const c=document.createElement('canvas'); c.width=W; c.height=Math.round(W*LOGO.r);
+        const g2=c.getContext('2d'); g2.fillStyle=bg; g2.fillRect(0,0,c.width,c.height);
+        g2.imageSmoothingQuality='high'; g2.drawImage(im,0,0,c.width,c.height); res({data:c.toDataURL('image/jpeg',0.9),r:LOGO.r}); };
+      im.onerror=()=>res(LOGO); im.src=LOGO.data; });
+    const LOGO_S=await flat(240,'#ffffff'), LOGO_B=await flat(600,'#'+NAVY);
+    const logo=(x,o)=>{ if(LOGO_S) x.addImage(Object.assign({data:LOGO_S.data,x:LG.x,y:LG.y,w:LG.w,h:LG.h},o||{})); };
+    const footer=(x)=>{
+      x.addShape('line',{x:XL,y:6.98,w:WC,h:0,line:{color:LINE,width:0.75}});
+      x.addText('ส่วนควบคุมงานก่อสร้างทาง  '+this.OFFICE,T({x:XL,y:7.03,w:7.2,h:0.34,fontSize:14,color:SUB}));
+      x.addText('ประชุมวันที่ '+meetTxt,T({x:7.6,y:7.03,w:4.6,h:0.34,fontSize:14,color:SUB,align:'right'}));
+      x.slideNumber={x:12.3,y:7.03,w:0.53,h:0.34,fontFace:FONT,fontSize:14,color:NAVY,bold:true,align:'right'};
+    };
+    /* หัวสไลด์: แถบสีกรมทางหลวงด้านซ้าย · หัวข้อย่อยสีทอง · หัวเรื่อง (ย่อตัวอักษรให้อยู่ 1 บรรทัด) · เส้นใต้ */
+    /* กรอบรูปสไลด์รายสัญญา: อัตราส่วน 4:3 จัดกึ่งกลางแนวนอน
+       ทำเป็น "ช่องใส่รูปภาพ" (picture placeholder) ในเค้าโครง CONTRACT — ใน PowerPoint กดไอคอนกลางกรอบเพื่อเลือกรูปจากเครื่อง
+       รูปจะถูกครอปให้เต็มกรอบเอง */
+    const PIC={y:3.12, h:2.06}; PIC.w=PIC.h*4/3; PIC.g=0.2; PIC.x0=XL+(WC-(4*PIC.w+3*PIC.g))/2;
+    pptx.defineSlideMaster({title:'CONTRACT', background:{color:'FFFFFF'},
+      objects:[0,1,2,3].map(k=>({placeholder:{options:{name:'pic'+(k+1),x:PIC.x0+k*(PIC.w+PIC.g),y:PIC.y,w:PIC.w,h:PIC.h,
+        fontFace:FONT,fontSize:14,color:'8A94A3',align:'center',valign:'middle'}, text:'คลิกไอคอนเพื่อใส่รูปภาพ'}}))});
+    const slide=(kicker,title,o)=>{ o=o||{};
+      const x=o.master? pptx.addSlide({masterName:o.master}) : pptx.addSlide(); x.background={color:'FFFFFF'};
+      box(x,{x:0,y:0,w:0.14,h:SH,fill:{color:NAVY}});
+      box(x,{x:0,y:0.3,w:0.14,h:0.85,fill:{color:GOLD}});
+      const tw=(LOGO? LG.x-0.2 : SW-0.5)-XL-(o.tagW||0);
+      if(kicker) x.addText(kicker,T({x:XL,y:0.16,w:tw,h:0.36,fontSize:17,bold:true,color:GOLD}));
+      const fits=[32,30,28,26,24,22,20].map(s=>({s,L:this.pptWrap(title,s,tw*0.97,true,FONT,false)}));
+      const f=fits.find(z=>z.L.length===1)||fits[fits.length-1];
+      x.addText(f.L.length>1? f.L.join(' ') : f.L[0],T({x:XL,y:0.5,w:tw,h:0.66,fontSize:f.s,bold:true,color:NAVY,fit:'shrink'}));
+      x.addShape('line',{x:XL,y:1.22,w:WC,h:0,line:{color:LINE,width:1}});
+      box(x,{x:XL,y:1.19,w:1.3,h:0.065,fill:{color:GOLD}});
+      logo(x); footer(x);
+      return x;
+    };
+    /* การ์ดตัวเลข: แถบสีซ้าย + ชื่อ + ค่า */
+    const card=(x,X,Y,W,H,label,value,color,vs)=>{
+      box(x,{x:X,y:Y,w:W,h:H,fill:{color:SOFT}});
+      box(x,{x:X,y:Y,w:0.07,h:H,fill:{color}});
+      x.addText([R(label,{fontSize:vs? 14:15,color:SUB,breakLine:true}),R(value,{fontSize:vs||(H>0.9? 30:24),bold:true,color})],
+        T({x:X+0.2,y:Y+0.04,w:W-0.26,h:H-0.08,valign:'middle',lineSpacingMultiple:0.92}));
+    };
+    const stat=(p)=>{ const pr=this.progressOf(p); return {plan:pr.plan, actual:pr.actual, diff:pr.actual-pr.plan}; };
+
+    /* 1 — ปก */
+    {
+      const x=pptx.addSlide(); x.background={color:NAVY};
+      box(x,{x:0,y:SH-0.32,w:SW,h:0.32,fill:{color:GOLD}});
+      box(x,{x:4.35,y:1.35,w:0.03,h:4.4,fill:{color:GOLD}});
+      if(LOGO_B){ const w=2.9; x.addImage({data:LOGO_B.data,x:0.85,y:(SH-0.32-w*LOGO.r)/2,w,h:w*LOGO.r}); }
+      x.addText('รายงานความก้าวหน้าโครงการก่อสร้างทาง',T({x:4.8,y:1.75,w:8.1,h:0.95,fontSize:46,bold:true,color:'FFFFFF',fit:'shrink'}));
+      x.addText([R('ส่วนควบคุมงานก่อสร้างทาง',{fontSize:30,color:'FFFFFF',bold:true,breakLine:true}),R(this.OFFICE,{fontSize:26,color:'D8E0EC'})],
+        T({x:4.8,y:2.95,w:8.1,h:1.2,valign:'top'}));
+      x.addText('ประชุมวันที่ '+meetTxt,T({x:4.8,y:4.5,w:8.1,h:0.6,fontSize:24,bold:true,color:GOLD,align:'left'}));
+    }
+
+    /* 2 — สรุปโครงการทุกแขวง: การ์ดตัวเลข + ตาราง + กราฟแท่ง */
+    {
+      const x=slide('','สรุปโครงการก่อสร้างในความควบคุมของส่วนควบคุมงานก่อสร้างทาง');
+      const doneAll=all.filter(isDone), left=all.filter(p=>!isDone(p));
+      const late=left.filter(p=>stat(p).diff<=-amberT);
+      const cw=(WC-0.45)/4;
+      card(x,XL,1.45,cw,0.95,'โครงการทั้งหมด',all.length+' โครงการ',NAVY);
+      card(x,XL+(cw+0.15),1.45,cw,0.95,'ก่อสร้างแล้วเสร็จ',doneAll.length+' โครงการ',DONE);
+      card(x,XL+(cw+0.15)*2,1.45,cw,0.95,'อยู่ระหว่างก่อสร้าง',left.length+' โครงการ',LEFT);
+      card(x,XL+(cw+0.15)*3,1.45,cw,0.95,'ล่าช้ากว่าแผน',late.length+' โครงการ',RED);
+      const ds=order.filter(d=>this.DISTRICT_ORDER.indexOf(d)>=0 || groups[d]);
+      const H={bold:true,fill:{color:NAVY},color:'FFFFFF',align:'center',fontSize:16};
+      const rows=[[C('หน่วยงาน',H),C('จำนวนโครงการ',H),C('แล้วเสร็จ',H),C('ระหว่างก่อสร้าง',H),C('หมายเหตุ',H)]];
+      const tot={n:0,d:0,b:{}};
+      ds.forEach((d,i)=>{ const L=groups[d]||[], dn=L.filter(isDone).length, b={};
+        L.forEach(p=>{ const k=p.budgetType||''; if(k && k!=='งบกรม'){ b[k]=(b[k]||0)+1; tot.b[k]=(tot.b[k]||0)+1; } });
+        tot.n+=L.length; tot.d+=dn;
+        const z=i%2? {fill:{color:SOFT}} : {};
+        rows.push([C('แขวงฯ '+d,Object.assign({bold:true},z)),C(L.length,Object.assign({align:'center'},z)),C(dn,Object.assign({align:'center',color:DONE,bold:true},z)),
+          C(L.length-dn,Object.assign({align:'center',color:LEFT,bold:true},z)),C(Object.keys(b).map(k=>k+' '+b[k]).join(', ')||'-',Object.assign({align:'center',fontSize:14,color:SUB},z))]); });
+      const TF={bold:true,fill:{color:'E6EBF2'}};
+      rows.push([C('รวม',Object.assign({align:'center'},TF)),C(tot.n,Object.assign({align:'center'},TF)),C(tot.d,Object.assign({align:'center',color:DONE},TF)),
+        C(tot.n-tot.d,Object.assign({align:'center',color:LEFT},TF)),C(Object.keys(tot.b).map(k=>k+' '+tot.b[k]).join(', ')||'-',Object.assign({align:'center',fontSize:14},TF))]);
+      const rh=Math.min(0.5,(6.8-2.6)/rows.length);
+      x.addTable(rows,{x:XL,y:2.6,w:7.5,colW:[2.2,1.15,0.95,1.3,1.9],rowH:rows.map(()=>rh),border:{type:'solid',pt:0.75,color:LINE},
+        fontFace:FONT,fontSize:17,valign:'middle',margin:[2,6,2,6],autoPage:false});
+      const labels=ds.map(abbr);
+      x.addChart('bar',[
+        {name:'จำนวนโครงการทั้งสิ้น',labels,values:ds.map(d=>(groups[d]||[]).length)},
+        {name:'แล้วเสร็จ',labels,values:ds.map(d=>(groups[d]||[]).filter(isDone).length)},
+        {name:'คงเหลือ',labels,values:ds.map(d=>(groups[d]||[]).filter(p=>!isDone(p)).length)}
+      ],{x:8.25,y:2.5,w:4.6,h:4.35,barDir:'col',barGrouping:'clustered',barGapWidthPct:60,chartColors:[NAVY,DONE,LEFT],
+        showValue:true,dataLabelPosition:'outEnd',dataLabelFontFace:FONT,dataLabelFontSize:14,dataLabelColor:INK,dataLabelFormatCode:'0;-0;;',
+        catAxisLabelFontFace:FONT,catAxisLabelFontSize:15,catAxisLabelColor:INK,valAxisHidden:true,valGridLine:{style:'none'},
+        catAxisLineShow:true,showLegend:true,legendPos:'b',legendFontFace:FONT,legendFontSize:14,legendColor:INK});
+    }
+
+    /* แต่ละแขวง */
+    for(const d of order){
+      const L=groups[d]; if(!L || !L.length) continue;
+      const left=L.filter(p=>!isDone(p)), dn=L.length-left.length;
+      const DT='แขวงทางหลวง'+d;
+      /* 3 — สรุปแขวง: ตัวเลข + ตารางโครงการคงเหลือ + โดนัทแล้วเสร็จ/คงเหลือ (ตารางยาวแบ่งต่อสไลด์ถัดไป) */
+      const rowsOf=(list,base)=>{
+        const H={bold:true,fill:{color:NAVY},color:'FFFFFF',align:'center',fontSize:16};
+        const r=[[C('ที่',H),C('สัญญาเลขที่',H),C('ลงวันที่',H),C('แผนงาน %',H),C('ผลงาน %',H),C('ผลต่าง %',H)]];
+        list.forEach((p,i)=>{ const s=stat(p), z=(i%2)? {fill:{color:SOFT}} : {};
+          r.push([C(base+i+1,Object.assign({align:'center'},z)),C(shortNo(p),Object.assign({bold:true},z)),C(dateOf(p),Object.assign({align:'center',fontSize:16},z)),
+            C(this.n(s.plan,3),Object.assign({align:'right'},z)),C(this.n(s.actual,3),Object.assign({align:'right'},z)),
+            C((s.diff>=0?'+':'')+this.n(s.diff,3),Object.assign({align:'right',bold:true,color:tone(s.diff)},z))]); });
+        return r; };
+      const CW=[0.55,2.55,2.05,1.0,1.0,1.05];
+      {
+        const x=slide('',DT);
+        const cw=2.6;
+        card(x,XL,1.45,cw,0.9,'จำนวนโครงการทั้งสิ้น',L.length+' โครงการ',NAVY);
+        card(x,XL+cw+0.15,1.45,cw,0.9,'ก่อสร้างแล้วเสร็จ',dn+' โครงการ',DONE);
+        card(x,XL+(cw+0.15)*2,1.45,cw,0.9,'คงเหลือ (ระหว่างก่อสร้าง)',left.length+' โครงการ',LEFT);
+        if(left.length){
+          x.addText('โครงการที่อยู่ระหว่างก่อสร้าง ดังนี้',T({x:XL,y:2.5,w:8.2,h:0.38,fontSize:18,bold:true,color:NAVY}));
+          const first=left.slice(0,8), r=rowsOf(first,0);
+          x.addTable(r,{x:XL,y:2.95,w:8.2,colW:CW,rowH:r.map(()=>0.42),border:{type:'solid',pt:0.75,color:LINE},fontFace:FONT,fontSize:17,valign:'middle',margin:[2,6,2,6],autoPage:false});
+        } else {
+          x.addText('ทุกโครงการก่อสร้างแล้วเสร็จ',T({x:XL,y:3.2,w:8.2,h:0.6,fontSize:26,bold:true,color:DONE}));
+        }
+        x.addChart('doughnut',[{name:'โครงการ',labels:['แล้วเสร็จ','คงเหลือ'],values:[dn,left.length]}],
+          {x:8.95,y:1.45,w:3.9,h:5.35,holeSize:58,chartColors:[DONE,LEFT],showPercent:true,showValue:false,showLegend:true,legendPos:'b',
+           legendFontFace:FONT,legendFontSize:16,legendColor:INK,dataLabelColor:'FFFFFF',dataLabelFormatCode:'0%;-0%;;',dataLabelFontFace:FONT,dataLabelFontSize:16,dataLabelFontBold:true,
+           dataBorder:{pt:2,color:'FFFFFF'},showTitle:false});
+        x.addText([R(left.length+'/'+L.length,{fontSize:34,bold:true,color:NAVY,breakLine:true}),R('คงเหลือ',{fontSize:16,color:SUB})],
+          T({x:9.9,y:3.35,w:2.0,h:1.0,align:'center'}));
+        for(let k=8;k<left.length;k+=11){
+          const y=slide('',DT+' (ต่อ)'), r=rowsOf(left.slice(k,k+11),k);
+          y.addTable(r,{x:XL,y:1.5,w:WC,colW:CW.map(v=>v*WC/8.2),rowH:r.map(()=>0.42),border:{type:'solid',pt:0.75,color:LINE},fontFace:FONT,fontSize:17,valign:'middle',margin:[2,6,2,6],autoPage:false});
+        }
+      }
+      if(!left.length) continue;
+
+      /* 4 — แผนที่ตำแหน่งโครงการที่ยังไม่แล้วเสร็จ (หมายเลขตรงกับตาราง) */
+      {
+        const x=slide(DT,'แผนที่ตำแหน่งโครงการ');
+        const MX=XL, MY=1.45, MW=8.25, MH=5.4;
+        const pts=[];
+        left.forEach((p,i)=>{ const la=parseFloat(p.lat), ln=parseFloat(p.lng);
+          if(isFinite(la)&&isFinite(ln)) pts.push({lat:la,lng:ln,n:i+1,label:shortNo(p),color:'#'+tone(stat(p).diff)}); });
+        let img=null;
+        if(pts.length){ try{ img=await this.pptMapPng(pts,Math.round(MW*100),Math.round(MH*100)); }catch(e){ console.warn(e); } }
+        if(img) x.addImage({data:img,x:MX,y:MY,w:MW,h:MH});
+        else { box(x,{x:MX,y:MY,w:MW,h:MH,fill:{color:SOFT}});
+          x.addText(pts.length? 'โหลดแผนที่ไม่สำเร็จ (ต้องเชื่อมต่ออินเทอร์เน็ต)' : 'ยังไม่ได้ระบุพิกัดโครงการ',T({x:MX,y:MY,w:MW,h:MH,fontSize:20,color:SUB,align:'center'})); }
+        x.addShape('rect',{x:MX,y:MY,w:MW,h:MH,fill:{type:'none'},line:{color:LINE,width:1}});
+        /* รายการด้านขวา: หมายเลข + เลขที่สัญญา + ทางหลวง/ตอน + ผลงานเทียบแผน */
+        const LX=MX+MW+0.25, LWd=SW-0.5-LX;
+        x.addText('รายละเอียดโครงการ',T({x:LX,y:MY,w:LWd,h:0.4,fontSize:18,bold:true,color:NAVY}));
+        const roadOf=(p)=>{ const t=this.highwayTitle(p); const m=t.match(/ทางหลวงหมายเลข\s*([\d.]+)/), s=t.match(/ตอน\s+(?!ควบคุม)(.+?)(?=\s+(?:ระหว่าง|กม\.)|$)/);
+          return ((m? 'ทล.'+m[1] : '')+(s? ' ตอน '+s[1].trim() : '')).trim() || String(p.location||'').trim(); };
+        /* รายการยาวจัดเป็น 3 แบบ: 3 บรรทัด (มีชื่อทางหลวง) → 2 บรรทัด → 1 บรรทัด (2 คอลัมน์ถ้าเกิน 16 รายการ) */
+        const n=left.length, cols=n>16? 2 : 1, per=Math.ceil(n/cols), ih=Math.min(0.95,(MH-0.5)/per);
+        const mode=ih>=0.8? 3 : (ih>=0.5? 2 : 1), cwL=(LWd-(cols-1)*0.1)/cols, d=Math.min(0.4,ih-0.06);
+        left.forEach((p,i)=>{ const s=stat(p), col=tone(s.diff), cx0=LX+Math.floor(i/per)*(cwL+0.1), y=MY+0.5+(i%per)*ih;
+          const hasPt=isFinite(parseFloat(p.lat))&&isFinite(parseFloat(p.lng));
+          x.addShape('ellipse',{x:cx0,y:y+0.02,w:d,h:d,fill:{color:col},line:{color:'FFFFFF',width:1}});
+          x.addText(String(i+1),T({x:cx0,y:y+0.02,w:d,h:d,fontSize:mode>1? 16:12,bold:true,color:'FFFFFF',align:'center'}));
+          const tx=cx0+d+0.1, tw=cwL-d-0.1, prog='แผนงาน '+this.n(s.plan,2)+'% · ผลงาน '+this.n(s.actual,2)+'%'+(hasPt? '' : ' · ไม่มีพิกัด');
+          let r;
+          if(mode===1) r=[R(shortNo(p)+'  ',{fontSize:14,bold:true,color:INK}),R(cols>1? (this.n(s.actual,1)+'%') : prog,{fontSize:12,color:col,bold:true})];
+          else { r=[R('สัญญาเลขที่ '+shortNo(p),{fontSize:mode===3?17:15,bold:true,color:INK,breakLine:true})];
+            if(mode===3) r.push(R(this.pptWrap(roadOf(p),13,tw,false,FONT,false)[0]||'',{fontSize:13,color:SUB,breakLine:true}));
+            r.push(R(prog,{fontSize:13,color:col,bold:true})); }
+          x.addText(r,T({x:tx,y:y,w:tw,h:mode===1? d+0.04 : ih-0.04,valign:mode===1? 'middle':'top',lineSpacingMultiple:0.9}));
+        });
+      }
+
+      /* 5.. — รายสัญญา: รายละเอียด · ช่องใส่รูป 4 ช่อง (เว้นว่าง) · ผลงานเทียบแผน · สาเหตุ/แนวทางแก้ไข */
+      for(let i=0;i<left.length;i++){
+        const p=left[i], s=stat(p);
+        const bt=String(p.budgetType||'').trim(), tagW=bt? 1.55 : 0;
+        const dt=dateOf(p);
+        const x=slide(DT,(i+1)+'. สัญญาเลขที่ '+shortNo(p)+(dt? '  ลงวันที่ '+dt : ''),{tagW,master:'CONTRACT'});
+        if(bt){ const tx=(LOGO? LG.x-0.15 : SW-0.5)-1.45;
+          x.addShape('rect',{x:tx,y:0.6,w:1.45,h:0.46,fill:{color:'FDECEA'},line:{color:RED,width:1}});
+          x.addText(bt,T({x:tx,y:0.6,w:1.45,h:0.46,fontSize:17,bold:true,color:RED,align:'center'})); }
+        /* รายละเอียดโครงการ: ไม่เกิน 3 บรรทัด */
+        const desc=[p.program1,p.program2,p.program3,p.jobCode?('รหัสงาน '+p.jobCode):'',p.projectName,p.location].filter(Boolean).join(' ').replace(/\s+/g,' ').trim();
+        const pick=[17,16,15,14,13].map(z=>({z,L:this.pptWrap(desc,z,WC*0.97,false,FONT,false)})).find(o=>o.L.length<=3)
+          || {z:13,L:this.pptWrap(desc,13,WC*0.97,false,FONT,false).slice(0,4)};
+        x.addText(pick.L.map((l,k)=>R(l,{fontSize:pick.z,breakLine:k<pick.L.length-1})),T({x:XL,y:1.32,w:WC,h:0.98,valign:'top',lineSpacingMultiple:0.95}));
+        /* แถบข้อมูลสัญญา */
+        const ab=(iso)=>this.thAbbr(iso)||'-';
+        const endTxt=this.hasNewEnd(p)? (ab(p.endDateOrig)+' (ใหม่ '+ab(p.endDate)+')') : ab(this.endOf(p));
+        const LBL={fontSize:13,color:SUB,fill:{color:SOFT}}, VAL={fontSize:16,bold:true};
+        x.addTable([
+          [C('ผู้รับจ้าง',LBL),C('ผู้ควบคุมงาน',LBL),C('วันเริ่มสัญญา',LBL),C(this.hasNewEnd(p)? 'วันสิ้นสุดสัญญา (เดิม / ใหม่)' : 'วันสิ้นสุดสัญญา',LBL),C('ค่างาน (บาท)',LBL)],
+          [C(p.contractor||'-',VAL),C(p.supervisor||'-',VAL),C(ab(p.startDate),VAL),C(endTxt,VAL),C(this.cmoney(p.contractValue),Object.assign({align:'right'},VAL))]
+        ],{x:XL,y:2.34,w:WC,colW:[3.55,2.45,1.5,3.0,1.83],rowH:[0.27,0.4],border:{type:'solid',pt:0.75,color:LINE},fontFace:FONT,valign:'middle',margin:[1,6,1,6],autoPage:false});
+        /* ช่องรูปภาพ 4 ช่อง: กรอบเส้นประด้านหลัง + ช่องใส่รูปของ PowerPoint ทับด้านบน (กดไอคอนเพื่อเลือกรูปจากเครื่อง) */
+        for(let k=0;k<4;k++){ const px=PIC.x0+k*(PIC.w+PIC.g);
+          x.addShape('rect',{x:px,y:PIC.y,w:PIC.w,h:PIC.h,fill:{color:'F7F8FA'},line:{color:'C3CBD6',width:1,dashType:'dash'}});
+          x.addText('',{placeholder:'pic'+(k+1)}); }
+        /* ผลงานเทียบแผน: แถบแนวนอน 2 แถบ + การ์ดตัวเลข */
+        const wkKey=this.weeksOf(p)[this.currentIdx(p)];
+        const bar=(Y,label,val,color)=>{
+          x.addText(label,T({x:XL,y:Y,w:0.95,h:0.36,fontSize:17,bold:true}));
+          const bx=XL+0.95, bw=4.95, v=Math.max(0,Math.min(100,val));
+          box(x,{x:bx,y:Y+0.07,w:bw,h:0.22,fill:{color:'E6EAF0'}});
+          if(v>0) box(x,{x:bx,y:Y+0.07,w:Math.max(0.03,bw*v/100),h:0.22,fill:{color}});
+          x.addText(pc(val),T({x:bx+bw+0.1,y:Y,w:1.15,h:0.36,fontSize:17,bold:true,color})); };
+        x.addText('ความก้าวหน้า'+(wkKey? ' ณ สัปดาห์ '+this.thAbbr(wkKey) : ''),T({x:XL,y:5.24,w:6.9,h:0.3,fontSize:14,color:SUB}));
+        bar(5.52,'แผนงาน',s.plan,NAVY);
+        bar(5.9,'ผลงาน',s.actual,tone(s.diff));
+        const cx=7.75, cw3=(SW-0.5-cx-0.2)/3;
+        card(x,cx,5.27,cw3,0.98,'แผนงาน',pc(s.plan),NAVY,22);
+        card(x,cx+cw3+0.1,5.27,cw3,0.98,'ผลงาน',pc(s.actual),tone(s.diff),22);
+        card(x,cx+(cw3+0.1)*2,5.27,cw3,0.98,s.diff>=0? 'เร็วกว่าแผน' : 'ช้ากว่าแผน',(s.diff>=0?'+':'')+pc(s.diff),tone(s.diff),22);
+        /* สาเหตุความล่าช้า (จากหมายเหตุสัปดาห์ล่าสุด) / แนวทางแก้ไข (เว้นให้กรอก) */
+        const ws=p.weeks||{}, keys=this.weeksOf(p);
+        let note=''; for(let k=Math.min(this.currentIdx(p),keys.length-1);k>=0 && !note;k--){ note=String((ws[keys[k]]||{}).note||'').trim(); }
+        if(!note && p.note && p.note!=='-') note=String(p.note).trim();
+        const dots='..................................................................................................................';
+        const line=(Y,label,txt,col)=>{ const lw=this.pptTextW(label+'  ',15,true,FONT)+0.05;
+          const fz=[15,14,13,12].find(z=>this.pptWrap(txt,z,WC-lw-0.1,false,FONT,false).length<=1)||12;
+          x.addText([R(label+'  ',{fontSize:15,bold:true,color:col}),R(txt,{fontSize:fz,color:INK})],T({x:XL,y:Y,w:WC,h:0.32})); };
+        if(s.diff<0){
+          line(6.3,'สาเหตุความล่าช้า',note||dots,RED);
+          line(6.62,'แนวทางแก้ไข',dots,NAVY);
+        } else {
+          line(6.3,'สถานะ','ผลงานเป็นไปตามแผน / เร็วกว่าแผน',GREEN);
+          if(note) line(6.62,'หมายเหตุ',note,NAVY);
+        }
+      }
+    }
+
+    /* ปิดท้าย */
+    {
+      const x=pptx.addSlide(); x.background={color:NAVY};
+      box(x,{x:0,y:SH-0.32,w:SW,h:0.32,fill:{color:GOLD}});
+      if(LOGO_B){ const w=1.9; x.addImage({data:LOGO_B.data,x:(SW-w)/2,y:1.0,w,h:w*LOGO.r}); }
+      x.addText('จบการนำเสนอ',T({x:0,y:3.35,w:SW,h:1.0,fontSize:54,bold:true,color:'FFFFFF',align:'center'}));
+      x.addText('ขอบคุณครับ',T({x:0,y:4.35,w:SW,h:0.8,fontSize:38,bold:true,color:GOLD,align:'center'}));
+      x.addText('ส่วนควบคุมงานก่อสร้างทาง  '+this.OFFICE,T({x:0,y:5.4,w:SW,h:0.5,fontSize:22,color:'D8E0EC',align:'center'}));
+    }
+    return pptx;
+  }
   exportCoverOne = () => this.exportCoverDoc('one');
   exportCoverAll = () => this.exportCoverDoc('all');
   toggleExportMenu = () => this.setState({exportMenu:!this.state.exportMenu});
@@ -7064,6 +7534,7 @@ class Component extends DCLogic {
       exportSchedule: this.exportSchedule,
       exportScheduleAll: this.exportScheduleAll,
       pptxExport: this.pptxExport,
+      monthlyPptxExport: this.monthlyPptxExport,
       exportCoverOne: this.exportCoverOne,
       exportCoverAll: this.exportCoverAll,
       exportItemsXlsx: this.exportItemsXlsx,
@@ -7106,6 +7577,22 @@ class Component extends DCLogic {
     out.showManageMenu=!this.isExec();
     out.showDashMenu=true;
     out.importExcel=this.importExcel;
+    const mg=this.state.mpDlg;
+    out.mpOpen=!!mg;
+    if(mg){
+      const setM=(o)=>this.setState({mpDlg:Object.assign({},this.state.mpDlg,o)});
+      /* โทนฟ้า-กรมท่า เดียวกับปุ่ม "งานนำเสนอประชุมประจำเดือน" */
+      const PBm=(on)=>({ bg:on?'#cfe6fb':'var(--color-neutral-100)', fg:on?'#1f3b63':'var(--color-neutral-800)', bd:on?'#5f9fd6':'var(--color-divider)' });
+      const sel=this.monthlyProjects(mg.fy), doneN=sel.filter(p=>this.actualAt(p,this.lastReported(p))>=99.999).length;
+      out.mp={
+        years:this.monthlyYears().concat(['all']).map(y=>Object.assign({label:y==='all'? 'ทุกปี' : y, pick:()=>setM({fy:y})}, PBm(mg.fy===y))),
+        /* ปฏิทินภาษาไทยแบบเดียวกับช่องวันที่อื่นในระบบ (ไม่ใช้ input type=date ที่แสดงตามภาษาของเบราว์เซอร์) */
+        dateF:this.dpField('mp:date', mg.date||'', (iso)=>setM({date:iso||this.today()})),
+        summary:'โครงการที่จะออกสไลด์ '+sel.length+' สัญญา (แล้วเสร็จ '+doneN+' · ระหว่างก่อสร้าง '+(sel.length-doneN)+')',
+        busy:!!mg.busy, busyTxt:mg.busy? 'กำลังสร้างไฟล์…' : 'สร้างไฟล์ .pptx',
+        build:this.buildMonthlyPptx, close:this.closeMpDlg
+      };
+    }
     const pg=this.state.pptDlg;
     out.pptOpen=!!pg;
     if(pg){
@@ -7871,6 +8358,16 @@ class Component extends DCLogic {
           planTxt:this.n(plan,2), actualTxt:this.n(actual,2),
           color: diff<=-redT? 'var(--c-late)' : (diff<=-amberT? '#b8860b':'var(--c-ahead)') });
       });
+      /* ส่งออก PDF: แยกเป็นตารางละแขวง แถบชื่อแขวงอยู่บนสุดของตาราง (ใน thead จึงซ้ำทุกหน้าของแขวงนั้น) แขวงถัดไปขึ้นหน้าใหม่
+         บนจอ: ตารางเดียว ไม่มีแถบแขวง */
+      const watchGroups=[];
+      if(this.state.hPrintDist && sortKey==='dist'){
+        watch.forEach(w=>{ const g=watchGroups[watchGroups.length-1];
+          if(g && g.key===w.district) g.rows.push(w);
+          else watchGroups.push({key:w.district, rows:[w], hasHead:true, bg:w.distBg,
+            title:String(w.district).replace(/^แขวงฯ/,'แขวงทางหลวง'), cls:watchGroups.length? 'hm-grp-brk' : ''}); });
+        watchGroups.forEach(g=>{ g.count=g.rows.length+' สัญญา'; });
+      } else watchGroups.push({rows:watch, hasHead:false, cls:''});
       const watchList=watch;
       const doneGroups=[
         {label:'แล้วเสร็จ', count:doneN, color:'var(--color-accent-2-600)'},
@@ -7902,6 +8399,7 @@ class Component extends DCLogic {
           {label:'เกินอายุสัญญา', value:String(overdue)+' สัญญา', sub: fineSum? ('ค่าปรับสะสม '+this.n(fineSum,0)+' บาท'):'ยังไม่มีค่าปรับ', accent:'var(--c-late)'}
         ],
         watch:watchList,
+        watchGroups,
         watchFilters:[
           { label:'ปีงบประมาณ', value:this.state.hFy||'', onChange:this.setHomeFilter('hFy'),
             options:[{v:'',t:'ทุกปีงบ'}].concat(this.uniqSorted(p=>this.fiscalYearOf(p)).reverse().map(v=>({v:v,t:'ปีงบ '+v}))) },
