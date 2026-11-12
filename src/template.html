@@ -1638,6 +1638,7 @@ svg.leaflet-image-layer.leaflet-interactive path {
     [data-print-root],[data-print-wrap]{padding:0 !important;margin:0 !important;min-height:0 !important;max-width:none !important}
     .printsheet{break-after:auto !important;page-break-after:auto !important}
     .printsheet + .printsheet{break-before:page !important;page-break-before:always !important}
+    .printsheet.wk-sheet{width:210mm !important;padding:10mm !important;box-sizing:border-box !important}
     /* Schedule: พิมพ์ด้วยความกว้างและระยะขอบเดียวกับบนจอ แล้วย่อทั้งแผ่น (fitPrint) ให้หน้าตาเหมือนก่อนพิมพ์ทุกอย่าง */
     .printsheet.sched-sheet{padding:14px 16px !important;width:var(--sched-w,100%) !important}
     .sched-page{height:var(--sched-h,auto);overflow:hidden;break-inside:avoid;page-break-inside:avoid}
@@ -2782,7 +2783,7 @@ svg.leaflet-image-layer.leaflet-interactive path {
       </sc-if>
       <div style="display:flex;gap:10px;overflow-x:auto;padding-bottom:2px">
         <sc-for list="{{ dvRounds }}" as="r" hint-placeholder-count="2">
-          <div style="flex:0 0 268px;border:1px solid var(--color-divider);border-radius:var(--radius-md);padding:10px 12px;background:var(--color-bg);display:flex;flex-direction:column;gap:7px">
+          <div style="flex:0 0 300px;border:1px solid var(--color-divider);border-radius:var(--radius-md);padding:10px 12px;background:var(--color-bg);display:flex;flex-direction:column;gap:7px">
             <div style="display:flex;align-items:center;gap:8px">
               <span class="hd" style="font-size:12.5px">{{ r.title }}</span>
               <button sc-camel-on-click="{{ r.remove }}" disabled="{{ dvReadOnly }}" style="margin-left:auto;white-space:nowrap;background:var(--color-accent-100);color:var(--color-accent-700);border:1px solid var(--color-accent-300);border-radius:999px;padding:3px 9px;font-size:11px;cursor:pointer">ลบ</button>
@@ -2813,10 +2814,16 @@ svg.leaflet-image-layer.leaflet-interactive path {
                 <input sc-camel-input-mode="decimal" value="{{ r.advance }}" sc-camel-on-change="{{ r.setAdvance }}" disabled="{{ dvReadOnly }}" placeholder="-" style="border:1px solid var(--color-divider);border-radius:999px;padding:5px 11px;font-size:12px;background:var(--color-neutral-100);color:inherit">
               </label>
             </div>
-            <label style="display:flex;align-items:center;gap:7px;font-size:12px">
-              <input type="checkbox" checked="{{ r.final }}" sc-camel-on-change="{{ r.setFinal }}" disabled="{{ dvReadOnly }}" style="width:15px;height:15px;accent-color:var(--color-accent)">
-              <span class="val" style="font-size:12px">เป็นงวดสุดท้าย</span>
-            </label>
+            <div style="display:flex;flex-wrap:wrap;align-items:center;gap:6px 14px">
+              <label style="display:flex;align-items:center;gap:7px;font-size:12px">
+                <input type="checkbox" checked="{{ r.final }}" sc-camel-on-change="{{ r.setFinal }}" disabled="{{ dvReadOnly }}" style="width:15px;height:15px;accent-color:var(--color-accent)">
+                <span class="val" style="font-size:12px;white-space:nowrap">เป็นงวดสุดท้าย</span>
+              </label>
+              <label title="เติมปริมาณงวดนี้ให้ครบตามสัญญาทุกรายการอัตโนมัติ (หักส่วนที่ส่งในงวดอื่นแล้ว)" style="display:flex;align-items:center;gap:7px;font-size:12px">
+                <input type="checkbox" checked="{{ r.full }}" sc-camel-on-change="{{ r.setFull }}" disabled="{{ dvReadOnly }}" style="width:15px;height:15px;accent-color:var(--color-accent)">
+                <span class="val" style="font-size:12px;white-space:nowrap">ส่งงานปริมาณเท่าสัญญา</span>
+              </label>
+            </div>
             <label style="display:flex;flex-direction:column;gap:2px">
               <span class="lbl" style="font-size:10.5px">หมายเหตุ</span>
               <textarea rows="2" value="{{ r.note }}" sc-camel-on-change="{{ r.setNote }}" disabled="{{ dvReadOnly }}" style="border:1px solid var(--color-divider);border-radius:var(--radius-md);padding:6px 10px;font-size:12px;font-family:var(--font-body);line-height:1.5;background:var(--color-neutral-100);color:inherit;resize:vertical"></textarea>
@@ -2933,10 +2940,6 @@ svg.leaflet-image-layer.leaflet-interactive path {
               <div class="wk-title">รายงานผลงานก้าวหน้าโครงการก่อสร้างทาง</div>
               <div class="wk-sub">ส่วนควบคุมงานก่อสร้างทาง &nbsp;{{ pg.dept }}</div>
             </div>
-            <div class="wk-head-date">
-              <div class="wk-head-datelbl">{{ pg.dateLbl }}</div>
-              <div class="wk-head-dateval">{{ pg.dateVal }}</div>
-            </div>
           </div>
 
           <div class="wk-grid">
@@ -2996,7 +2999,7 @@ svg.leaflet-image-layer.leaflet-interactive path {
           </div>
 
           <div class="wk-foot">
-            <span>ระบบติดตามงานก่อสร้าง · พิมพ์เมื่อ {{ pg.printedTh }}</span>
+            <span>ระบบติดตามงานก่อสร้าง</span>
             <span>หน้า {{ pg.no }} / {{ pg.total }}</span>
           </div>
         </div>
@@ -5335,7 +5338,7 @@ class Component extends DCLogic {
     const size=weekly? 'A4' : (this.state.paper||'A4'), o=weekly? 'portrait' : (home? 'landscape' : (this.state.orient||'landscape'));
     el.textContent=home
       ? '@page{size:'+size+' '+o+';margin:9mm 6mm 12mm;@bottom-right{content:"หน้า " counter(page) " / " counter(pages);font-size:9px;color:#645c50}}'
-      : '@page{size:'+size+' '+o+';margin:'+(weekly?'10mm':'6mm')+'}';
+      : '@page{size:'+size+' '+o+';margin:'+(weekly?'0':'6mm')+'}'; /* รายงานประจำสัปดาห์: ขอบ 0 เพื่อไม่ให้เบราว์เซอร์พิมพ์วันที่/ชื่อหน้า/URL/เลขหน้า — ขอบ 10mm ย้ายไปเป็น padding ของแผ่นแทน */
   }
   exportHomePdf = () => { this.syncPage(); setTimeout(()=>window.print(),60); };
   exportHomeJpg = () => this.exportImages('ภาพรวมโครงการ');
@@ -6298,7 +6301,7 @@ class Component extends DCLogic {
       pr+='<w:rPr>'+FN+'<w:sz w:val="'+z+'"/><w:szCs w:val="'+z+'"/></w:rPr></w:pPr>';
       return '<w:p>'+pr+(runs||'')+'</w:p>'; };
     /* ตารางไร้เส้น: แต่ละเซลล์ระบุตำแหน่งเริ่ม/สิ้นสุด (twip) แล้วสร้างกริดคอลัมน์ร่วมให้เอง เพื่อจัดตัวเลขให้ตรงแนวกันทั้งเอกสาร */
-    const W=9071, half=Math.round(W/2);
+    const W=9355, half=Math.round(W/2);
     const C=(x0,x1,runs,o)=>({x0,x1,runs,o});
     const TBL=(rows,opt)=>{ opt=opt||{};
       const xs={}; xs[0]=1; xs[W]=1;
@@ -6345,7 +6348,7 @@ class Component extends DCLogic {
     const L=(t)=>R(t,{b:1,sz:40});
     x+=P(GAR+R('บันทึกข้อความ',{b:1,sz:58}),{jc:'center',before:60,after:200});
     x+=P(L('ส่วนราชการ')+R('  ส่วนควบคุมงานก่อสร้างทาง     สำนักงานทางหลวงที่ 5 (พิษณุโลก)  โทร. 0-5530-2518'));
-    x+=P(L('ที่')+R('  สทล.5.7 /')+TAB+L('วันที่')+R('            '+monthYear),{tabs:[[4536]]});
+    x+=P(L('ที่')+R('  สทล.5.7 /')+TAB+L('วันที่')+R('            '+monthYear),{tabs:[[half]]});
     x+=P(L('เรื่อง')+R('  ขออนุมัติถัวจ่ายค่างาน ('+ROUND+') สญ. '+noTxt),{rule:true,after:80});
     x+=P(R('เรียน  ผอ.ขท.'+dist),{before:120,after:120});
 
@@ -6368,16 +6371,19 @@ class Component extends DCLogic {
     /* ---- รายการน้อยกว่า/มากกว่าสัญญา ---- */
     const block=(r,i,kind)=>{
       const rows=[];
+      /* "หน่วย  ละ  ราคา" (หน่วยเว้น 2 เคาะก่อน "ละ"): กว้างเท่าที่ข้อความต้องใช้ ชื่องานได้พื้นที่ที่เหลือ */
+      const upTxt=(r.unit||'หน่วย')+'  ละ  '+N2(r.price);
+      const xU=Math.min(6650, 8634-Math.ceil(this.pptTextW(upTxt,16,false,FONT)*1440)-120);
       rows.push({keep:1, before:140, c:[
-        C(0,510,R((i+1)+'.'),{jc:'right'}),
+        C(0,567,R((i+1)+'.')),
         C(567,2041,R('รายการที่ '+r.no)),
-        C(2041,6650,R(r.name),{right:113}),
-        C(6650,8350,R((r.unit||'หน่วย')+'ละ  '+N2(r.price)),{jc:'right'}),
-        C(8350,W,R('บาท'),{left:113})]});
+        C(2041,xU,R(r.name),{right:113}),
+        C(xU,8634,R(upTxt),{jc:'right'}),
+        C(8634,W,R('บาท'),{left:113})]});
       const line=(lab,qty,mon,o)=>({keep:1, c:[
         C(567,2700,R(lab,o)), C(2700,2950,R('=',o),{jc:'center'}),
-        C(2950,4650,R(N3(qty),o),{jc:'right'}), C(4650,5550,R(r.unit,o),{left:113}),
-        C(5550,6450,R('เป็นเงิน',o)), C(6450,8350,R(N2(mon),o),{jc:'right'}), C(8350,W,R('บาท',o),{left:113})]});
+        C(2950,4650,R(N3(qty),o),{jc:'right'}), C(4650,6050,R(r.unit,o),{left:113}),
+        C(6050,6950,R('เป็นเงิน',o),{jc:'right'}), C(6950,8634,R(N2(mon),o),{jc:'right'}), C(8634,W,R('บาท',o),{left:113})]});
       rows.push(line('ปริมาณงานในสัญญา',r.q,r.cM));
       rows.push(line('ปริมาณงานในสนาม',r.t,r.fM));
       rows.push(line(kind==='less'?'น้อยกว่าสัญญา':'มากกว่าสัญญา',r.d,r.dM,{b:1}));
@@ -6387,19 +6393,39 @@ class Component extends DCLogic {
           C(2950,4650,R(this.n(r.ratio*100,3)+' %'),{jc:'right'}), C(4650,W,R('ของปริมาณงานในสัญญา'),{left:113})]});
         if(r.over){
           rows.push({keep:1, before:60, c:[C(567,W,R('กรณีจ่ายค่างาน Overrun',{b:1}))]});
-          const labs=['ปริมาณงานที่ไม่เกิน 125 % จ่ายค่างานที่ 100 %','ปริมาณงานระหว่าง 125 % ถึง 150 % จ่ายค่างานที่ 90 %','ปริมาณงานที่มากกว่า 150 % จ่ายค่างานที่ 83 %'];
-          const s={sz:28};
-          r.over.forEach((v,k)=>{
-            rows.push({keep:1, sz:28, c:[C(850,W,R((k+1)+') '+labs[k],s))]});
-            rows.push({keep:1, sz:28, c:[
-              C(2700,2950,R('=',s),{jc:'center'}), C(2950,4250,R(v.a?N3(v.a):'-',s),{jc:'right'}),
-              C(4250,4450,R('x',s),{jc:'center'}), C(4450,5550,R(N2(r.price),s),{jc:'right'}),
-              C(5550,5750,R('x',s),{jc:'center'}), C(5750,6250,R(v.f.toFixed(2),s),{jc:'right'}),
-              C(6250,6450,R('=',s),{jc:'center'}), C(6450,8350,R(v.a?N2(v.m):'-',s),{jc:'right'}),
-              C(8350,W,R('บาท',s),{left:113})]});
+          /* แต่ละช่วงบรรทัดเดียว: ป้าย | = สูตรคำนวณ | เป็นเงิน | จำนวนเงิน | บาท (แสดงเฉพาะช่วงที่มีปริมาณ)
+             ความกว้างช่องคำนวณจากความกว้างตัวอักษรจริงของ TH Sarabun New ให้สูตรอยู่บรรทัดเดียว ไม่พอจึงลดขนาดตัวอักษร */
+          const Q=N3(r.q), PR=N2(r.price), capped=r.t>r.q*1.5+1e-9;
+          const tiers=[
+            {lab:'ปริมาณงานไม่เกิน 125%', fx:'= (125/100x'+Q+')x'+PR},
+            {lab:'ปริมาณงาน 125% - 150%', fx: capped? '= (25/100x'+Q+')x'+PR+'x0.9' : '= ('+N3(r.t)+'-(125/100x'+Q+'))x'+PR+'x0.9'},
+            {lab:'ปริมาณงานมากกว่า 150%', fx:'= ('+N3(r.t)+'-(150/100x'+Q+'))x'+PR+'x0.83'}
+          ].map((o,k)=>Object.assign(o,r.over[k])).filter(o=>o.a>0);
+          const TW=(t,pt,b)=>Math.ceil(this.pptTextW(t,pt,b,FONT)*1440);
+          const X1=8634, X0=567;
+          /* ตัวอักษร 16 pt เท่าเนื้อความ: ป้ายกับสูตรวางบรรทัดเดียวกันถ้าพอ ถ้าไม่พอให้ป้ายขึ้นบรรทัดของตัวเอง แล้วสูตรอยู่บรรทัดถัดไป (ย่อหน้าเข้า) */
+          const sz=32, pt=16, IND=X0+284;
+          const amtW=Math.max.apply(null,tiers.map(o=>TW(N2(o.m),pt)).concat([TW(N2(r.fM),pt)]))+60;
+          const eqW=Math.max(TW('เป็นเงิน',pt),TW('รวมจ่าย =',pt))+170;
+          const labW=Math.max.apply(null,tiers.map(o=>TW(o.lab,pt)))+170;
+          const fW=Math.max.apply(null,tiers.map(o=>TW(o.fx,pt)))+60;
+          let xA=X1-amtW, xE=xA-eqW;
+          const xF=X0+labW, one=xF+fW<=xE;
+          /* สองบรรทัด: ถ้าสูตรพอดี ให้ "เป็นเงิน" และจำนวนเงินตรงคอลัมน์เดียวกับแถว ปริมาณงานในสัญญา/ในสนาม ด้านบน */
+          if(!one && IND+fW<=6050 && eqW-170<=900 && amtW<=X1-6950){ xE=6050; xA=6950; }
+          const lay={sz,xA,xE,xF};
+          const s={sz};
+          tiers.forEach(o=>{
+            const tail=[C(xE,xA,R('เป็นเงิน',s),{jc:'right'}), C(xA,X1,R(N2(o.m),s),{jc:'right'}), C(X1,W,R('บาท',s),{left:113})];
+            if(one) rows.push({keep:1, sz, c:[C(X0,xF,R(o.lab,s)), C(xF,xE,R(o.fx,s))].concat(tail)});
+            else{
+              rows.push({keep:1, sz, c:[C(X0,W,R(o.lab,s))]});
+              rows.push({keep:1, sz, c:[C(IND,xE,R(o.fx,s))].concat(tail)});
+            }
           });
-          rows.push({keep:1, c:[ C(4650,6250,R('รวมจ่าย',{b:1}),{jc:'right'}), C(6250,6450,R('=',{b:1}),{jc:'center'}),
-            Object.assign(C(6450,8350,R(N2(r.fM),{b:1}),{jc:'right'}),{line:'double'}), C(8350,W,R('บาท',{b:1}),{left:113})]});
+          const sb={sz:lay.sz,b:1};   /* แถวรวมจ่าย: ตัวหนาทั้งป้าย ตัวเลข และหน่วย */
+          rows.push({keep:1, sz:lay.sz, c:[ C(lay.xE,lay.xA,R('รวมจ่าย',sb),{jc:'right'}),
+            C(lay.xA,X1,R(N2(r.fM),sb),{jc:'right'}), C(X1,W,R('บาท',sb),{left:113})]});
         }
       }
       rows[rows.length-1].keep=0;
@@ -6411,9 +6437,9 @@ class Component extends DCLogic {
       let rows=[]; list.forEach((r,i)=>{ rows=rows.concat(block(r,i,kind)); });
       rows.push({before:200, c:[
         C(0,3800,R(kind==='less'?'รวมปริมาณงานที่น้อยกว่าสัญญา':'รวมปริมาณงานที่มากกว่าสัญญา',b)),
-        C(3800,4250,R(String(list.length),b),{jc:'right'}), C(4250,5550,R('รายการ',b),{left:113}),
-        C(5550,6450,R('เป็นเงิน',b)), C(6450,8350,R(N2(sum),b),{jc:'right'}),
-        C(8350,W,R('บาท',b),{left:113})]});
+        C(3800,4250,R(String(list.length),b),{jc:'right'}), C(4250,6050,R('รายการ',b),{left:113}),
+        C(6050,6950,R('เป็นเงิน',b),{jc:'right'}), C(6950,8634,R(N2(sum),b),{jc:'right'}),
+        C(8634,W,R('บาท',b),{left:113})]});
       return P(R(kind==='less'?'ปริมาณงานที่น้อยกว่าสัญญา':'ปริมาณงานที่มากกว่าสัญญา',{b:1,u:1}),{left:567,before:240,keep:1})+TBL(rows);
     };
     x+=section(T.less,'less');
@@ -6423,7 +6449,7 @@ class Component extends DCLogic {
     const remain=Math.round((T.lessSum-T.moreSum)*100)/100;
     x+=P(R('สรุปปริมาณงานที่มากกว่าและน้อยกว่าในสัญญาได้ดังนี้'),{first:1417,before:280,keep:1});
     const sumRow=(lab,n,v,keep)=>({keep, c:[ C(850,3900,R(lab)), C(3900,4250,R(String(n)),{jc:'right'}),
-      C(4250,5550,R('รายการ'),{left:113}), C(5550,6450,R('เป็นเงิน')), C(6450,8350,R(N2(v)),{jc:'right'}), C(8350,W,R('บาท'),{left:113})]});
+      C(4250,6050,R('รายการ'),{left:113}), C(6050,6950,R('เป็นเงิน'),{jc:'right'}), C(6950,8634,R(N2(v)),{jc:'right'}), C(8634,W,R('บาท'),{left:113})]});
     x+=TBL([sumRow('ปริมาณงานน้อยกว่าสัญญา',T.less.length,T.lessSum,1), sumRow('ปริมาณงานมากกว่าสัญญา',T.more.length,T.moreSum,0)]);
     /* "ก - ข = ค" ให้อยู่บรรทัดเดียวกัน (ใช้ non-breaking hyphen ของ Word) */
     const NBH='<w:r><w:rPr>'+FN+'<w:sz w:val="32"/><w:szCs w:val="32"/><w:cs/></w:rPr><w:noBreakHyphen/></w:r>';
@@ -6508,7 +6534,7 @@ class Component extends DCLogic {
     const XML='<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
     const docXml=XML+'<w:document '+NSW+' xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing" xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture">'
       +'<w:body>'+x
-      +'<w:sectPr><w:headerReference w:type="default" r:id="rId8"/><w:pgSz w:w="11906" w:h="16838" w:code="9"/><w:pgMar w:top="1134" w:right="1134" w:bottom="1134" w:left="1701" w:header="567" w:footer="567" w:gutter="0"/><w:cols w:space="720"/><w:titlePg/><w:docGrid w:linePitch="381"/></w:sectPr>'
+      +'<w:sectPr><w:headerReference w:type="default" r:id="rId8"/><w:pgSz w:w="11906" w:h="16838" w:code="9"/><w:pgMar w:top="1134" w:right="1134" w:bottom="1134" w:left="1417" w:header="567" w:footer="567" w:gutter="0"/><w:cols w:space="720"/><w:titlePg/><w:docGrid w:linePitch="381"/></w:sectPr>'
       +'</w:body></w:document>';
     /* เลขหน้าแบบหนังสือราชการ "- 2 -" กึ่งกลางหัวกระดาษ (ไม่แสดงหน้าแรก) */
     const hr=(t)=>'<w:r><w:rPr>'+FN+'<w:sz w:val="32"/><w:szCs w:val="32"/></w:rPr>'+t+'</w:r>';
@@ -6570,6 +6596,91 @@ class Component extends DCLogic {
     const c=this.PPT_DISTRICT[this.distKey(this.distOf(p))]||{};
     return Object.assign({}, this.PPT_THEMES.district, c);
   }
+  /* โลโก้กรมทางหลวง: แปลง .webp (พื้นใส) เป็น PNG ผ่าน canvas เพราะ PowerPoint รุ่นเก่าเปิด webp ไม่ได้ */
+  pptLogo(){
+    if(this._pptLogoP) return this._pptLogoP;
+    this._pptLogoP=new Promise((res,rej)=>{
+      const im=new Image();
+      im.onload=()=>{ const W=480, H=Math.round(im.naturalHeight*W/im.naturalWidth);
+        const c=document.createElement('canvas'); c.width=W; c.height=H;
+        const g=c.getContext('2d'); g.imageSmoothingQuality='high'; g.drawImage(im,0,0,W,H);
+        res({data:c.toDataURL('image/png'), r:H/W}); };
+      im.onerror=()=>{ this._pptLogoP=null; rej(new Error('โหลดโลโก้ไม่สำเร็จ')); };
+      im.src='./icons/doh-logo.webp';
+    });
+    return this._pptLogoP;
+  }
+  /* ความกว้างตัวอักษร TH Sarabun New (หน่วย 1/1000 em) วัดจากฟอนต์จริง: ASCII 0x20-0x7E ต่อด้วยอักษรไทย 0xE01-0xE5B (สระบน-ล่าง/วรรณยุกต์ = 0) */
+  PPT_FW={
+    r:'216,147,208,403,361,585,423,120,190,190,285,411,162,216,162,270,362,362,362,362,362,362,362,362,362,362,162,162,411,411,411,283,536,400,378,406,431,351,351,425,441,147,264,376,353,548,441,486,378,487,379,352,379,466,390,588,418,366,424,196,262,196,412,352,204,344,401,331,401,374,206,311,390,143,155,316,200,601,390,398,401,401,217,282,238,390,341,507,318,337,321,208,153,208,416,386,378,382,393,393,408,294,367,377,380,384,519,519,425,425,343,461,532,543,391,391,378,430,335,420,428,428,381,381,447,447,425,400,375,322,378,381,425,335,393,438,381,427,454,387,372,391,357,0,316,316,0,0,0,0,0,0,0,692,692,692,692,411,203,377,237,242,244,205,399,0,0,0,0,0,0,0,0,450,449,449,449,449,449,449,449,449,449,449,522,697',
+    b:'226,168,291,462,367,688,486,169,244,244,343,417,172,226,172,276,378,378,378,378,378,378,378,378,378,378,172,172,417,417,417,289,572,451,396,432,459,358,358,454,472,163,282,411,359,574,472,518,390,518,395,365,421,482,422,612,426,396,451,234,268,234,418,376,210,367,435,347,435,391,254,332,423,163,171,340,213,636,423,412,431,431,246,296,258,418,358,480,349,361,358,255,177,255,422,391,415,431,403,403,453,318,390,405,415,431,565,565,425,425,372,492,551,576,405,405,391,438,358,433,445,445,414,414,482,482,425,417,386,329,391,399,425,379,403,461,399,438,468,394,385,380,340,0,336,336,0,0,0,0,0,0,0,698,698,698,698,389,208,395,252,269,252,209,437,0,0,0,0,0,0,0,0,450,456,456,456,456,456,456,456,456,456,456,525,697'
+  };
+  /* ความกว้างข้อความเป็นนิ้ว ที่ขนาด pt (ฟอนต์อื่นที่ไม่ใช่ตระกูล Sarabun มักกว้างกว่า จึงเผื่อ 35%) */
+  pptTextW(t,pt,bold,font){
+    if(!this._pptFW){ const mk=s=>s.split(',').map(Number); this._pptFW={r:mk(this.PPT_FW.r), b:mk(this.PPT_FW.b)}; }
+    const tb=this._pptFW[bold?'b':'r']; let u=0;
+    for(const ch of String(t||'')){ const c=ch.charCodeAt(0);
+      u+= (c>=0x20&&c<=0x7E)? tb[c-0x20] : (c>=0xE01&&c<=0xE5B)? tb[95+c-0xE01] : 500; }
+    const k=/sarabun|angsana|cordia|browallia|^th /i.test(font||'TH Sarabun New')? 1 : 1.35;
+    return u/1000*pt/72*k;
+  }
+  /* ตัดบรรทัดภาษาไทยเอง (PowerPoint ตัดกลางคำทับศัพท์ เช่น โลจิ|สติกส์):
+     แบ่งที่ช่องว่างระหว่างวลีเท่านั้น โดยไม่แยก พ.ศ.|2569, หมายเลข|102, จังหวัด|ชื่อ, ห้วยไผ่ - ห้วยช้าง
+     วลีที่ยาวเกินบรรทัดจึงแบ่งตามคำ (Intl.Segmenter) แล้วเฉลี่ยความยาวทุกบรรทัดให้ใกล้กัน */
+  /* balance=false (หัวเรื่อง): เติมบรรทัดแรกให้เต็มก่อน แล้วค่อยขึ้นบรรทัดใหม่ */
+  pptWrap(text,pt,w,bold,font,balance){
+    const W=(s)=>this.pptTextW(s,pt,bold,font), SP=W(' ');
+    const words=String(text||'').replace(/\s+/g,' ').trim().split(' ').filter(Boolean);
+    if(!words.length) return [''];
+    const NUM=/^[\d.,+\-\/%]+$/, ABBR=/^[ก-ฮ]{1,3}\.([ก-ฮ]{1,2}\.)?$/, DASH=/^[-–]$/;
+    const PRE=/^(จังหวัด|อำเภอ|ตำบล|ตอน|ระหว่าง|หมายเลข|ทางหลวงหมายเลข|ระยะทาง|พ\.ศ\.)$/;
+    const UNIT=/^(กิโลเมตร|เมตร|กม\.|ม\.|บาท|วัน|%)$/;
+    const groups=[];
+    words.forEach((t,i)=>{ const prev=words[i-1];
+      const glue = i>0 && (DASH.test(t) || DASH.test(prev) || ABBR.test(prev) || PRE.test(prev) || NUM.test(t) || (UNIT.test(t) && NUM.test(prev)));
+      if(glue) groups[groups.length-1]+=' '+t; else groups.push(t); });
+    /* ข้อความในวงเล็บ เช่น (END WALL), (MOUNTING HEIGHT 9.00 M.) ไม่แยกบรรทัด ถ้ายาวไม่เกินบรรทัด
+       วงเล็บที่ยาวเกินบรรทัดจะแยกได้ แต่ยังรักษาวงเล็บย่อยข้างในไว้ด้วยกัน */
+    const depthOf=(s)=>(s.match(/\(/g)||[]).length-(s.match(/\)/g)||[]).length;
+    /* base = ระดับวงเล็บที่กำลังจัดกลุ่ม, d0 = ระดับวงเล็บก่อนคำแรกของ list */
+    const paren=(list,base,d0)=>{ const out=[]; let d=d0, buf=null, bd=0;
+      const flush=()=>{ const j=buf.join(' '); if(W(j)<=w) out.push(j); else out.push.apply(out,paren(buf,base+1,bd)); buf=null; };
+      list.forEach(s=>{ const nd=Math.max(0,d+depthOf(s));
+        if(buf){ buf.push(s); if(nd<=base) flush(); }
+        else if(nd>base){ buf=[s]; bd=d; }
+        else out.push(s);
+        d=nd; });
+      if(buf) flush();
+      return out; };
+    const merged=paren(groups,0,0);
+    groups.length=0; merged.forEach(s=>groups.push(s));
+    /* โทเค็น: {t:ข้อความ, sp:มีช่องว่างนำหน้าหรือไม่} — กลุ่มที่ยาวเกินบรรทัดแยกกลับเป็นคำ */
+    const seg=(typeof Intl!=='undefined' && Intl.Segmenter)? new Intl.Segmenter('th',{granularity:'word'}) : null;
+    const toks=[];
+    const pushLong=(t,sp)=>{
+      if(W(t)<=w || !seg){ toks.push({t,sp}); return; }
+      let cur='', first=true;
+      for(const s of seg.segment(t)){ const piece=s.segment;
+        if(cur && W(cur+piece)>w){ toks.push({t:cur,sp:first?sp:false}); first=false; cur=''; }
+        cur+=piece; }
+      if(cur) toks.push({t:cur,sp:first?sp:false});
+    };
+    groups.forEach((gp,gi)=>{
+      if(W(gp)<=w){ toks.push({t:gp,sp:gi>0}); return; }
+      gp.split(' ').forEach((t,k)=>pushLong(t, gi>0||k>0));
+    });
+    const tw=toks.map(o=>W(o.t));
+    const fill=(lim)=>{ const L=[]; let cur=null, cw=0;
+      toks.forEach((o,i)=>{ const add=(o.sp?SP:0)+tw[i];
+        if(cur!==null && cw+add>lim){ L.push(cur); cur=null; }
+        if(cur===null){ cur=o.t; cw=tw[i]; } else { cur+=(o.sp?' ':'')+o.t; cw+=add; } });
+      if(cur!==null) L.push(cur); return L; };
+    if(balance===false) return fill(w);
+    const n=fill(w).length;
+    let lo=Math.max.apply(null,tw), hi=w;
+    for(let k=0;k<24;k++){ const mid=(lo+hi)/2; if(fill(mid).length<=n) hi=mid; else lo=mid; }
+    return fill(hi);
+  }
 
   async pptxThemeFromFile(file){
     const buf=new Uint8Array(await file.arrayBuffer());
@@ -6615,6 +6726,7 @@ class Component extends DCLogic {
     let Pptx;
     try{ Pptx=await this.loadPptxLib(); }
     catch(e){ return fail('สร้างไฟล์ไม่สำเร็จ: โหลดไลบรารีไม่ได้ (ต้องเชื่อมต่ออินเทอร์เน็ต)'); }
+    let LOGO=null; try{ LOGO=await this.pptLogo(); }catch(e){ console.warn(e); }   /* โหลดโลโก้ไม่ได้ก็ยังสร้างไฟล์ต่อ (ไม่มีโลโก้) */
 
     const TH = (g.tpl==='custom' && g.custom)? g.custom
       : g.tpl==='district'? this.pptDistrictTheme(p)
@@ -6639,21 +6751,30 @@ class Component extends DCLogic {
     /* lang th-TH ให้ PowerPoint ตัดบรรทัดตามคำภาษาไทย ไม่ตัดกลางคำ */
     const T=(o)=>Object.assign({fontFace:FONT,color:INK,fontSize:24,isTextBox:true,lang:'th-TH'},o||{});
     const C=(t,o)=>({text:String(t==null?'':t),options:Object.assign({fontFace:FONT,fontSize:22,color:INK,lang:'th-TH'},o||{})});
-    const S=()=>{ const x=pptx.addSlide(); x.background={color:BG}; return x; };
+    /* สไลด์ 2 เป็นต้นไป: โลโก้กรมทางหลวงมุมขวาบน (ปกวางโลโก้กลางหน้าเอง) */
+    /* วางโลโก้ไว้ในต้นแบบสไลด์ (slide master) ไฟล์จึงเก็บรูปไว้ชุดเดียว ไม่ซ้ำทุกสไลด์ */
+    const LG={x:8.85,y:0.2,w:0.95};
+    if(LOGO) pptx.defineSlideMaster({title:'DOH_LOGO', background:{color:BG},
+      objects:[{image:{data:LOGO.data,x:LG.x,y:LG.y,w:LG.w,h:LG.w*LOGO.r}}]});
+    const S=(cover)=>{ const x=(LOGO && !cover)? pptx.addSlide({masterName:'DOH_LOGO'}) : pptx.addSlide();
+      x.background={color:BG}; return x; };
     const Y0=1.3, YB=6.45, XL=0.5, WC=9.0;   /* พื้นที่เนื้อหา: ใต้หัวเรื่อง ถึงเหนือท้ายสไลด์ */
-    /* นับความยาวข้อความแบบไม่นับสระบน-ล่างและวรรณยุกต์ (ไม่กินที่ในแนวนอน) */
-    const vlen=(t)=>String(t||'').replace(/[ัิ-ฺ็-๎]/g,'').length;
+    /* หัวเรื่องเว้นที่ให้โลโก้: ตัดบรรทัดที่ความกว้าง HW (ชิดขอบโลโก้) แต่กล่องข้อความกว้างกว่าเล็กน้อย กัน PowerPoint ตัดซ้ำ */
+    const HW = LOGO? LG.x-0.05-XL : WC, HBOX = LOGO? HW+0.15 : WC;
+    /* ข้อความหลายบรรทัดที่ตัดบรรทัดเองแล้ว: บรรทัดละ 1 ย่อหน้า */
+    const runs=(lines,o)=>lines.map((l,i)=>({text:l,options:Object.assign({fontFace:FONT,color:INK,lang:'th-TH'},o,{breakLine:i<lines.length-1})}));
     /* ท้ายสไลด์: ตาราง 1 แถว แบ่งช่องเท่ากัน (แขวง | ส่วนควบคุมฯ | สำนักงาน) พื้นเทาอ่อนแบบหัวตาราง */
     const foots=(x)=>{ const cw=foot.map(()=>WC/foot.length);
       x.addTable([foot.map(t=>C(t,{fontSize:16,color:INK,fill:HEAD,align:'center'}))],
         {x:XL,y:6.85,w:WC,colW:cw,rowH:[0.42],border:{type:'solid',pt:1.5,color:'FFFFFF'},valign:'middle',margin:[2,6,2,6],autoPage:false}); };
     /* หัวเรื่อง: ชื่อสั้นใช้ตัวใหญ่ 1 บรรทัด ชื่อยาวลดขนาดลงและขึ้นได้ 2-3 บรรทัด แล้วเลื่อนตารางลงตามความสูงหัวเรื่อง */
     let yTop=Y0;
-    const head=(x,t)=>{ const n=vlen(t);
-      const lines=(s)=>Math.max(1,Math.ceil(n*0.5*s/72/WC));
-      const opt=[[32,1],[28,1],[24,2],[22,2],[20,3]].find(o=>lines(o[0])<=o[1]) || [20,3];
-      const s=opt[0], h=Math.max(0.85, Math.min(opt[1],lines(s))*s*1.3/72+0.1);
-      x.addText(t,T({x:XL,y:0.3,w:WC,h:h,fontSize:s,bold:true,valign:'middle',color:TTL,margin:0}));
+    const head=(x,t)=>{
+      /* ชื่อยาวไม่เกิน 2 บรรทัด: ลดขนาดตัวอักษรจนพอดี 2 บรรทัด (ยาวมากจริงๆ จึงยอม 3 บรรทัด) */
+      const fits=[[32,1],[28,1],[24,2],[22,2],[20,2],[18,2],[16,2],[16,3]].map(o=>({s:o[0],max:o[1],L:this.pptWrap(t,o[0],HW*(LOGO?1:0.96),true,FONT,false)}));
+      const f=fits.find(o=>o.L.length<=o.max) || fits[fits.length-1];
+      const s=f.s, h=Math.max(0.85, f.L.length*s*1.3/72+0.1);
+      x.addText(runs(f.L,{fontSize:s,bold:true,color:TTL}),T({x:XL,y:0.3,w:HBOX,h:h,fontSize:s,bold:true,valign:'middle',color:TTL,margin:0}));
       yTop=Math.max(Y0, 0.3+h+0.15); };
     /* ตาราง: วางใต้หัวเรื่อง ความสูงแถวยืดให้เต็มพื้นที่เนื้อหา แต่ไม่เกิน maxH ต่อแถว */
     const tbl=(x,rows,cw,fs,maxH)=>{
@@ -6665,16 +6786,23 @@ class Component extends DCLogic {
 
     /* 1 — ปก */
     {
-      const x=S();
-      x.addText('ตรวจรับงาน'+RD,T({x:XL,y:0.85,w:WC,h:0.95,fontSize:44,bold:true,align:'center',valign:'middle',color:TTL,margin:0}));
+      /* โลโก้กลางบน → หัวเรื่อง → เลขที่สัญญา → รายละเอียดโครงการ (ตัดบรรทัดตามวลีภาษาไทย จัดกึ่งกลาง) */
+      const x=S(true);
+      const LW=1.25, ty = LOGO? 1.65 : 0.85;
+      if(LOGO) x.addImage({data:LOGO.data,x:(10-LW)/2,y:0.3,w:LW,h:LW*LOGO.r});
+      x.addText('ตรวจรับงาน'+RD,T({x:XL,y:ty,w:WC,h:0.85,fontSize:44,bold:true,align:'center',valign:'middle',color:TTL,margin:0}));
       const dated=/ลงวันที่/.test(short) || !p.contractDate;
       x.addText(short+(dated? '' : ('  ลงวันที่ '+(this.th(p.contractDate)||''))),
-        T({x:XL,y:1.85,w:WC,h:0.6,fontSize:28,bold:true,align:'center',valign:'middle',color:SUB,margin:0}));
+        T({x:XL,y:ty+0.85,w:WC,h:0.55,fontSize:28,bold:true,align:'center',valign:'middle',color:SUB,margin:0}));
       const para=['งบประมาณรายจ่ายประจำปีงบประมาณ พ.ศ. '+(p.fiscalYear||''),
         p.program1,p.program2,p.program3,p.jobCode?('รหัสงาน '+p.jobCode):'',p.projectName,p.location]
         .filter(Boolean).join(' ').replace(/\s+/g,' ');
-      const n=vlen(para);
-      x.addText(para,T({x:0.7,y:2.65,w:8.6,h:3.5,fontSize: n<=330? 26 : n<=430? 24 : 22,align:'center',valign:'middle',lineSpacingMultiple:1.12,margin:0}));
+      /* ใช้ตัวใหญ่ที่สุดที่ยังวางได้ครบในพื้นที่ (บรรทัดละ ~1.5 เท่าของขนาดตัวอักษร เมื่อเว้นบรรทัด 1.12) */
+      const py=ty+1.55, ph=6.7-py, pw=8.6;
+      const pick=[26,24,22,20,18].map(s=>({s,L:this.pptWrap(para,s,pw*0.94,false,FONT)}))
+        .find(o=>o.L.length*o.s*1.5/72<=ph) || {s:18,L:this.pptWrap(para,18,pw*0.94,false,FONT)};
+      x.addText(runs(pick.L,{fontSize:pick.s,align:'center'}),
+        T({x:0.7,y:py,w:pw,h:ph,fontSize:pick.s,align:'center',valign:'top',lineSpacingMultiple:1.12,margin:0}));
       foots(x);
     }
     /* 2 — ข้อมูลสัญญา */
@@ -6709,7 +6837,7 @@ class Component extends DCLogic {
       const H={bold:true,fill:HEAD,align:'center'};
       const R={align:'right'}, RB={align:'right',bold:true};
       const rows=[
-        [C('',{fill:HEAD}),C('ค่างานในสัญญาต่อหน่วย',H),C('ปริมาณงาน',H),C('เป็นเงิน',H)],
+        [C('',{fill:HEAD}),C('ราคาต่อหน่วย',H),C('ปริมาณงาน',H),C('เป็นเงิน',H)],
         [C(''),C(M(pr)+' บาท',{align:'center',bold:true}),C(this.workUnit(it.unit),{align:'center'}),C('บาท',{align:'center'})],
         [C('ตามสัญญา'),C(''),C(N(q),R),C(M(q*pr),R)],
         [C('ถัวจ่าย'),C(''),C(tua? N(tua):'-',R),C(tua? M(tua*pr):'-',R)],
@@ -6720,7 +6848,7 @@ class Component extends DCLogic {
         [C('คิดเป็น'),C(''),C(tua? N(cum*100/tua)+' %':'-',R),C('ของถัวจ่าย',{align:'center',color:SUB})],
         [C('ส่งมอบงานตามรายการนี้'),C(RD,{align:'center',colspan:3,bold:true})]
       ];
-      tbl(x,rows,[2.8,2.6,1.8,1.8],22,0.5);
+      tbl(x,rows,[3.0,2.0,2.0,2.0],22,0.5);   /* ราคาต่อหน่วย / ปริมาณงาน / เป็นเงิน กว้างเท่ากัน */
       foots(x);
       if(g.photoItem){
         const y=S();
@@ -7504,10 +7632,33 @@ class Component extends DCLogic {
         np.deliveries[i][k]= (k==='final')? !!e.target.checked : e.target.value;
         this.writeProject(np);
       };
+      /* "ส่งงานปริมาณเท่าสัญญา": ปริมาณงวดนี้ = ตามสัญญา − ที่ส่งในงวดอื่นแล้ว ทุกรายการ ยอดรวมส่งงานจึงเท่าสัญญาพอดี
+         ยกเลิกติ๊ก = ล้างเฉพาะช่องที่ยังเป็นค่าที่เติมให้อัตโนมัติ (ช่องที่แก้เองแล้วคงไว้) */
+      const fullQty=(i,it)=>{ const o=dls.reduce((t,d,j)=>j===i? t : t+this.dvQty(p,j,it.no),0);
+        return Math.max(0, Math.round((this.num(it.qty)-o)*1000)/1000); };
+      const setFull=(i)=>(e)=>{
+        const on=!!e.target.checked;
+        const apply=()=>{
+          const np=JSON.parse(JSON.stringify(p));
+          const d=(np.deliveries||[])[i]; if(!d) return;
+          d.q=d.q||{}; d.full=on;
+          (p.items||[]).filter(it=>this.num(it.qty)>0).forEach(it=>{
+            const v=fullQty(i,it);
+            if(on){ if(v>0) d.q[it.no]=String(v); else delete d.q[it.no]; }
+            else if(d.q[it.no]!==undefined && Math.abs(this.num(d.q[it.no])-v)<1e-9) delete d.q[it.no];
+          });
+          this.writeProject(np);
+        };
+        const typed=(p.items||[]).some(it=>{ const c=(dls[i].q||{})[it.no]; return c!==undefined && c!=='' && Math.abs(this.num(c)-fullQty(i,it))>1e-9; });
+        if(on && typed){ e.target.checked=false;
+          this.askConfirm('งวดนี้กรอกปริมาณไว้บางรายการแล้ว — แทนที่ด้วยปริมาณเท่าสัญญาทุกรายการ?', apply); }
+        else apply();
+      };
       out.dvRounds=dls.map((d,i)=>({
         title:this.dvRoundTxt(d,i),
         no:d.no===undefined?String(i+1):d.no, setNo:setDv(i,'no'),
         final:!!d.final, setFinal:setDv(i,'final'),
+        full:!!d.full, setFull:setFull(i),
         dDate:d.dDate||'', setDDate:setDv(i,'dDate'),
         iDate:d.iDate||'', setIDate:setDv(i,'iDate'),
         retain:d.retain===undefined?'':d.retain, setRetain:setDv(i,'retain'),
@@ -7545,6 +7696,8 @@ class Component extends DCLogic {
               np.deliveries[i].q=np.deliveries[i].q||{};
               const v=e.target.value;
               if(v==='') delete np.deliveries[i].q[it.no]; else np.deliveries[i].q[it.no]=v;
+              /* แก้ปริมาณเองจนไม่เท่าสัญญาแล้ว → เอาติ๊ก "ส่งงานปริมาณเท่าสัญญา" ออก */
+              if(np.deliveries[i].full && Math.abs(this.num(v)-fullQty(i,it))>1e-9) np.deliveries[i].full=false;
               this.writeProject(np);
             }
           }))
@@ -7796,14 +7949,13 @@ class Component extends DCLogic {
       });
       out.sheets=isSchedule? cards : [];
       /* รายงานประจำสัปดาห์: A4 แนวตั้ง หน้าละ 4 โครงการ */
-      const PER_PAGE=4, printedTh=this.th(this.today());
+      const PER_PAGE=4;
       out.weeklyPages=[];
       if(!isSchedule){
         const total=Math.ceil(cards.length/PER_PAGE);
         for(let i=0;i<total;i++){
           const projects=cards.slice(i*PER_PAGE,(i+1)*PER_PAGE);
-          out.weeklyPages.push({ no:i+1, total, dept:deptTxt, projects, printedTh,
-            dateLbl:'วันที่พิมพ์รายงาน', dateVal:printedTh,
+          out.weeklyPages.push({ no:i+1, total, dept:deptTxt, projects,
             blanks: Array.from({length:PER_PAGE-projects.length},(_,k)=>({k})) });
         }
       }
