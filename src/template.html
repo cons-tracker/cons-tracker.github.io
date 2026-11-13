@@ -4558,7 +4558,9 @@ class Component extends DCLogic {
     'ผส.ทล.5':{bg:'#fbdcd6', fg:'#8f1d12', bd:'#c0392b'},
     'รส.ทล.5':{bg:'#dcefd3', fg:'#2f5f24', bd:'#4f8f3f'}
   };
-  apptBoxStyle(status,p){ return this.CHAIR_BOX[this.chairOf(p).pos] || this.apptStyle(status); }
+  /* ประธานตำแหน่งอื่น (หน่วยงานภายนอก) ใช้สีส้มเดียวกันทุกสถานะ */
+  OTHER_CHAIR_BOX={bg:'#fcd9b8', fg:'#7a3a0e', bd:'#d9782b'};
+  apptBoxStyle(status,p){ return this.CHAIR_BOX[this.chairOf(p).pos] || this.OTHER_CHAIR_BOX; }
   fiscalYearOf(p){
     if(p.fiscalYear) return String(p.fiscalYear);
     if(!p.startDate) return '';
@@ -8251,8 +8253,10 @@ class Component extends DCLogic {
         const dow=new Date(yy,mm-1,d).getDay();
         cells.push({ day:String(d), isToday:iso===todayIso,
           showToday:iso===todayIso && !nrw, dotToday:iso===todayIso && nrw,
-          bg: iso===todayIso? 'var(--color-accent-100)' : (dow===0||dow===6? 'var(--color-neutral-200)':'var(--color-neutral-100)'),
-          fg: (dow===0||dow===6)? 'var(--c-late)' : 'var(--color-text)', fw: list.length? '700':'400',
+          /* วันนี้: พื้นเป็นสีประจำวัน (โทนอ่อน) อา.แดง จ.เหลือง อ.ชมพู พ.เขียว พฤ.ส้ม ศ.ฟ้า ส.ม่วง */
+          bg: iso===todayIso? ['#fde2e2','#fff4c2','#fde3ef','#e0f2d9','#ffe5cc','#dbedfb','#ebe0f6'][dow] : (dow===0||dow===6? 'var(--color-neutral-200)':'var(--color-neutral-100)'),
+          fg: iso===todayIso? 'var(--color-text)' : ((dow===0||dow===6)? 'var(--c-late)' : 'var(--color-text)'),
+          fw: iso===todayIso? '800' : (list.length? '700':'400'),
           appts:list.map(a=>{ const s=this.apptBoxStyle(a.status,a.project), ch=this.chairOf(a.project);
             const tt=this.timeTh(a.time);
             return { time:tt||'ไม่ระบุเวลา', timeLine:tt? 'เวลา '+tt : 'ไม่ระบุเวลา',
@@ -8268,7 +8272,7 @@ class Component extends DCLogic {
         dowHead:['จ.','อ.','พ.','พฤ.','ศ.','ส.','อา.'].map((name,i)=>({ name, fg:i>=5? 'var(--c-late)' : 'var(--color-text)' })),
         prev:this.shiftMonth(-1), next:this.shiftMonth(1), today:this.thisMonth };
       out.apptLegend=Object.keys(this.CHAIR_BOX).map(pos=>Object.assign({label:'ประธาน '+pos}, this.CHAIR_BOX[pos]))
-        .concat(this.APPT_STATUS.map(s=>Object.assign({label:s+' (ประธานอื่น)'}, this.apptStyle(s))));
+        .concat([Object.assign({label:'ประธาน หน่วยงานภายนอก'}, this.OTHER_CHAIR_BOX)]);
       out.newAppt=this.newAppt;
       const DOWFULL=['อาทิตย์','จันทร์','อังคาร','พุธ','พฤหัสบดี','ศุกร์','เสาร์'];
       const agenda=[];
