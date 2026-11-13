@@ -2448,7 +2448,7 @@ svg.leaflet-image-layer.leaflet-interactive path {
     <div style="margin-left:auto;display:flex;gap:var(--space-2);flex-wrap:wrap;justify-content:flex-end">
       <button sc-camel-on-click="{{ exportSelected }}" class="btn btn-primary" style="white-space:nowrap;font-size:12.5px;cursor:pointer">Export รายงานสัปดาห์ (ที่เลือก)</button>
       <button sc-camel-on-click="{{ exportAll }}" class="btn" style="white-space:nowrap;font-size:12.5px;cursor:pointer;background:#f2c94c;color:#3d2e05;border:1px solid #d9ac2a;font-weight:700" style-hover="background:#e6b93a">Export รายงานสัปดาห์ทุกโครงการ</button>
-      <button sc-camel-on-click="{{ monthlyPptxExport }}" class="btn" style="white-space:nowrap;font-size:12.5px;cursor:pointer;background:#cfe6fb;color:#1f3b63;border:1px solid #8fbfe8;font-weight:700" style-hover="background:#b9dbf8">งานนำเสนอประชุมประจำเดือน (.pptx)</button>
+      <button sc-camel-on-click="{{ monthlyPptxExportSel }}" class="btn" style="white-space:nowrap;font-size:12.5px;cursor:pointer;background:#cfe6fb;color:#1f3b63;border:1px solid #8fbfe8;font-weight:700" style-hover="background:#b9dbf8">งานนำเสนอประชุมประจำเดือน (.pptx) (ที่เลือก)</button>
     </div>
   </div>
   <div style="background:var(--color-neutral-100);border:1px solid var(--color-divider);border-radius:var(--radius-lg);overflow-x:auto">
@@ -3996,6 +3996,10 @@ svg.leaflet-image-layer.leaflet-interactive path {
 
       <div style="display:flex;flex-direction:column;gap:6px">
         <label style="display:flex;gap:8px;align-items:center;font-size:12.5px">
+          <input type="checkbox" checked="{{ ppt.photoBefore }}" sc-camel-on-change="{{ ppt.togglePhotoBefore }}" style="width:15px;height:15px;accent-color:var(--color-accent)">
+          <span>สไลด์ “ภาพก่อนดำเนินการ”</span>
+        </label>
+        <label style="display:flex;gap:8px;align-items:center;font-size:12.5px">
           <input type="checkbox" checked="{{ ppt.photoItem }}" sc-camel-on-change="{{ ppt.togglePhotoItem }}" style="width:15px;height:15px;accent-color:var(--color-accent)">
           <span>แทรกสไลด์รูประหว่างดำเนินการ (รายการละ 1 สไลด์)</span>
         </label>
@@ -4085,6 +4089,7 @@ svg.leaflet-image-layer.leaflet-interactive path {
       <button sc-camel-on-click="{{ mp.close }}" style="margin-left:auto;background:transparent;border:1px solid var(--color-divider);border-radius:999px;padding:5px 13px;font-family:var(--font-body);font-size:12.5px;color:var(--color-text);cursor:pointer">ปิด</button>
     </div>
     <div style="padding:16px 18px;display:flex;flex-direction:column;gap:16px">
+      <sc-if value="{{ mp.byYear }}" hint-placeholder-val="{{ true }}">
       <div>
         <div class="hd" style="font-size:12.5px;margin-bottom:7px">ปีงบประมาณ</div>
         <div style="display:flex;gap:6px;flex-wrap:wrap">
@@ -4093,6 +4098,7 @@ svg.leaflet-image-layer.leaflet-interactive path {
           </sc-for>
         </div>
       </div>
+      </sc-if>
       <div>
         <div class="hd" style="font-size:12.5px;margin-bottom:7px">วันที่ประชุม</div>
         <div style="position:relative;max-width:240px">
@@ -4129,7 +4135,7 @@ svg.leaflet-image-layer.leaflet-interactive path {
           </sc-if>
         </div>
       </div>
-      <div class="lbl" style="font-size:11.5px;font-weight:400;line-height:1.65">{{ mp.summary }}<br>ในไฟล์มี: ปก · สรุปภาพรวมทุกแขวง · แต่ละแขวง (สรุป + แผนที่ตำแหน่งโครงการ + สไลด์รายสัญญาที่ยังไม่แล้วเสร็จ) · ปิดท้าย — ช่องรูปภาพเว้นไว้ให้ใส่รูปเองใน PowerPoint</div>
+      <div class="lbl" style="font-size:11.5px;font-weight:400;line-height:1.65">{{ mp.summary }}<br>ในไฟล์มี: ปก · สรุปภาพรวมทุกแขวง · แต่ละแขวง (สรุป + แผนที่ตำแหน่งโครงการ + สไลด์รายสัญญา ทั้งระหว่างก่อสร้างและแล้วเสร็จ) · ปิดท้าย — ช่องรูปภาพเว้นไว้ให้ใส่รูปเองใน PowerPoint</div>
     </div>
     <div style="padding:12px 18px 16px;display:flex;gap:8px;justify-content:flex-end;border-top:1px solid var(--color-divider)">
       <button sc-camel-on-click="{{ mp.close }}" class="btn btn-secondary" style="white-space:nowrap;font-size:13px;cursor:pointer">ยกเลิก</button>
@@ -6936,7 +6942,7 @@ class Component extends DCLogic {
     const dl=this.dvList(p);
     const sel={}; (p.items||[]).forEach(it=>{ if(this.num(it.qty)>0) sel[it.no]=true; });
     this.setState({pptDlg:{ pid:p.id, di: dl.length? dl.length-1 : -1, tpl:'official', custom:null,
-      sel, photoItem:true, photoDone:true, busy:false }});
+      sel, photoBefore:true, photoItem:true, photoDone:true, busy:false }});
   };
   closePptDlg = () => this.setState({pptDlg:null});
 
@@ -7048,6 +7054,8 @@ class Component extends DCLogic {
       if(rows.length) tbl(x,rows,[0.7,3.1,3.5,1.7],22,0.58);
       foots(x);
     }
+    /* 4 — ภาพก่อนดำเนินการ (เลือกได้): หัวเรื่อง + ท้ายสไลด์ เว้นพื้นที่ให้ใส่รูปเองใน PowerPoint */
+    if(g.photoBefore){ const x=S(); head(x,'ภาพก่อนดำเนินการ'); foots(x); }
     /* 4..N — รายการ + สไลด์รูป */
     items.forEach((it,i)=>{
       const q=this.num(it.qty), pr=this.num(it.price), tua=this.num(it.tua);
@@ -7455,6 +7463,12 @@ class Component extends DCLogic {
     if(!this.monthlyProjects('all').length){ this.setState({exportMenu:false}); this.showNotice('ยังไม่มีโครงการ'); return; }
     this.setState({exportMenu:false, mpDlg:{fy:ys.length? ys[ys.length-1] : 'all', date:this.today(), busy:false}});
   };
+  /* ปุ่มหน้ารวม: ทำงานเฉพาะโครงการที่ติ๊กเลือกไว้ (ไม่ได้เลือกให้แจ้งเตือน) */
+  monthlyPptxExportSel = () => {
+    const ids=this.sortByContract(Object.keys(this.state.sel||{}).filter(id=>{ const p=this.byId(id); return p && !p.isDraftNew; }));
+    if(!ids.length){ this.showNotice('กรุณาเลือกโครงการก่อน — ติ๊กช่องหน้าสัญญาที่ต้องการนำเสนอ แล้วกดปุ่มนี้อีกครั้ง'); return; }
+    this.setState({exportMenu:false, mpDlg:{ids, fy:'all', date:this.today(), busy:false}});
+  };
   closeMpDlg = () => this.setState({mpDlg:null});
   buildMonthlyPptx = async () => {
     const g=this.state.mpDlg; if(!g || g.busy) return;
@@ -7470,7 +7484,7 @@ class Component extends DCLogic {
       const blob=await this.monthlyBlob(pptx);
       const a=document.createElement('a');
       a.href=URL.createObjectURL(blob);
-      a.download='รายงานความก้าวหน้าโครงการ '+(g.fy==='all'? 'ทุกปี' : ('ปี '+g.fy))+' (ประชุม '+this.thAbbr(g.date||this.today())+').pptx';
+      a.download='รายงานความก้าวหน้าโครงการ '+(g.ids? ('ที่เลือก '+g.ids.length+' สัญญา') : g.fy==='all'? 'ทุกปี' : ('ปี '+g.fy))+' (ประชุม '+this.thAbbr(g.date||this.today())+').pptx';
       document.body.appendChild(a); a.click();
       setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); },2000);
       this.setState({mpDlg:null});
@@ -7547,10 +7561,11 @@ class Component extends DCLogic {
     const NAVY='1F3B63', GOLD='C9A04A', INK='1E2733', SUB='5B6675', LINE='D5DBE3', SOFT='F3F5F8';
     const GREEN='2E8B57', RED='C0392B', AMBER='B7791F', DONE='4A7A3A', LEFT='D9822B';
     const amberT=this.num(this.props.amberThreshold ?? 5);
-    const fyTxt=g.fy==='all'? 'ทุกปีงบประมาณ' : ('งาน พ.ร.บ. '+g.fy);
+    const fyTxt=g.ids? 'โครงการที่เลือก' : g.fy==='all'? 'ทุกปีงบประมาณ' : ('งาน พ.ร.บ. '+g.fy);
     const meetTxt=this.cdate(this.d(g.date||this.today()));
-    const all=this.monthlyProjects(g.fy);
-    if(!all.length) throw new Error('ไม่มีโครงการในปีงบประมาณที่เลือก');
+    /* g.ids = เฉพาะโครงการที่ติ๊กเลือกจากหน้ารวม (ไม่กรองปีงบประมาณ) */
+    const all=g.ids? g.ids.map(id=>this.byId(id)).filter(p=>p && !p.isDraftNew) : this.monthlyProjects(g.fy);
+    if(!all.length) throw new Error(g.ids? 'ไม่พบโครงการที่เลือก' : 'ไม่มีโครงการในปีงบประมาณที่เลือก');
     const isDone=(p)=>this.actualAt(p,this.lastReported(p))>=99.999;
     const cKey=(c)=>{ const m=String(c||'').match(/(\d+)\s*\/\s*(\d{4})/); return m? [+m[2], +m[1]] : [Infinity, Infinity]; };
     const byNo=(x,y)=>{ const a=cKey(x.contractNo), b=cKey(y.contractNo); return (a[0]-b[0]) || (a[1]-b[1]) || String(x.contractNo||'').localeCompare(String(y.contractNo||''),'th'); };
@@ -7671,7 +7686,9 @@ class Component extends DCLogic {
     /* แต่ละแขวง */
     for(const d of order){
       const L=groups[d]; if(!L || !L.length) continue;
-      const left=L.filter(p=>!isDone(p)), dn=L.length-left.length;
+      const left=L.filter(p=>!isDone(p)), doneL=L.filter(isDone), dn=doneL.length;
+      /* สไลด์แผนที่และรายสัญญา: ระหว่างก่อสร้างก่อน แล้วตามด้วยโครงการที่แล้วเสร็จ (หมายเลขต่อกัน) */
+      const pres=left.concat(doneL);
       const DT='แขวงทางหลวง'+d;
       /* 3 — สรุปแขวง: ตัวเลข + ตารางโครงการคงเหลือ + โดนัทแล้วเสร็จ/คงเหลือ (ตารางยาวแบ่งต่อสไลด์ถัดไป) */
       const rowsOf=(list,base)=>{
@@ -7680,7 +7697,8 @@ class Component extends DCLogic {
         list.forEach((p,i)=>{ const s=stat(p), z=(i%2)? {fill:{color:SOFT}} : {};
           r.push([C(base+i+1,Object.assign({align:'center'},z)),C(shortNo(p),Object.assign({bold:true},z)),C(dateOf(p),Object.assign({align:'center',fontSize:16},z)),
             C(this.n(s.plan,3),Object.assign({align:'right'},z)),C(this.n(s.actual,3),Object.assign({align:'right'},z)),
-            C((s.diff>=0?'+':'')+this.n(s.diff,3),Object.assign({align:'right',bold:true,color:tone(s.diff)},z))]); });
+            isDone(p)? C('แล้วเสร็จ',Object.assign({align:'center',bold:true,color:DONE},z))
+              : C((s.diff>=0?'+':'')+this.n(s.diff,3),Object.assign({align:'right',bold:true,color:tone(s.diff)},z))]); });
         return r; };
       const CW=[0.55,2.55,2.05,1.0,1.0,1.05];
       {
@@ -7689,33 +7707,38 @@ class Component extends DCLogic {
         card(x,XL,1.45,cw,0.9,'จำนวนโครงการทั้งสิ้น',L.length+' โครงการ',NAVY);
         card(x,XL+cw+0.15,1.45,cw,0.9,'ก่อสร้างแล้วเสร็จ',dn+' โครงการ',DONE);
         card(x,XL+(cw+0.15)*2,1.45,cw,0.9,'คงเหลือ (ระหว่างก่อสร้าง)',left.length+' โครงการ',LEFT);
-        if(left.length){
-          x.addText('โครงการที่อยู่ระหว่างก่อสร้าง ดังนี้',T({x:XL,y:2.5,w:8.2,h:0.38,fontSize:18,bold:true,color:NAVY}));
-          const first=left.slice(0,8), r=rowsOf(first,0);
-          x.addTable(r,{x:XL,y:2.95,w:8.2,colW:CW,rowH:r.map(()=>0.42),border:{type:'solid',pt:0.75,color:LINE},fontFace:FONT,fontSize:17,valign:'middle',margin:[2,6,2,6],autoPage:false});
-        } else {
-          x.addText('ทุกโครงการก่อสร้างแล้วเสร็จ',T({x:XL,y:3.2,w:8.2,h:0.6,fontSize:26,bold:true,color:DONE}));
-        }
+        /* ตารางบนสไลด์สรุป: โครงการระหว่างก่อสร้าง (ถ้าไม่มีเลยแสดงโครงการที่แล้วเสร็จแทน) */
+        const first=left.length? left : doneL;
+        x.addText(left.length? 'โครงการที่อยู่ระหว่างก่อสร้าง ดังนี้' : 'ทุกโครงการก่อสร้างแล้วเสร็จ ดังนี้',
+          T({x:XL,y:2.5,w:8.2,h:0.38,fontSize:18,bold:true,color:left.length? NAVY : DONE}));
+        { const r=rowsOf(first.slice(0,8),0);
+          x.addTable(r,{x:XL,y:2.95,w:8.2,colW:CW,rowH:r.map(()=>0.42),border:{type:'solid',pt:0.75,color:LINE},fontFace:FONT,fontSize:17,valign:'middle',margin:[2,6,2,6],autoPage:false}); }
         x.addChart('doughnut',[{name:'โครงการ',labels:['แล้วเสร็จ','คงเหลือ'],values:[dn,left.length]}],
           {x:8.95,y:1.45,w:3.9,h:5.35,holeSize:58,chartColors:[DONE,LEFT],showPercent:true,showValue:false,showLegend:true,legendPos:'b',
            legendFontFace:FONT,legendFontSize:16,legendColor:INK,dataLabelColor:'FFFFFF',dataLabelFormatCode:'0%;-0%;;',dataLabelFontFace:FONT,dataLabelFontSize:16,dataLabelFontBold:true,
            dataBorder:{pt:2,color:'FFFFFF'},showTitle:false});
         x.addText([R(left.length+'/'+L.length,{fontSize:34,bold:true,color:NAVY,breakLine:true}),R('คงเหลือ',{fontSize:16,color:SUB})],
           T({x:9.9,y:3.35,w:2.0,h:1.0,align:'center'}));
-        for(let k=8;k<left.length;k+=11){
-          const y=slide('',DT+' (ต่อ)'), r=rowsOf(left.slice(k,k+11),k);
+        for(let k=8;k<first.length;k+=11){
+          const y=slide('',DT+' (ต่อ)'), r=rowsOf(first.slice(k,k+11),k);
+          y.addTable(r,{x:XL,y:1.5,w:WC,colW:CW.map(v=>v*WC/8.2),rowH:r.map(()=>0.42),border:{type:'solid',pt:0.75,color:LINE},fontFace:FONT,fontSize:17,valign:'middle',margin:[2,6,2,6],autoPage:false});
+        }
+        /* มีทั้งสองกลุ่ม: โครงการที่แล้วเสร็จแสดงในสไลด์ถัดไป (หน้าละ 11 รายการ) */
+        if(left.length) for(let k=0;k<doneL.length;k+=11){
+          const y=slide(DT,'โครงการที่ก่อสร้างแล้วเสร็จ'+(k? ' (ต่อ)' : '')), r=rowsOf(doneL.slice(k,k+11),k);
           y.addTable(r,{x:XL,y:1.5,w:WC,colW:CW.map(v=>v*WC/8.2),rowH:r.map(()=>0.42),border:{type:'solid',pt:0.75,color:LINE},fontFace:FONT,fontSize:17,valign:'middle',margin:[2,6,2,6],autoPage:false});
         }
       }
-      if(!left.length) continue;
 
       /* 4 — แผนที่ตำแหน่งโครงการที่ยังไม่แล้วเสร็จ (หมายเลขตรงกับตาราง) */
       {
         const x=slide(DT,'แผนที่ตำแหน่งโครงการ');
         const MX=XL, MY=1.45, MW=8.25, MH=5.4;
         const pts=[];
-        left.forEach((p,i)=>{ const la=parseFloat(p.lat), ln=parseFloat(p.lng);
-          if(isFinite(la)&&isFinite(ln)) pts.push({lat:la,lng:ln,n:i+1,label:shortNo(p),color:'#'+tone(stat(p).diff)}); });
+        /* สีหมุด: แล้วเสร็จ = เขียวเข้ม (DONE) · ระหว่างก่อสร้าง = ตามผลต่างแผน/ผล */
+        const colOf=(p)=>isDone(p)? DONE : tone(stat(p).diff);
+        pres.forEach((p,i)=>{ const la=parseFloat(p.lat), ln=parseFloat(p.lng);
+          if(isFinite(la)&&isFinite(ln)) pts.push({lat:la,lng:ln,n:i+1,label:shortNo(p),color:'#'+colOf(p)}); });
         let img=null;
         if(pts.length){ try{ img=await this.pptMapPng(pts,Math.round(MW*100),Math.round(MH*100)); }catch(e){ console.warn(e); } }
         if(img) x.addImage({data:img,x:MX,y:MY,w:MW,h:MH});
@@ -7728,13 +7751,13 @@ class Component extends DCLogic {
         const roadOf=(p)=>{ const t=this.highwayTitle(p); const m=t.match(/ทางหลวงหมายเลข\s*([\d.]+)/), s=t.match(/ตอน\s+(?!ควบคุม)(.+?)(?=\s+(?:ระหว่าง|กม\.)|$)/);
           return ((m? 'ทล.'+m[1] : '')+(s? ' ตอน '+s[1].trim() : '')).trim() || String(p.location||'').trim(); };
         /* รายการยาวจัดเป็น 3 แบบ: 3 บรรทัด (มีชื่อทางหลวง) → 2 บรรทัด → 1 บรรทัด (2 คอลัมน์ถ้าเกิน 16 รายการ) */
-        const n=left.length, cols=n>16? 2 : 1, per=Math.ceil(n/cols), ih=Math.min(0.95,(MH-0.5)/per);
+        const n=pres.length, cols=n>16? 2 : 1, per=Math.ceil(n/cols), ih=Math.min(0.95,(MH-0.5)/per);
         const mode=ih>=0.8? 3 : (ih>=0.5? 2 : 1), cwL=(LWd-(cols-1)*0.1)/cols, d=Math.min(0.4,ih-0.06);
-        left.forEach((p,i)=>{ const s=stat(p), col=tone(s.diff), cx0=LX+Math.floor(i/per)*(cwL+0.1), y=MY+0.5+(i%per)*ih;
+        pres.forEach((p,i)=>{ const s=stat(p), col=colOf(p), cx0=LX+Math.floor(i/per)*(cwL+0.1), y=MY+0.5+(i%per)*ih;
           const hasPt=isFinite(parseFloat(p.lat))&&isFinite(parseFloat(p.lng));
           x.addShape('ellipse',{x:cx0,y:y+0.02,w:d,h:d,fill:{color:col},line:{color:'FFFFFF',width:1}});
           x.addText(String(i+1),T({x:cx0,y:y+0.02,w:d,h:d,fontSize:mode>1? 16:12,bold:true,color:'FFFFFF',align:'center'}));
-          const tx=cx0+d+0.1, tw=cwL-d-0.1, prog='แผนงาน '+this.n(s.plan,2)+'% · ผลงาน '+this.n(s.actual,2)+'%'+(hasPt? '' : ' · ไม่มีพิกัด');
+          const tx=cx0+d+0.1, tw=cwL-d-0.1, prog=(isDone(p)? 'ก่อสร้างแล้วเสร็จ' : ('แผนงาน '+this.n(s.plan,2)+'% · ผลงาน '+this.n(s.actual,2)+'%'))+(hasPt? '' : ' · ไม่มีพิกัด');
           let r;
           if(mode===1) r=[R(shortNo(p)+'  ',{fontSize:14,bold:true,color:INK}),R(cols>1? (this.n(s.actual,1)+'%') : prog,{fontSize:12,color:col,bold:true})];
           else { r=[R('สัญญาเลขที่ '+shortNo(p),{fontSize:mode===3?17:15,bold:true,color:INK,breakLine:true})];
@@ -7745,8 +7768,8 @@ class Component extends DCLogic {
       }
 
       /* 5.. — รายสัญญา: รายละเอียด · ช่องใส่รูป 4 ช่อง (เว้นว่าง) · ผลงานเทียบแผน · สาเหตุ/แนวทางแก้ไข */
-      for(let i=0;i<left.length;i++){
-        const p=left[i], s=stat(p);
+      for(let i=0;i<pres.length;i++){
+        const p=pres[i], s=stat(p), done=isDone(p);
         const bt=String(p.budgetType||'').trim(), tagW=bt? 1.55 : 0;
         const dt=dateOf(p);
         const x=slide(DT,(i+1)+'. สัญญาเลขที่ '+shortNo(p)+(dt? '  ลงวันที่ '+dt : ''),{tagW});
@@ -7779,11 +7802,13 @@ class Component extends DCLogic {
           x.addText(pc(val),T({x:bx+bw+0.1,y:Y,w:1.15,h:0.36,fontSize:17,bold:true,color})); };
         x.addText('ความก้าวหน้า'+(wkKey? ' ณ สัปดาห์ '+this.thAbbr(wkKey) : ''),T({x:XL,y:5.24,w:6.9,h:0.3,fontSize:14,color:SUB}));
         bar(5.52,'แผนงาน',s.plan,NAVY);
-        bar(5.9,'ผลงาน',s.actual,tone(s.diff));
+        const tc=done? DONE : tone(s.diff);
+        bar(5.9,'ผลงาน',s.actual,tc);
         const cx=7.75, cw3=(SW-0.5-cx-0.2)/3;
         card(x,cx,5.27,cw3,0.98,'แผนงาน',pc(s.plan),NAVY,22);
-        card(x,cx+cw3+0.1,5.27,cw3,0.98,'ผลงาน',pc(s.actual),tone(s.diff),22);
-        card(x,cx+(cw3+0.1)*2,5.27,cw3,0.98,s.diff>=0? 'เร็วกว่าแผน' : 'ช้ากว่าแผน',(s.diff>=0?'+':'')+pc(s.diff),tone(s.diff),22);
+        card(x,cx+cw3+0.1,5.27,cw3,0.98,'ผลงาน',pc(s.actual),tc,22);
+        if(done) card(x,cx+(cw3+0.1)*2,5.27,cw3,0.98,'สถานะ','แล้วเสร็จ',DONE,22);
+        else card(x,cx+(cw3+0.1)*2,5.27,cw3,0.98,s.diff>=0? 'เร็วกว่าแผน' : 'ช้ากว่าแผน',(s.diff>=0?'+':'')+pc(s.diff),tone(s.diff),22);
         /* สาเหตุความล่าช้า (จากหมายเหตุสัปดาห์ล่าสุด) / แนวทางแก้ไข (เว้นให้กรอก) */
         const ws=p.weeks||{}, keys=this.weeksOf(p);
         let note=''; for(let k=Math.min(this.currentIdx(p),keys.length-1);k>=0 && !note;k--){ note=String((ws[keys[k]]||{}).note||'').trim(); }
@@ -7792,7 +7817,10 @@ class Component extends DCLogic {
         const line=(Y,label,txt,col)=>{ const lw=this.pptTextW(label+'  ',15,true,FONT)+0.05;
           const fz=[15,14,13,12].find(z=>this.pptWrap(txt,z,WC-lw-0.1,false,FONT,false).length<=1)||12;
           x.addText([R(label+'  ',{fontSize:15,bold:true,color:col}),R(txt,{fontSize:fz,color:INK})],T({x:XL,y:Y,w:WC,h:0.32})); };
-        if(s.diff<0){
+        if(done){
+          line(6.3,'สถานะ','ก่อสร้างแล้วเสร็จ',DONE);
+          if(note) line(6.62,'หมายเหตุ',note,NAVY);
+        } else if(s.diff<0){
           line(6.3,'สาเหตุความล่าช้า',note||dots,RED);
           line(6.62,'แนวทางแก้ไข',dots,NAVY);
         } else {
@@ -7986,6 +8014,7 @@ class Component extends DCLogic {
       exportScheduleAll: this.exportScheduleAll,
       pptxExport: this.pptxExport,
       monthlyPptxExport: this.monthlyPptxExport,
+      monthlyPptxExportSel: this.monthlyPptxExportSel,
       tuaPptxExport: this.tuaPptxExport,
       exportCoverOne: this.exportCoverOne,
       exportCoverAll: this.exportCoverAll,
@@ -8035,12 +8064,13 @@ class Component extends DCLogic {
       const setM=(o)=>this.setState({mpDlg:Object.assign({},this.state.mpDlg,o)});
       /* โทนฟ้า-กรมท่า เดียวกับปุ่ม "งานนำเสนอประชุมประจำเดือน" */
       const PBm=(on)=>({ bg:on?'#cfe6fb':'var(--color-neutral-100)', fg:on?'#1f3b63':'var(--color-neutral-800)', bd:on?'#5f9fd6':'var(--color-divider)' });
-      const sel=this.monthlyProjects(mg.fy), doneN=sel.filter(p=>this.actualAt(p,this.lastReported(p))>=99.999).length;
+      const sel=mg.ids? mg.ids.map(id=>this.byId(id)).filter(Boolean) : this.monthlyProjects(mg.fy), doneN=sel.filter(p=>this.actualAt(p,this.lastReported(p))>=99.999).length;
       out.mp={
+        byYear:!mg.ids,   /* เลือกจากหน้ารวม: ใช้เฉพาะโครงการที่ติ๊กไว้ ไม่ต้องเลือกปีงบประมาณ */
         years:this.monthlyYears().concat(['all']).map(y=>Object.assign({label:y==='all'? 'ทุกปี' : y, pick:()=>setM({fy:y})}, PBm(mg.fy===y))),
         /* ปฏิทินภาษาไทยแบบเดียวกับช่องวันที่อื่นในระบบ (ไม่ใช้ input type=date ที่แสดงตามภาษาของเบราว์เซอร์) */
         dateF:this.dpField('mp:date', mg.date||'', (iso)=>setM({date:iso||this.today()})),
-        summary:'โครงการที่จะออกสไลด์ '+sel.length+' สัญญา (แล้วเสร็จ '+doneN+' · ระหว่างก่อสร้าง '+(sel.length-doneN)+')',
+        summary:(mg.ids? 'โครงการที่เลือก ' : 'โครงการที่จะออกสไลด์ ')+sel.length+' สัญญา (แล้วเสร็จ '+doneN+' · ระหว่างก่อสร้าง '+(sel.length-doneN)+')',
         busy:!!mg.busy, busyTxt:mg.busy? 'กำลังสร้างไฟล์…' : 'สร้างไฟล์ .pptx',
         build:this.buildMonthlyPptx, close:this.closeMpDlg
       };
@@ -8073,6 +8103,7 @@ class Component extends DCLogic {
         selCount:Object.keys(pg.sel||{}).length,
         allOn:()=>{ const sel={}; (pp.items||[]).forEach(it=>{ if(this.num(it.qty)>0) sel[it.no]=true; }); setG({sel}); },
         noneOn:()=>setG({sel:{}}),
+        photoBefore:!!pg.photoBefore, togglePhotoBefore:()=>setG({photoBefore:!pg.photoBefore}),
         photoItem:!!pg.photoItem, togglePhotoItem:()=>setG({photoItem:!pg.photoItem}),
         photoDone:!!pg.photoDone, togglePhotoDone:()=>setG({photoDone:!pg.photoDone}),
         build:this.buildPptx, close:this.closePptDlg
