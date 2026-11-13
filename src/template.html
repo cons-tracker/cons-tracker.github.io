@@ -1979,10 +1979,10 @@ svg.leaflet-image-layer.leaflet-interactive path {
         <div style="display:flex;align-items:center;gap:4px">
           <span class="val" style="font-size:12px;font-weight:{{ c.fw }};color:{{ c.fg }}">{{ c.day }}</span>
           <sc-if value="{{ c.showToday }}" hint-placeholder-val="{{ false }}">
-            <span style="background:var(--color-accent);color:var(--color-bg);border-radius:999px;padding:0 7px;font-size:10px;font-weight:700;white-space:nowrap;flex:0 0 auto">วันนี้</span>
+            <span style="background:{{ c.pill }};color:#fff;border-radius:999px;padding:0 7px;font-size:10px;font-weight:700;white-space:nowrap;flex:0 0 auto">วันนี้</span>
           </sc-if>
           <sc-if value="{{ c.dotToday }}" hint-placeholder-val="{{ false }}">
-            <span style="width:6px;height:6px;border-radius:999px;background:var(--color-accent);display:inline-block;flex:0 0 auto"></span>
+            <span style="width:6px;height:6px;border-radius:999px;background:{{ c.pill }};display:inline-block;flex:0 0 auto"></span>
           </sc-if>
         </div>
         <sc-if value="{{ isWide }}" hint-placeholder-val="{{ true }}">
@@ -8255,6 +8255,8 @@ class Component extends DCLogic {
           showToday:iso===todayIso && !nrw, dotToday:iso===todayIso && nrw,
           /* วันนี้: พื้นเป็นสีประจำวัน (โทนอ่อน) อา.แดง จ.เหลือง อ.ชมพู พ.เขียว พฤ.ส้ม ศ.ฟ้า ส.ม่วง */
           bg: iso===todayIso? ['#fde2e2','#fff4c2','#fde3ef','#e0f2d9','#ffe5cc','#dbedfb','#ebe0f6'][dow] : (dow===0||dow===6? 'var(--color-neutral-200)':'var(--color-neutral-100)'),
+          /* ป้าย "วันนี้": สีประจำวันโทนเข้ม (ตัวอักษรขาว) */
+          pill: ['#c62828','#b58900','#d6337f','#2e7d32','#e0610e','#1e6fc9','#7b2fa8'][dow],
           fg: iso===todayIso? 'var(--color-text)' : ((dow===0||dow===6)? 'var(--c-late)' : 'var(--color-text)'),
           fw: iso===todayIso? '800' : (list.length? '700':'400'),
           appts:list.map(a=>{ const s=this.apptBoxStyle(a.status,a.project), ch=this.chairOf(a.project);
