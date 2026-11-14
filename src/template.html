@@ -1744,6 +1744,12 @@ svg.leaflet-image-layer.leaflet-interactive path {
   .leaflet-popup-tip{background:var(--color-neutral-100)}
   .leaflet-bar a{border-radius:999px !important;color:var(--color-text)}
   .leaflet-tooltip{border-radius:999px;border:1px solid var(--color-divider);font-size:11.5px}
+  /* เลขสัญญาที่กดเปิดรายละเอียดได้: ลูกศรท้ายข้อความให้รู้ว่าเป็นลิงก์ (ขีดเส้นใต้เฉพาะตอนชี้) */
+  .ct-link{cursor:pointer}
+  .ct-link::before{content:'›';display:inline-block;margin-right:6px;font-weight:700;font-size:1.5em;line-height:.7;vertical-align:-1px;text-decoration:none;transition:transform .15s}
+  .ct-link:hover{text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:3px}
+  .ct-link:hover::before{transform:translateX(2px)}
+  @media print{ .ct-link::before{content:none} }
 </style>
 </helmet>
 <div data-print-root="1" style="min-height:100vh;padding:0 0 60px">
@@ -2323,7 +2329,7 @@ svg.leaflet-image-layer.leaflet-interactive path {
           <sc-for list="{{ gr.rows }}" as="w" hint-placeholder-count="4">
             <sc-raw-tr>
               <sc-raw-td style="padding:6px 8px;border:1px solid var(--color-divider)">
-                <span class="val" sc-camel-on-click="{{ w.open }}" title="ดูรายละเอียดโครงการ" style="font-weight:700;cursor:pointer;color:var(--color-accent-800)" style-hover="text-decoration:underline">{{ w.contractNo }}</span>
+                <span class="val ct-link" sc-camel-on-click="{{ w.open }}" title="ดูรายละเอียดโครงการ" style="font-weight:700;color:var(--color-accent-800)">{{ w.contractNo }}</span>
                 <div class="lbl wk-prog-para" style="font-size:11.5px;margin-top:2px"><sc-for list="{{ w.projectParts }}" as="x" hint-placeholder-count="1"><span style="white-space:{{ x.ws }}">{{ x.t }}</span></sc-for></div>
                 <div style="display:flex;gap:4px;margin-top:4px;flex-wrap:wrap;align-items:center">
                   <span class="tag" style="font-size:10.5px;background:{{ w.distBg }};color:#000">{{ w.district }}</span>
@@ -5590,8 +5596,8 @@ class Component extends DCLogic {
       : {bd:'var(--color-divider)',bg:'var(--color-neutral-100)',fg:'var(--color-neutral-800)'};
     const mk=(k,val,opts)=>Object.assign({value:val||'',options:opts,onChange:this.setMapFilter(k)},chip(val));
     return [
-      mk('mdist', s.mdist, [{v:'',t:'แขวง'}].concat(uniq(p=>this.distOf(p)).map(v=>({v:v,t:'แขวงฯ'+v})))),
       mk('mfy', s.mfy, OPT(uniq(p=>String(p.fiscalYear||'')),'ปีงบ')),
+      mk('mdist', s.mdist, [{v:'',t:'แขวง'}].concat(uniq(p=>this.distOf(p)).map(v=>({v:v,t:'แขวงฯ'+v})))),
       mk('mbudget', s.mbudget, OPT(uniq(p=>p.budgetType),'แหล่งงบ')),
       mk('mwork', s.mwork, OPT(uniq(p=>p.workType),'ประเภท'))
     ];
