@@ -2832,7 +2832,6 @@ svg.leaflet-image-layer.leaflet-interactive path {
     <div class="noprint" style="background:var(--color-neutral-100);border:1px solid var(--color-divider);border-radius:var(--radius-lg);padding:14px 16px">
       <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px">
         <div class="hd" style="font-size:13px">งวดส่งงาน</div>
-        <span class="lbl" style="font-size:11.5px;font-weight:400">ข้อมูลนี้ใช้สร้างสไลด์สรุป PAYMENT ตอน export</span>
         <sc-if value="{{ canEditProject }}" hint-placeholder-val="{{ false }}">
           <button sc-camel-on-click="{{ addDelivery }}" style="margin-left:auto;white-space:nowrap;background:var(--color-accent-200);color:var(--color-accent-800);border:1px solid var(--color-accent-400);border-radius:999px;padding:5px 12px;font-size:12.5px;font-weight:600;cursor:pointer">+ เพิ่มงวด</button>
         </sc-if>
@@ -2878,7 +2877,7 @@ svg.leaflet-image-layer.leaflet-interactive path {
                 <input type="checkbox" checked="{{ r.final }}" sc-camel-on-change="{{ r.setFinal }}" disabled="{{ dvReadOnly }}" style="width:15px;height:15px;accent-color:var(--color-accent)">
                 <span class="val" style="font-size:12px;white-space:nowrap">เป็นงวดสุดท้าย</span>
               </label>
-              <label title="เติมปริมาณงวดนี้ให้ครบตามสัญญาทุกรายการอัตโนมัติ (หักส่วนที่ส่งในงวดอื่นแล้ว)" style="display:flex;align-items:center;gap:7px;font-size:12px">
+              <label title="เติมปริมาณงวดนี้ให้ครบทุกรายการอัตโนมัติ: รายการที่กรอกถัวจ่ายไว้ใช้ปริมาณถัวจ่าย นอกนั้นใช้ปริมาณตามสัญญา (หักส่วนที่ส่งในงวดอื่นแล้ว)" style="display:flex;align-items:center;gap:7px;font-size:12px">
                 <input type="checkbox" checked="{{ r.full }}" sc-camel-on-change="{{ r.setFull }}" disabled="{{ dvReadOnly }}" style="width:15px;height:15px;accent-color:var(--color-accent)">
                 <span class="val" style="font-size:12px;white-space:nowrap">ส่งงานปริมาณเท่าสัญญา</span>
               </label>
@@ -2899,18 +2898,19 @@ svg.leaflet-image-layer.leaflet-interactive path {
         <div class="hd" style="font-size:13px">ปริมาณส่งงานแต่ละรายการ</div>
         <span class="lbl" style="font-size:11.5px;font-weight:400">กรอกเป็นปริมาณงานตามหน่วยของรายการ</span>
         <sc-if value="{{ dvOverWarn }}" hint-placeholder-val="{{ false }}">
-          <span class="tag" style="margin-left:auto;font-size:11px;background:var(--c-late-bg);color:var(--c-late);border:1px solid var(--c-late-bd)">มีรายการส่งงานเกินปริมาณตามสัญญา</span>
+          <span class="tag" style="margin-left:auto;font-size:11px;background:var(--c-late-bg);color:var(--c-late);border:1px solid var(--c-late-bd)">มีรายการส่งงานเกินปริมาณถัวจ่าย/ตามสัญญา</span>
         </sc-if>
       </div>
       <div style="overflow:auto">
-        <sc-raw-table style="border-collapse:collapse;width:100%;min-width:820px;font-size:12.5px">
+        <sc-raw-table style="border-collapse:collapse;width:100%;min-width:1000px;font-size:12.5px">
           <sc-raw-thead>
             <sc-raw-tr style="background:var(--color-neutral-200)">
               <sc-raw-th class="hd" style="border:1px solid var(--color-divider);padding:5px;width:52px;font-size:11.5px">ลำดับ</sc-raw-th>
-              <sc-raw-th class="hd" style="border:1px solid var(--color-divider);padding:5px;text-align:left;font-size:11.5px">รายการ</sc-raw-th>
-              <sc-raw-th class="hd" style="border:1px solid var(--color-divider);padding:5px;width:62px;font-size:11.5px">หน่วย</sc-raw-th>
+              <sc-raw-th class="hd" style="border:1px solid var(--color-divider);padding:5px;text-align:left;font-size:11.5px;min-width:200px">รายการ</sc-raw-th>
               <sc-raw-th class="hd" style="border:1px solid var(--color-divider);padding:5px;width:92px;font-size:11.5px">ตามสัญญา</sc-raw-th>
               <sc-raw-th class="hd" style="border:1px solid var(--color-divider);padding:5px;width:88px;font-size:11.5px">ถัวจ่าย</sc-raw-th>
+              <sc-raw-th class="hd" style="border:1px solid var(--color-divider);padding:5px;width:62px;font-size:11.5px">หน่วย</sc-raw-th>
+              <sc-raw-th class="hd" style="border:1px solid var(--color-divider);padding:5px;width:88px;font-size:11.5px">หน่วยละ (บาท)</sc-raw-th>
               <sc-for list="{{ dvRounds }}" as="r" hint-placeholder-count="2">
                 <sc-raw-th class="hd" style="border:1px solid var(--color-divider);padding:5px;width:100px;font-size:11.5px">{{ r.title }}</sc-raw-th>
               </sc-for>
@@ -2924,12 +2924,18 @@ svg.leaflet-image-layer.leaflet-interactive path {
               <sc-raw-tr>
                 <sc-raw-td class="val" style="border:1px solid var(--color-divider);padding:4px;text-align:center">{{ v.no }}</sc-raw-td>
                 <sc-raw-td style="border:1px solid var(--color-divider);padding:4px 6px;line-height:1.45;overflow-wrap:anywhere">{{ v.name }}</sc-raw-td>
-                <sc-raw-td class="lbl" style="border:1px solid var(--color-divider);padding:4px;text-align:center;font-weight:400">{{ v.unit }}</sc-raw-td>
                 <sc-raw-td class="val" style="border:1px solid var(--color-divider);padding:4px 6px;text-align:right;font-variant-numeric:tabular-nums">{{ v.qtyTxt }}</sc-raw-td>
                 <sc-raw-td class="lbl" style="border:1px solid var(--color-divider);padding:4px 6px;text-align:right;font-weight:400;font-variant-numeric:tabular-nums">{{ v.tuaTxt }}</sc-raw-td>
+                <sc-raw-td class="lbl" style="border:1px solid var(--color-divider);padding:4px;text-align:center;font-weight:400">{{ v.unit }}</sc-raw-td>
+                <sc-raw-td class="lbl" style="border:1px solid var(--color-divider);padding:4px 6px;text-align:right;font-weight:400;font-variant-numeric:tabular-nums">{{ v.priceTxt }}</sc-raw-td>
                 <sc-for list="{{ v.cells }}" as="c" hint-placeholder-count="2">
                   <sc-raw-td style="border:1px solid var(--color-divider);padding:2px;background:{{ c.bg }}">
+                    <sc-if value="{{ c.edit }}" hint-placeholder-val="{{ true }}">
                     <input sc-camel-input-mode="decimal" value="{{ c.value }}" sc-camel-on-change="{{ c.onChange }}" disabled="{{ dvReadOnly }}" placeholder="-" style="width:100%;box-sizing:border-box;border:0;padding:5px;font-size:12.5px;text-align:right;background:transparent;color:inherit">
+                    </sc-if>
+                    <sc-if value="{{ c.head }}" hint-placeholder-val="{{ false }}">
+                    <div class="lbl" style="padding:5px;text-align:right;font-weight:400">-</div>
+                    </sc-if>
                   </sc-raw-td>
                 </sc-for>
                 <sc-raw-td class="val" style="border:1px solid var(--color-divider);padding:4px 6px;text-align:right;font-weight:700;font-variant-numeric:tabular-nums;color:{{ v.sumFg }};background:{{ v.sumBg }}">{{ v.sumTxt }}</sc-raw-td>
@@ -2938,7 +2944,7 @@ svg.leaflet-image-layer.leaflet-interactive path {
               </sc-raw-tr>
             </sc-for>
             <sc-raw-tr style="background:var(--color-neutral-200)">
-              <sc-raw-td sc-camel-col-span="5" class="hd" style="border:1px solid var(--color-divider);padding:6px;text-align:right;font-size:11.5px">เป็นเงินแต่ละงวด (บาท)</sc-raw-td>
+              <sc-raw-td sc-camel-col-span="6" class="hd" style="border:1px solid var(--color-divider);padding:6px;text-align:right;font-size:11.5px">เป็นเงินแต่ละงวด (บาท)</sc-raw-td>
               <sc-for list="{{ dvMoneyRow }}" as="m" hint-placeholder-count="2">
                 <sc-raw-td class="val" style="border:1px solid var(--color-divider);padding:6px 4px;text-align:right;font-size:11.5px;font-variant-numeric:tabular-nums">{{ m.txt }}</sc-raw-td>
               </sc-for>
@@ -5480,6 +5486,26 @@ class Component extends DCLogic {
     window.addEventListener('pwa-installed',this._onInstalled);
     if(window.__pwaPrompt) this.setState({canInstall:true});
     if(this.isGuest() && this.state.view!=='map' && this.state.view!=='calendar') this.setState({view:'map'});
+    /* กรอกข้อมูลในตาราง: กด Enter ไปช่องถัดลงมาในคอลัมน์เดียวกัน (Shift+Enter ขึ้นบน) เหมือน Excel
+       หาช่องจากตำแหน่งบนจอ จึงใช้ได้ทุกตารางแม้มีแถวหัวข้อ/เซลล์รวมคั่น และข้ามช่องที่ปิดแก้ไข */
+    this._enterNext=(e)=>{
+      if(e.key!=='Enter' || e.isComposing || e.altKey || e.ctrlKey || e.metaKey) return;
+      const el=e.target;
+      if(!el || el.tagName!=='INPUT' || /^(checkbox|radio|button|submit|reset|file|color|range|date|time|datetime-local|month|week)$/i.test(el.type||'')) return;
+      const td=el.closest('td'), tbl=td && td.closest('table'); if(!tbl) return;
+      e.preventDefault();
+      const me=el.getBoundingClientRect(), cx=me.left+me.width/2, up=e.shiftKey;
+      let best=null, bestD=Infinity;
+      tbl.querySelectorAll('input').forEach(o=>{
+        if(o===el || o.disabled || o.readOnly || o.type!==el.type || !o.closest('td')) return;
+        const r=o.closest('td').getBoundingClientRect(), b=o.getBoundingClientRect();
+        if(!b.height || cx<r.left || cx>r.right) return;
+        const d=up? me.top-b.bottom : b.top-me.bottom;
+        if(d>-2 && d<bestD){ bestD=d; best=o; }
+      });
+      if(best){ best.focus(); try{ best.select(); }catch(err){} best.scrollIntoView({block:'nearest'}); }
+    };
+    document.addEventListener('keydown',this._enterNext);
     this._bp=()=>this.fitPrint(); this._ap=()=>this.unfitPrint();
     window.addEventListener('beforeprint',this._bp);
     window.addEventListener('afterprint',this._ap);
@@ -5513,6 +5539,7 @@ class Component extends DCLogic {
       if(this._onAuth) window.removeEventListener('hwprog-auth',this._onAuth);
       window.removeEventListener('beforeprint',this._bp);
       window.removeEventListener('afterprint',this._ap);
+      document.removeEventListener('keydown',this._enterNext);
       window.removeEventListener('resize',this._rs);
       window.removeEventListener('orientationchange',this._rs);
       window.removeEventListener('load',this._rs);
@@ -6678,9 +6705,9 @@ class Component extends DCLogic {
              ความกว้างช่องคำนวณจากความกว้างตัวอักษรจริงของ TH Sarabun New ให้สูตรอยู่บรรทัดเดียว ไม่พอจึงลดขนาดตัวอักษร */
           const Q=N3(r.q), PR=N2(r.price), capped=r.t>r.q*1.5+1e-9;
           const tiers=[
-            {lab:'ปริมาณงานไม่เกิน 125%', fx:'= (125/100x'+Q+')x'+PR},
-            {lab:'ปริมาณงาน 125% - 150%', fx: capped? '= (25/100x'+Q+')x'+PR+'x0.9' : '= ('+N3(r.t)+'-(125/100x'+Q+'))x'+PR+'x0.9'},
-            {lab:'ปริมาณงานมากกว่า 150%', fx:'= ('+N3(r.t)+'-(150/100x'+Q+'))x'+PR+'x0.83'}
+            {lab:'ปริมาณงานไม่เกิน 125%', fx:'= (125/100x'+Q+') x '+PR+' x 1.00'},
+            {lab:'ปริมาณงาน 125% - 150%', fx: capped? '= (25/100x'+Q+') x '+PR+' x 0.90' : '= ('+N3(r.t)+'-(125/100x'+Q+')) x '+PR+' x 0.90'},
+            {lab:'ปริมาณงานมากกว่า 150%', fx:'= ('+N3(r.t)+'-(150/100x'+Q+')) x '+PR+' x 0.83'}
           ].map((o,k)=>Object.assign(o,r.over[k])).filter(o=>o.a>0);
           const TW=(t,pt,b)=>Math.ceil(this.pptTextW(t,pt,b,FONT)*1440);
           const X1=8634, X0=567;
@@ -6733,13 +6760,14 @@ class Component extends DCLogic {
       C(4250,6050,R('รายการ'),{left:113}), C(6050,6950,R('เป็นเงิน'),{jc:'right'}), C(6950,8634,R(N2(v)),{jc:'right'}), C(8634,W,R('บาท'),{left:113})]});
     x+=TBL([sumRow('ปริมาณงานน้อยกว่าสัญญา',T.less.length,T.lessSum,1), sumRow('ปริมาณงานมากกว่าสัญญา',T.more.length,T.moreSum,0)]);
     /* "ก - ข = ค" ให้อยู่บรรทัดเดียวกัน (ใช้ non-breaking hyphen ของ Word) */
-    const NBH='<w:r><w:rPr>'+FN+'<w:sz w:val="32"/><w:szCs w:val="32"/><w:cs/></w:rPr><w:noBreakHyphen/></w:r>';
+    /* บรรทัดสรุปยอดคงเหลือเป็นตัวหนาทั้งบรรทัด (รวมเครื่องหมายลบด้วย) */
+    const NBH='<w:r><w:rPr>'+FN+'<w:b/><w:bCs/><w:sz w:val="32"/><w:szCs w:val="32"/><w:cs/></w:rPr><w:noBreakHyphen/></w:r>', BO={b:1};
     const tail= remain>=0
-      ? R('คงเหลือเงินทั้งสิ้น '+N2(T.lessSum)+' ')+NBH+R(' '+N2(T.moreSum)+' = '+N2(remain)+' บาท')
-      : R('ซึ่งค่างานที่มากกว่าสัญญาสูงกว่าค่างานที่น้อยกว่าสัญญาเป็นเงิน '+N2(-remain)+' บาท');
+      ? R('คงเหลือเงินทั้งสิ้น '+N2(T.lessSum)+' ',BO)+NBH+R(' '+N2(T.moreSum)+' = '+N2(remain)+' บาท',BO)
+      : R('ซึ่งค่างานที่มากกว่าสัญญาสูงกว่าค่างานที่น้อยกว่าสัญญาเป็นเงิน '+N2(-remain)+' บาท',BO);
     x+=P(R('ดังนั้นจึงขออนุมัตินำค่างานที่มีปริมาณงานน้อยกว่าสัญญาเป็นเงิน '+N2(T.lessSum)+' บาท มาถัวจ่ายค่างานที่มีปริมาณงานมากกว่าสัญญาเป็นเงิน '+N2(T.moreSum)+' บาท'),
       {first:1417,jc:'thaiDistribute',before:120,keep:1});
-    x+=P(tail);
+    x+=P(tail,{first:1417,before:120});   /* ย่อหน้าตรงกับ "ดังนั้นจึงขออนุมัติ..." เว้นระยะบนเท่ากับย่อหน้าอื่น (ด้านล่างเว้นด้วย before ของ "จึงเรียนมา...") */
     x+=P(R('จึงเรียนมาเพื่อโปรดพิจารณาอนุมัติการดำเนินการทำงานของผู้ควบคุมงาน และการถัวจ่ายตามรายละเอียดและบัญชีสรุปปริมาณงานและค่างานที่แนบมาพร้อมนี้ต่อไป'),
       {first:1417,jc:'thaiDistribute',before:120,keep:1});
 
@@ -6815,9 +6843,11 @@ class Component extends DCLogic {
     const XML='<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
     const docXml=XML+'<w:document '+NSW+' xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing" xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture">'
       +'<w:body>'+x
-      +'<w:sectPr><w:headerReference w:type="default" r:id="rId8"/><w:pgSz w:w="11906" w:h="16838" w:code="9"/><w:pgMar w:top="1134" w:right="1134" w:bottom="1134" w:left="1417" w:header="567" w:footer="567" w:gutter="0"/><w:cols w:space="720"/><w:titlePg/><w:docGrid w:linePitch="381"/></w:sectPr>'
+      /* ไม่ใส่เลขหน้า: ไม่อ้างอิง header1.xml (ไฟล์ยังอยู่ในแพ็กเกจแต่ไม่ถูกใช้ ถ้าจะใส่เลขหน้ากลับ เติม headerReference + titlePg) */
+      /* ขอบบน 1.5 ซม. ล่าง 1.5 ซม. (ซ้าย 2.5 ซม. ขวา 2 ซม.) */
+      +'<w:sectPr><w:pgSz w:w="11906" w:h="16838" w:code="9"/><w:pgMar w:top="850" w:right="1134" w:bottom="850" w:left="1417" w:header="425" w:footer="425" w:gutter="0"/><w:cols w:space="720"/><w:docGrid w:linePitch="381"/></w:sectPr>'
       +'</w:body></w:document>';
-    /* เลขหน้าแบบหนังสือราชการ "- 2 -" กึ่งกลางหัวกระดาษ (ไม่แสดงหน้าแรก) */
+    /* เลขหน้าแบบหนังสือราชการ "- 2 -" กึ่งกลางหัวกระดาษ (ตอนนี้ปิดไว้ ดู sectPr ด้านบน) */
     const hr=(t)=>'<w:r><w:rPr>'+FN+'<w:sz w:val="32"/><w:szCs w:val="32"/></w:rPr>'+t+'</w:r>';
     const HDR=XML+'<w:hdr '+NSW+'><w:p><w:pPr><w:jc w:val="center"/></w:pPr>'+hr('<w:t xml:space="preserve">- </w:t>')
       +hr('<w:fldChar w:fldCharType="begin"/>')+hr('<w:instrText xml:space="preserve"> PAGE </w:instrText>')+hr('<w:fldChar w:fldCharType="separate"/>')
@@ -6858,8 +6888,28 @@ class Component extends DCLogic {
   dvList(p){ return (p&&p.deliveries)||[]; }
   dvQty(p,di,no){ const d=this.dvList(p)[di]; return (d&&d.q)? this.num(d.q[no]) : 0; }
   dvCum(p,di,no){ let s=0; const L=this.dvList(p).length; for(let i=0;i<=di&&i<L;i++) s+=this.dvQty(p,i,no); return s; }
-  dvMoney(p,di){ return (p.items||[]).reduce((s,it)=>s+this.dvQty(p,di,it.no)*this.num(it.price),0); }
+  /* ค่างานของปริมาณส่งงานสะสม cum ของรายการ it ตามเงื่อนไข Overrun (เกิน 125 % ของปริมาณตามสัญญา):
+     ไม่เกิน 125 % จ่าย 100 %, ช่วง 125–150 % จ่าย 90 %, ส่วนเกิน 150 % จ่าย 83 %
+     แต่ละช่วงปัดแบบ ROUND(x-0.001,2) ตรงกับใบ payment (พ.1-37) และนำเสนอถัวจ่าย */
+  dvAmt(it,cum){
+    const q=this.num(it.qty), pr=this.num(it.price), m2=(v)=>Math.round(v*100)/100, q3=(v)=>Math.round(v*1000)/1000;
+    if(!(cum>0)) return 0;
+    if(!(q>0) || cum<=q*1.25+1e-9) return m2(cum*pr);
+    const cut=(v)=>Math.round((v-0.001)*100)/100, b1=q3(q*1.25), b2=q3(q*1.5);
+    return m2([[b1,1],[Math.min(cum,b2)-b1,0.9],[Math.max(0,cum-b2),0.83]]
+      .reduce((s,[a,f])=>{ a=q3(a); return s+(a>0? cut(a*pr*f) : 0); },0));
+  }
+  /* ค่างานของรายการในงวด di = ค่างานสะสมถึงงวดนี้ − ค่างานสะสมถึงงวดก่อน (ส่งงานทีละส่วนก็คิดช่วง Overrun ถูกต้อง) */
+  dvItemMoney(p,di,it){
+    const prev=di>0? this.dvCum(p,di-1,it.no) : 0, now=this.dvQty(p,di,it.no);
+    return Math.round((this.dvAmt(it,prev+now)-this.dvAmt(it,prev))*100)/100;
+  }
+  dvMoney(p,di){ return Math.round((p.items||[]).reduce((s,it)=>s+this.dvItemMoney(p,di,it),0)*100)/100; }
+  /* ปริมาณเป้าหมายของรายการ: ถ้ากรอกถัวจ่ายไว้ใช้ถัวจ่าย ไม่เช่นนั้นใช้ปริมาณตามสัญญา */
+  dvTarget(it){ const raw=it.tua; return (raw!==undefined && raw!==null && String(raw).trim()!=='')? this.num(raw) : this.num(it.qty); }
   dvRoundTxt(d,i){ return 'ครั้งที่ '+((d&&d.no)||(i+1))+((d&&d.final)?' (งวดสุดท้าย)':''); }
+  /* ชื่องวดบนหน้าจอ (หัวการ์ด หัวคอลัมน์ ตัวเลือกงวดตอนส่งออก) — ในไฟล์ PowerPoint ใช้ dvRoundTxt เพราะมีคำนำหน้าของตัวเองแล้ว */
+  dvRoundLabel(d,i){ return 'ส่งงาน'+this.dvRoundTxt(d,i); }
 
   PPT_THEMES={
     official:{ label:'ขาวทางการ', bg:'FFFFFF', ink:'000000', sub:'404040', line:'7F7F7F', head:'F2F2F2', accent:'000000', font:'TH Sarabun New' },
@@ -7150,10 +7200,10 @@ class Component extends DCLogic {
         [C('',{fill:HEAD}),C('ราคาต่อหน่วย',H),C('ปริมาณงาน',H),C('เป็นเงิน',H)],
         [C(''),C(M(pr)+' บาท',{align:'center',bold:true}),C(this.workUnit(it.unit),{align:'center'}),C('บาท',{align:'center'})],
         [C('ตามสัญญา'),C(''),C(N(q),R),C(M(q*pr),R)],
-        [C('ถัวจ่าย'),C(''),C(tua? N(tua):'-',R),C(tua? M(tua*pr):'-',R)],
-        [C('ส่งงานถึงงวดที่แล้ว'),C(''),C(prev? N(prev):'-',R),C(prev? M(prev*pr):'-',R)],
-        [C('ส่งงานงวดนี้'),C(''),C(now? N(now):'-',R),C(now? M(now*pr):'-',R)],
-        [C('รวมส่งงานถึงงวดนี้',{bold:true,fill:HEAD}),C('',{fill:HEAD}),C(cum? N(cum):'-',Object.assign({fill:HEAD},RB)),C(cum? M(cum*pr):'-',Object.assign({fill:HEAD},RB))],
+        [C('ถัวจ่าย'),C(''),C(tua? N(tua):'-',R),C(tua? M(this.dvAmt(it,tua)):'-',R)],
+        [C('ส่งงานถึงงวดที่แล้ว'),C(''),C(prev? N(prev):'-',R),C(prev? M(this.dvAmt(it,prev)):'-',R)],
+        [C('ส่งงานงวดนี้'),C(''),C(now? N(now):'-',R),C(now? M(this.dvAmt(it,cum)-this.dvAmt(it,prev)):'-',R)],
+        [C('รวมส่งงานถึงงวดนี้',{bold:true,fill:HEAD}),C('',{fill:HEAD}),C(cum? N(cum):'-',Object.assign({fill:HEAD},RB)),C(cum? M(this.dvAmt(it,cum)):'-',Object.assign({fill:HEAD},RB))],
         [C('คิดเป็น'),C(''),C(q? N(cum*100/q)+' %':'-',R),C('ของสัญญา',{align:'center',color:SUB})],
         [C('คิดเป็น'),C(''),C(tua? N(cum*100/tua)+' %':'-',R),C('ของถัวจ่าย',{align:'center',color:SUB})],
         [C('ส่งมอบงานตามรายการนี้'),C(RD,{align:'center',colspan:3,bold:true})]
@@ -7169,11 +7219,11 @@ class Component extends DCLogic {
     if(g.photoDone){ const x=S(); head(x,'งานแล้วเสร็จ'); foots(x); }
     /* สรุป PAYMENT */
     {
-      const amt=items.reduce((t,it)=>t+(di>=0? this.dvQty(p,di,it.no):0)*this.num(it.price),0);
+      const amt=items.reduce((t,it)=>t+(di>=0? this.dvItemMoney(p,di,it):0),0);
       const rt=this.num(cur&&cur.retain), ad=this.num(cur&&cur.advance), fd=this.num(cur&&cur.fineDays);
       const retain=amt*rt/100, adv=amt*ad/100, fine=fd*this.num(p.finePerDay);
       const pay=amt-retain-adv-fine;
-      const cumAll=items.reduce((t,it)=>t+(di>=0? this.dvCum(p,di,it.no):0)*this.num(it.price),0);
+      const cumAll=items.reduce((t,it)=>t+(di>=0? this.dvAmt(it,this.dvCum(p,di,it.no)):0),0);
       const cv=this.num(p.contractValue);
       const x=S(); head(x,'สรุป PAYMENT  ส่งงาน'+RD);
       const money=(v,o)=>C(v? M(v):'-',Object.assign({align:'right',bold:true},o||{}));
@@ -7256,12 +7306,14 @@ class Component extends DCLogic {
       if(!el) return null;
       if(document.fonts && document.fonts.ready) await document.fonts.ready;
       await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));
-      const r=el.getBoundingClientRect();
-      const o={pixelRatio:3, width:Math.ceil(r.width), height:Math.ceil(r.height), backgroundColor:'#ffffff',
-        style:{transform:'none', boxShadow:'none', borderRadius:'0', marginBottom:'0'}};
+      /* หน้าพิมพ์ย่อแผ่นด้วย transform:scale ให้พอดี A4 — ต้องวัดขนาดจริงก่อนย่อ (offsetWidth/scrollHeight)
+         ถ้าใช้ getBoundingClientRect จะได้ขนาดหลังย่อ แต่ภาพวาดเนื้อหาขนาดเต็ม ตารางด้านล่าง/ขวาจึงถูกตัด */
+      const w=Math.ceil(el.offsetWidth), h=Math.ceil(Math.max(el.scrollHeight, el.offsetHeight));
+      const o={pixelRatio:3, width:w, height:h, backgroundColor:'#ffffff',
+        style:{transform:'none', boxShadow:'none', borderRadius:'0', marginBottom:'0', height:h+'px'}};
       await lib.toPng(el,o);                 /* รอบแรกโหลดฟอนต์/รูปเข้าแคช */
       const data=await lib.toPng(el,o);
-      return {data, r:r.height/r.width};
+      return {data, r:h/w};
     } finally { this.setState(keep); }
   }
   tuaDeck(Pptx,LOGO,p,g,SCHED){
@@ -7412,7 +7464,7 @@ class Component extends DCLogic {
         const pct=r.q? r.t*100/r.q : 0;
         const mark={bold:true};   /* แถวที่เป็นส่วนต่างของรายการนี้ ตัวหนา */
         const rows=[
-          [C('ค่างานในสัญญาต่อหน่วย',Object.assign({colspan:2},H)),C('ปริมาณงาน',H),C('เป็นเงิน',Object.assign({colspan:2},H))],
+          [C('ค่างานต่อหน่วย',Object.assign({colspan:2},H)),C('ปริมาณงาน',H),C('เป็นเงิน',Object.assign({colspan:2},H))],
           [C(M(r.price),V(1,{bold:true})),C('บาท',V(1,{align:'center'})),C(r.unit,V(1,{align:'center'})),C('บาท',V(1,{align:'center',colspan:2}))],
           [C('ตามสัญญา',LB(0)),C(N3(r.q),V(0)),C(M(r.cM),V(0,{colspan:2}))],
           [C('ตามจริงในสนาม',LB(1)),C(N3(r.t),V(1)),C(M(r.fM),V(1,{colspan:2}))],
@@ -7466,13 +7518,12 @@ class Component extends DCLogic {
           {text:Math.abs(diff)<0.0005? '' : N3(Math.abs(diff))+' %',options:{bold:true,color:dc}}
         ],T({x:XL,y,w:WC,h:0.6,fontSize:28,align:'center',valign:'middle'})); };
       if(SCHED){
-        /* ภาพหน้า Export Schedule ขยายให้ใหญ่ที่สุดในพื้นที่ใต้หัวเรื่อง (คงสัดส่วน) จัดกึ่งกลาง มีกรอบบาง */
+        /* ภาพหน้า Export Schedule ขยายให้ใหญ่ที่สุดในพื้นที่ใต้หัวเรื่อง (คงสัดส่วน) จัดกึ่งกลาง ไม่มีกรอบ */
         const x=S(); head(x,'รายการผลงานดำเนินงาน ณ วันที่ '+D(mon));
         const by=yTop-0.15, bh=6.2-by, bw=SW-0.5;
         let iw=bw, ih=iw*SCHED.r; if(ih>bh){ ih=bh; iw=ih/SCHED.r; }
         const ix=(SW-iw)/2;
         x.addImage({data:SCHED.data,x:ix,y:by,w:iw,h:ih});
-        x.addShape('rect',{x:ix,y:by,w:iw,h:ih,fill:{type:'none'},line:{color:LINE,width:0.75}});
         sumLine(x,6.22);
         foots(x);
       }
@@ -8166,7 +8217,7 @@ class Component extends DCLogic {
         busy:!!pg.busy,
         busyTxt: pg.busy? '\u0e01\u0e33\u0e25\u0e31\u0e07\u0e2a\u0e23\u0e49\u0e32\u0e07\u0e44\u0e1f\u0e25\u0e4c\u2026':'\u0e2a\u0e23\u0e49\u0e32\u0e07\u0e44\u0e1f\u0e25\u0e4c .pptx',
         noRounds: pdl.length===0,
-        rounds: pdl.map((d,i)=>Object.assign({label:this.dvRoundTxt(d,i), pick:()=>setG({di:i})}, PB(pg.di===i))),
+        rounds: pdl.map((d,i)=>Object.assign({label:this.dvRoundLabel(d,i), pick:()=>setG({di:i})}, PB(pg.di===i))),
         tpls: [{k:'official',label:this.PPT_THEMES.official.label},{k:'district',label:this.PPT_THEMES.district.label}]
           .map(t=>Object.assign({label:t.label, pick:()=>setG({tpl:t.k})}, PB(pg.tpl===t.k))),
         customLabel: pg.custom? pg.custom.label : '\u0e22\u0e31\u0e07\u0e44\u0e21\u0e48\u0e44\u0e14\u0e49\u0e2d\u0e31\u0e1b\u0e42\u0e2b\u0e25\u0e14\u0e44\u0e1f\u0e25\u0e4c',
@@ -8707,7 +8758,7 @@ class Component extends DCLogic {
       /* "ส่งงานปริมาณเท่าสัญญา": ปริมาณงวดนี้ = ตามสัญญา − ที่ส่งในงวดอื่นแล้ว ทุกรายการ ยอดรวมส่งงานจึงเท่าสัญญาพอดี
          ยกเลิกติ๊ก = ล้างเฉพาะช่องที่ยังเป็นค่าที่เติมให้อัตโนมัติ (ช่องที่แก้เองแล้วคงไว้) */
       const fullQty=(i,it)=>{ const o=dls.reduce((t,d,j)=>j===i? t : t+this.dvQty(p,j,it.no),0);
-        return Math.max(0, Math.round((this.num(it.qty)-o)*1000)/1000); };
+        return Math.max(0, Math.round((this.dvTarget(it)-o)*1000)/1000); };
       const setFull=(i)=>(e)=>{
         const on=!!e.target.checked;
         const apply=()=>{
@@ -8727,7 +8778,7 @@ class Component extends DCLogic {
         else apply();
       };
       out.dvRounds=dls.map((d,i)=>({
-        title:this.dvRoundTxt(d,i),
+        title:this.dvRoundLabel(d,i),
         no:d.no===undefined?String(i+1):d.no, setNo:setDv(i,'no'),
         final:!!d.final, setFinal:setDv(i,'final'),
         full:!!d.full, setFull:setFull(i),
@@ -8738,7 +8789,7 @@ class Component extends DCLogic {
         fineDays:d.fineDays===undefined?'':d.fineDays, setFineDays:setDv(i,'fineDays'),
         note:d.note||'', setNote:setDv(i,'note'),
         moneyTxt:this.cmoney(this.dvMoney(p,i)),
-        remove:()=>this.askConfirm('\u0e25\u0e1a '+this.dvRoundTxt(d,i)+' ?', ()=>{
+        remove:()=>this.askConfirm('\u0e25\u0e1a '+this.dvRoundLabel(d,i)+' ?', ()=>{
           const np=JSON.parse(JSON.stringify(p)); np.deliveries.splice(i,1); this.writeProject(np); })
       }));
       out.addDelivery=()=>{
@@ -8748,17 +8799,24 @@ class Component extends DCLogic {
         this.writeProject(np);
       };
       const dvItemList=(p.items||[]).filter(it=>this.num(it.qty)>0);
-      out.dvItems=dvItemList.map(it=>{
-        const q=this.num(it.qty), pr=this.num(it.price);
+      /* แถวหัวข้อ (ไม่มีปริมาณและราคา เช่น 6 SOFT SPOT ...) แสดงด้วยเพื่อให้ลำดับรายการครบเหมือนใบ payment แต่ไม่มีช่องกรอก */
+      const dvIsHead=(it)=>!this.num(it.qty) && !this.num(it.price) && String(it.name||'').trim()!=='';
+      out.dvItems=(p.items||[]).filter(it=>this.num(it.qty)>0 || dvIsHead(it)).map(it=>{
+        if(dvIsHead(it)) return { no:it.no, name:it.name||'', unit:'-', priceTxt:'-', qtyTxt:'-', tuaTxt:'-',
+          sumTxt:'-', leftTxt:'-', moneyTxt:'-', sumFg:'var(--color-neutral-600)', sumBg:'transparent',
+          cells:dls.map(()=>({head:true, edit:false, bg:'transparent'})) };
+        const q=this.num(it.qty), pr=this.num(it.price), tg=this.dvTarget(it);
         const cum=dls.reduce((t,d,i)=>t+this.dvQty(p,i,it.no),0);
-        const over=cum>q+1e-9;
+        /* คงเหลือ/แจ้งเตือนเทียบกับถัวจ่าย (ถ้ามี) ไม่เช่นนั้นเทียบปริมาณตามสัญญา; เป็นเงินคิดตามเงื่อนไข Overrun */
+        const over=cum>tg+1e-9;
         return {
-          no:it.no, name:it.name||'', unit:this.workUnit(it.unit),
+          no:it.no, name:it.name||'', unit:this.workUnit(it.unit), priceTxt:this.cmoney(pr),
           qtyTxt:this.n(q,3), tuaTxt:this.num(it.tua)? this.n(this.num(it.tua),3):'-',
-          sumTxt:this.n(cum,3), leftTxt:this.n(q-cum,3), moneyTxt:this.cmoney(cum*pr),
+          sumTxt:this.n(cum,3), leftTxt:this.n(Math.round((tg-cum)*1000)/1000,3), moneyTxt:this.cmoney(this.dvAmt(it,cum)),
           sumFg: over? 'var(--c-late)':'var(--color-text)',
           sumBg: over? 'var(--c-late-bg)':'transparent',
           cells:dls.map((d,i)=>({
+            head:false, edit:true,
             value:(d.q&&d.q[it.no]!==undefined)? d.q[it.no] : '',
             bg: over? 'var(--c-late-bg)':'transparent',
             onChange:(e)=>{
@@ -8777,7 +8835,7 @@ class Component extends DCLogic {
       });
       out.dvMoneyRow=dls.map((d,i)=>({txt:this.cmoney(this.dvMoney(p,i))}));
       out.dvGrandTxt=this.cmoney(dls.reduce((t,d,i)=>t+this.dvMoney(p,i),0));
-      out.dvOverWarn=dvItemList.some(it=>dls.reduce((t,d,i)=>t+this.dvQty(p,i,it.no),0) > this.num(it.qty)+1e-9);
+      out.dvOverWarn=dvItemList.some(it=>dls.reduce((t,d,i)=>t+this.dvQty(p,i,it.no),0) > this.dvTarget(it)+1e-9);
 
       out.itemRows=(p.items||[]).map((it,i)=>{
         const isHead=!this.num(it.qty)&&!this.num(it.price);
