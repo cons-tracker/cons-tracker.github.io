@@ -2006,6 +2006,21 @@ svg.leaflet-image-layer.leaflet-interactive path {
               <button sc-camel-on-click="{{ a.toggle }}" aria-expanded="{{ a.ariaExp }}" style="display:block;width:100%;text-align:left;border:0;background:transparent;color:inherit;padding:0;font-family:inherit;font-size:inherit;line-height:inherit;cursor:pointer">
                 <span style="display:block;font-weight:700;font-size:clamp(9px,7.5cqw,12.5px);overflow-wrap:anywhere;color:var(--color-text)">{{ a.contractNo }} {{ a.timeLine }}</span>
                 <span style="display:block;margin-top:1px;font-size:clamp(9px,7.1cqw,12px);font-weight:500;overflow-wrap:anywhere;color:var(--color-text)">{{ a.phaseLine }}</span>
+              </button>
+              <!-- สถานที่ / จุดนัดพบ แล้วต่อด้วยปุ่มนำทาง (อยู่นอกปุ่มพับ/ขยาย เพราะลิงก์ซ้อนในปุ่มไม่ได้) -->
+              <sc-if value="{{ a.hasPlaceOrNav }}" hint-placeholder-val="{{ false }}">
+                <div style="margin-top:4px;font-size:clamp(9px,6.6cqw,11px);line-height:1.6;overflow-wrap:anywhere;color:var(--color-text)">
+                  <sc-if value="{{ a.hasPlace }}" hint-placeholder-val="{{ false }}">
+                    <span sc-camel-on-click="{{ a.toggle }}" style="cursor:pointer"><span style="font-weight:700;color:{{ a.fg }}">สถานที่ / จุดนัดพบ </span>{{ a.placeTxt }}</span>
+                  </sc-if>
+                  <sc-if value="{{ a.hasNav }}" hint-placeholder-val="{{ false }}">
+                    <a href="{{ a.navUrl }}" target="_blank" rel="noopener" title="นำทาง (Google Maps)" aria-label="นำทาง" style="margin-left:4px;vertical-align:middle;display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border:1px solid var(--color-accent-2-600);background:var(--color-accent-2-100);color:var(--color-accent-2-800);border-radius:999px;text-decoration:none">
+                      <svg sc-camel-view-box="0 0 24 24" width="13" height="13" fill="currentColor" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><path d="M21 3 3 10.5l7.5 3 3 7.5L21 3Z"></path></svg>
+                    </a>
+                  </sc-if>
+                </div>
+              </sc-if>
+              <button sc-camel-on-click="{{ a.toggle }}" aria-expanded="{{ a.ariaExp }}" style="display:block;width:100%;text-align:left;border:0;background:transparent;color:inherit;padding:0;font-family:inherit;font-size:inherit;line-height:inherit;cursor:pointer">
                 <sc-for list="{{ a.chairGroups }}" as="gr" hint-placeholder-count="1">
                   <span style="display:block;margin-top:6px;padding-top:5px;border-top:1px solid {{ a.bd }}">
                     <span style="display:block;margin-bottom:1px;font-size:9px;font-weight:700;color:{{ a.fg }}">{{ gr.label }}</span>
@@ -8409,6 +8424,9 @@ class Component extends DCLogic {
               doneTxt:this.normStatus(a.status)==='ตรวจแล้ว'? 'ตรวจแล้ว ✓' : '',
               phaseLine:(()=>{ const ph=String(a.phase||'ตรวจรับงาน').trim(), no=String(this.phaseLabel(a)).trim().replace(/^\(\s*(.*?)\s*\)$/,'$1'); return no&&no!==ph? ph+' ('+no+')' : ph; })(),
               ...this.apptCardFields(a),
+              hasPlace:!!String(a.place||'').trim(), placeTxt:String(a.place||'').trim(),
+              navUrl:this.navUrlOf(a.project)||'#', hasNav:!!this.navUrlOf(a.project),
+              hasPlaceOrNav:!!String(a.place||'').trim() || !!this.navUrlOf(a.project),
               textColor: (ch.pos==='ผส.ทล.5'||ch.pos==='รส.ทล.5')? ch.color : s.fg,
               contractNo:this.contractShort(a.project).replace(/\s*\/\s*/g,'/')||'ไม่ระบุเลขสัญญา',
               bg:s.bg, fg:s.fg, bd:s.bd, open:this.openAppt(a.pid,a.id) }; }) });
