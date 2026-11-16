@@ -2841,10 +2841,11 @@ svg.leaflet-image-layer.leaflet-interactive path {
       </sc-if>
       <div style="display:flex;gap:10px;overflow-x:auto;padding-bottom:2px">
         <sc-for list="{{ dvRounds }}" as="r" hint-placeholder-count="2">
-          <div style="flex:0 0 300px;border:1px solid var(--color-divider);border-radius:var(--radius-md);padding:10px 12px;background:var(--color-bg);display:flex;flex-direction:column;gap:7px">
+          <div style="flex:0 0 300px;border:{{ r.cardBd }};border-radius:var(--radius-md);padding:10px 12px;background:var(--color-bg);display:flex;flex-direction:column;gap:7px">
             <div style="display:flex;align-items:center;gap:8px">
               <span class="hd" style="font-size:12.5px">{{ r.title }}</span>
-              <button sc-camel-on-click="{{ r.remove }}" disabled="{{ dvReadOnly }}" style="margin-left:auto;white-space:nowrap;background:var(--color-accent-100);color:var(--color-accent-700);border:1px solid var(--color-accent-300);border-radius:999px;padding:3px 9px;font-size:11px;cursor:pointer">ลบ</button>
+              <button sc-camel-on-click="{{ r.pick }}" title="แก้ไขปริมาณส่งงานได้เฉพาะงวดที่เลือก" style="margin-left:auto;white-space:nowrap;background:{{ r.pickBg }};color:{{ r.pickFg }};border:1px solid {{ r.pickBd }};border-radius:999px;padding:3px 10px;font-size:11px;font-weight:{{ r.pickFw }};cursor:pointer">{{ r.pickTxt }}</button>
+              <button sc-camel-on-click="{{ r.remove }}" disabled="{{ dvReadOnly }}" style="white-space:nowrap;background:var(--color-accent-100);color:var(--color-accent-700);border:1px solid var(--color-accent-300);border-radius:999px;padding:3px 9px;font-size:11px;cursor:pointer">ลบ</button>
             </div>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
               <label style="display:flex;flex-direction:column;gap:2px">
@@ -2912,11 +2913,12 @@ svg.leaflet-image-layer.leaflet-interactive path {
               <sc-raw-th class="hd" style="border:1px solid var(--color-divider);padding:5px;width:62px;font-size:11.5px">หน่วย</sc-raw-th>
               <sc-raw-th class="hd" style="border:1px solid var(--color-divider);padding:5px;width:88px;font-size:11.5px">หน่วยละ (บาท)</sc-raw-th>
               <sc-for list="{{ dvRounds }}" as="r" hint-placeholder-count="2">
-                <sc-raw-th class="hd" style="border:1px solid var(--color-divider);padding:5px;width:100px;font-size:11.5px">{{ r.title }}</sc-raw-th>
+                <sc-raw-th class="hd" style="border:1px solid var(--color-divider);padding:5px;width:100px;font-size:11.5px;background:{{ r.headBg }};color:{{ r.headFg }}">{{ r.title }}</sc-raw-th>
               </sc-for>
               <sc-raw-th class="hd" style="border:1px solid var(--color-divider);padding:5px;width:96px;font-size:11.5px">รวมส่งงาน</sc-raw-th>
               <sc-raw-th class="hd" style="border:1px solid var(--color-divider);padding:5px;width:92px;font-size:11.5px">คงเหลือ</sc-raw-th>
-              <sc-raw-th class="hd" style="border:1px solid var(--color-divider);padding:5px;width:118px;font-size:11.5px">เป็นเงิน (บาท)</sc-raw-th>
+              <sc-raw-th class="hd" style="border:1px solid var(--color-divider);padding:5px;width:118px;font-size:11.5px">เป็นเงิน (ตามสัญญา) (บาท)</sc-raw-th>
+              <sc-raw-th class="hd" style="border:1px solid var(--color-divider);padding:5px;width:118px;font-size:11.5px">เป็นเงิน (ถัวจ่าย) (บาท)</sc-raw-th>
             </sc-raw-tr>
           </sc-raw-thead>
           <sc-raw-tbody>
@@ -2931,7 +2933,7 @@ svg.leaflet-image-layer.leaflet-interactive path {
                 <sc-for list="{{ v.cells }}" as="c" hint-placeholder-count="2">
                   <sc-raw-td style="border:1px solid var(--color-divider);padding:2px;background:{{ c.bg }}">
                     <sc-if value="{{ c.edit }}" hint-placeholder-val="{{ true }}">
-                    <input sc-camel-input-mode="decimal" value="{{ c.value }}" sc-camel-on-change="{{ c.onChange }}" disabled="{{ dvReadOnly }}" placeholder="-" style="width:100%;box-sizing:border-box;border:0;padding:5px;font-size:12.5px;text-align:right;background:transparent;color:inherit">
+                    <input sc-camel-input-mode="decimal" value="{{ c.value }}" sc-camel-on-change="{{ c.onChange }}" sc-camel-on-focus="{{ c.onFocus }}" sc-camel-on-blur="{{ c.onBlur }}" disabled="{{ c.locked }}" placeholder="-" style="width:100%;box-sizing:border-box;border:0;padding:5px;font-size:12.5px;text-align:right;background:transparent;color:{{ c.fg }}">
                     </sc-if>
                     <sc-if value="{{ c.head }}" hint-placeholder-val="{{ false }}">
                     <div class="lbl" style="padding:5px;text-align:right;font-weight:400">-</div>
@@ -2940,6 +2942,7 @@ svg.leaflet-image-layer.leaflet-interactive path {
                 </sc-for>
                 <sc-raw-td class="val" style="border:1px solid var(--color-divider);padding:4px 6px;text-align:right;font-weight:700;font-variant-numeric:tabular-nums;color:{{ v.sumFg }};background:{{ v.sumBg }}">{{ v.sumTxt }}</sc-raw-td>
                 <sc-raw-td class="lbl" style="border:1px solid var(--color-divider);padding:4px 6px;text-align:right;font-weight:400;font-variant-numeric:tabular-nums">{{ v.leftTxt }}</sc-raw-td>
+                <sc-raw-td class="lbl" style="border:1px solid var(--color-divider);padding:4px 6px;text-align:right;font-weight:400;font-variant-numeric:tabular-nums">{{ v.contractTxt }}</sc-raw-td>
                 <sc-raw-td class="val" style="border:1px solid var(--color-divider);padding:4px 6px;text-align:right;font-variant-numeric:tabular-nums">{{ v.moneyTxt }}</sc-raw-td>
               </sc-raw-tr>
             </sc-for>
@@ -2948,7 +2951,8 @@ svg.leaflet-image-layer.leaflet-interactive path {
               <sc-for list="{{ dvMoneyRow }}" as="m" hint-placeholder-count="2">
                 <sc-raw-td class="val" style="border:1px solid var(--color-divider);padding:6px 4px;text-align:right;font-size:11.5px;font-variant-numeric:tabular-nums">{{ m.txt }}</sc-raw-td>
               </sc-for>
-              <sc-raw-td sc-camel-col-span="2" style="border:1px solid var(--color-divider)"> </sc-raw-td>
+              <sc-raw-td sc-camel-col-span="2" class="hd" style="border:1px solid var(--color-divider);padding:6px;text-align:right;font-size:11.5px">รวม</sc-raw-td>
+              <sc-raw-td class="hd" style="border:1px solid var(--color-divider);padding:6px;text-align:right;font-size:11.5px;font-variant-numeric:tabular-nums">{{ dvContractTxt }}</sc-raw-td>
               <sc-raw-td class="hd" style="border:1px solid var(--color-divider);padding:6px;text-align:right;font-size:11.5px;font-variant-numeric:tabular-nums">{{ dvGrandTxt }}</sc-raw-td>
             </sc-raw-tr>
           </sc-raw-tbody>
@@ -3982,18 +3986,10 @@ svg.leaflet-image-layer.leaflet-interactive path {
 
       <div>
         <div class="hd" style="font-size:12.5px;margin-bottom:7px">Template</div>
-        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px">
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
           <sc-for list="{{ ppt.tpls }}" as="t" hint-placeholder-count="2">
             <button sc-camel-on-click="{{ t.pick }}" style="white-space:nowrap;border-radius:999px;padding:6px 14px;font-size:12.5px;font-family:var(--font-body);cursor:pointer;border:1px solid {{ t.bd }};background:{{ t.bg }};color:{{ t.fg }}">{{ t.label }}</button>
           </sc-for>
-        </div>
-        <div style="border:1px solid var(--color-divider);border-radius:var(--radius-md);padding:10px 12px;display:flex;flex-direction:column;gap:7px;background:{{ ppt.customBg }}">
-          <div class="lbl" style="font-size:11.5px;font-weight:400;line-height:1.55">หรืออัปโหลดไฟล์ .pptx ของตัวเอง — ระบบจะดึงสีและฟอนต์จากไฟล์นั้นมาใช้</div>
-          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-            <input type="file" accept=".pptx" sc-camel-on-change="{{ ppt.upload }}" style="font-size:12px;font-family:var(--font-body);color:var(--color-text);max-width:100%">
-            <button sc-camel-on-click="{{ ppt.pickCustom }}" style="white-space:nowrap;background:var(--color-neutral-200);color:var(--color-accent);border:1px solid var(--color-divider);border-radius:999px;padding:5px 12px;font-family:var(--font-body);font-size:12px;cursor:pointer">ใช้ไฟล์นี้</button>
-          </div>
-          <div class="lbl" style="font-size:11px;font-weight:400">{{ ppt.customLabel }}</div>
         </div>
       </div>
 
@@ -4001,7 +3997,11 @@ svg.leaflet-image-layer.leaflet-interactive path {
         <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:7px">
           <div class="hd" style="font-size:12.5px">รายการที่จะออกสไลด์</div>
           <span class="lbl" style="font-size:11px;font-weight:400">เลือกแล้ว {{ ppt.selCount }} รายการ</span>
-          <button sc-camel-on-click="{{ ppt.allOn }}" style="margin-left:auto;white-space:nowrap;background:transparent;color:var(--color-accent-700);border:1px solid var(--color-accent-300);border-radius:999px;padding:4px 11px;font-family:var(--font-body);font-size:11.5px;cursor:pointer">เลือกทั้งหมด</button>
+          <span style="margin-left:auto"></span>
+          <sc-if value="{{ ppt.hasRound }}" hint-placeholder-val="{{ true }}">
+            <button sc-camel-on-click="{{ ppt.roundOn }}" title="เลือกเฉพาะรายการที่กรอกปริมาณไว้ในงวดที่เลือกด้านบน" style="white-space:nowrap;background:var(--color-accent-100);color:var(--color-accent-700);border:1px solid var(--color-accent-300);border-radius:999px;padding:4px 11px;font-family:var(--font-body);font-size:11.5px;cursor:pointer">เลือกตาม{{ ppt.roundLabel }}</button>
+          </sc-if>
+          <button sc-camel-on-click="{{ ppt.allOn }}" style="white-space:nowrap;background:transparent;color:var(--color-accent-700);border:1px solid var(--color-accent-300);border-radius:999px;padding:4px 11px;font-family:var(--font-body);font-size:11.5px;cursor:pointer">เลือกทั้งหมด</button>
           <button sc-camel-on-click="{{ ppt.noneOn }}" style="white-space:nowrap;background:transparent;color:var(--color-neutral-700);border:1px solid var(--color-divider);border-radius:999px;padding:4px 11px;font-family:var(--font-body);font-size:11.5px;cursor:pointer">ล้าง</button>
         </div>
         <div style="max-height:210px;overflow:auto;border:1px solid var(--color-divider);border-radius:var(--radius-md);padding:8px 10px;display:flex;flex-direction:column;gap:5px">
@@ -7069,12 +7069,20 @@ class Component extends DCLogic {
     this.setState({exportMenu:false});
     const p=this.byId(this.state.pid);
     if(!p){ this.showNotice('กรุณาเลือกโครงการก่อน'); return; }
-    const dl=this.dvList(p);
-    const sel={}; (p.items||[]).forEach(it=>{ if(this.num(it.qty)>0) sel[it.no]=true; });
-    this.setState({pptDlg:{ pid:p.id, di: dl.length? dl.length-1 : -1, tpl:'official', custom:null,
+    const dl=this.dvList(p), di=dl.length? dl.length-1 : -1;
+    const sel=this.pptRoundSel(p,di);   /* เปิดมาเลือกรายการตามงวดล่าสุด */
+    this.setState({pptDlg:{ pid:p.id, di, tpl:'official', custom:null,
       sel, photoBefore:true, photoItem:true, photoDone:true, busy:false }});
   };
   closePptDlg = () => this.setState({pptDlg:null});
+  /* รายการที่ติ๊กตามงวด di: เฉพาะรายการที่กรอกปริมาณในงวดนั้น — ไม่มีงวด หรืองวดนั้นยังไม่กรอกปริมาณเลย ให้เลือกทั้งหมด */
+  pptRoundSel(p,di){
+    const all=(p.items||[]).filter(it=>this.num(it.qty)>0);
+    let pick=di>=0? all.filter(it=>this.dvQty(p,di,it.no)>0) : [];
+    if(!pick.length) pick=all;
+    const sel={}; pick.forEach(it=>{ sel[it.no]=true; });
+    return sel;
+  }
 
   buildPptx = async () => {
     const g=this.state.pptDlg; if(!g || g.busy) return;
@@ -8217,7 +8225,8 @@ class Component extends DCLogic {
         busy:!!pg.busy,
         busyTxt: pg.busy? '\u0e01\u0e33\u0e25\u0e31\u0e07\u0e2a\u0e23\u0e49\u0e32\u0e07\u0e44\u0e1f\u0e25\u0e4c\u2026':'\u0e2a\u0e23\u0e49\u0e32\u0e07\u0e44\u0e1f\u0e25\u0e4c .pptx',
         noRounds: pdl.length===0,
-        rounds: pdl.map((d,i)=>Object.assign({label:this.dvRoundLabel(d,i), pick:()=>setG({di:i})}, PB(pg.di===i))),
+        /* เลือกงวด = ติ๊กรายการตามงวดนั้นทันที (งวดที่ยังไม่กรอกปริมาณ ติ๊กทั้งหมด) เหมือนตอนเปิดหน้าต่าง */
+        rounds: pdl.map((d,i)=>Object.assign({label:this.dvRoundLabel(d,i), pick:()=>setG({di:i, sel:this.pptRoundSel(pp,i)})}, PB(pg.di===i))),
         tpls: [{k:'official',label:this.PPT_THEMES.official.label},{k:'district',label:this.PPT_THEMES.district.label}]
           .map(t=>Object.assign({label:t.label, pick:()=>setG({tpl:t.k})}, PB(pg.tpl===t.k))),
         customLabel: pg.custom? pg.custom.label : '\u0e22\u0e31\u0e07\u0e44\u0e21\u0e48\u0e44\u0e14\u0e49\u0e2d\u0e31\u0e1b\u0e42\u0e2b\u0e25\u0e14\u0e44\u0e1f\u0e25\u0e4c',
@@ -8234,6 +8243,12 @@ class Component extends DCLogic {
         selCount:Object.keys(pg.sel||{}).length,
         allOn:()=>{ const sel={}; (pp.items||[]).forEach(it=>{ if(this.num(it.qty)>0) sel[it.no]=true; }); setG({sel}); },
         noneOn:()=>setG({sel:{}}),
+        /* เลือกเฉพาะรายการที่มีปริมาณส่งงานในงวดที่เลือกอยู่ */
+        hasRound: pg.di>=0 && !!pdl[pg.di],
+        roundLabel: (pg.di>=0 && pdl[pg.di])? this.dvRoundLabel(pdl[pg.di],pg.di) : '',
+        roundOn:()=>{ const di=(this.state.pptDlg||pg).di; const sel={};
+          (pp.items||[]).forEach(it=>{ if(this.num(it.qty)>0 && this.dvQty(pp,di,it.no)>0) sel[it.no]=true; });
+          setG({sel}); },
         photoBefore:!!pg.photoBefore, togglePhotoBefore:()=>setG({photoBefore:!pg.photoBefore}),
         photoItem:!!pg.photoItem, togglePhotoItem:()=>setG({photoItem:!pg.photoItem}),
         photoDone:!!pg.photoDone, togglePhotoDone:()=>setG({photoDone:!pg.photoDone}),
@@ -8777,8 +8792,21 @@ class Component extends DCLogic {
           this.askConfirm('งวดนี้กรอกปริมาณไว้บางรายการแล้ว — แทนที่ด้วยปริมาณเท่าสัญญาทุกรายการ?', apply); }
         else apply();
       };
+      /* งวดที่เลือกแก้ไข (เก็บในหน้าจอเท่านั้น ไม่บันทึกลงข้อมูล): ยังไม่เคยเลือก = งวดล่าสุด
+         ตารางด้านล่างแก้ปริมาณได้เฉพาะคอลัมน์ของงวดนี้ */
+      const dvPicks=this.state.dvPick||{};
+      const dvAct=(dvPicks[p.id]>=0 && dvPicks[p.id]<dls.length)? dvPicks[p.id] : dls.length-1;
+      const setPick=(i)=>this.setState({dvPick:Object.assign({},this.state.dvPick||{},{[p.id]:i})});
       out.dvRounds=dls.map((d,i)=>({
         title:this.dvRoundLabel(d,i),
+        pick:()=>setPick(i), pickTxt: i===dvAct? 'เลือกแล้ว' : 'เลือก',
+        pickBg: i===dvAct? 'var(--color-accent-700)' : 'var(--color-neutral-100)',
+        pickFg: i===dvAct? '#fff' : 'var(--color-accent-700)',
+        pickBd: i===dvAct? 'var(--color-accent-700)' : 'var(--color-accent-300)',
+        pickFw: i===dvAct? '700' : '500',
+        cardBd: i===dvAct? '2px solid var(--color-accent-700)' : '1px solid var(--color-divider)',
+        headBg: i===dvAct? 'var(--color-accent-700)' : 'transparent',
+        headFg: i===dvAct? '#fff' : 'inherit',
         no:d.no===undefined?String(i+1):d.no, setNo:setDv(i,'no'),
         final:!!d.final, setFinal:setDv(i,'final'),
         full:!!d.full, setFull:setFull(i),
@@ -8790,12 +8818,17 @@ class Component extends DCLogic {
         note:d.note||'', setNote:setDv(i,'note'),
         moneyTxt:this.cmoney(this.dvMoney(p,i)),
         remove:()=>this.askConfirm('\u0e25\u0e1a '+this.dvRoundLabel(d,i)+' ?', ()=>{
-          const np=JSON.parse(JSON.stringify(p)); np.deliveries.splice(i,1); this.writeProject(np); })
+          const np=JSON.parse(JSON.stringify(p)); np.deliveries.splice(i,1);
+          /* ลบงวดก่อนหน้างวดที่เลือก: เลื่อนตัวชี้ตาม ลบงวดที่เลือกเอง: กลับไปใช้งวดล่าสุด */
+          const cur=(this.state.dvPick||{})[p.id];
+          if(cur!==undefined) setPick(cur===i? -1 : (cur>i? cur-1 : cur));
+          this.writeProject(np); })
       }));
       out.addDelivery=()=>{
         const np=JSON.parse(JSON.stringify(p));
         np.deliveries=np.deliveries||[];
         np.deliveries.push({no:String(np.deliveries.length+1),final:false,dDate:'',iDate:'',retain:'',advance:'',fineDays:'',note:'',q:{}});
+        setPick(np.deliveries.length-1);   /* งวดที่เพิ่งเพิ่มเป็นงวดที่แก้ไขอยู่ */
         this.writeProject(np);
       };
       const dvItemList=(p.items||[]).filter(it=>this.num(it.qty)>0);
@@ -8803,7 +8836,7 @@ class Component extends DCLogic {
       const dvIsHead=(it)=>!this.num(it.qty) && !this.num(it.price) && String(it.name||'').trim()!=='';
       out.dvItems=(p.items||[]).filter(it=>this.num(it.qty)>0 || dvIsHead(it)).map(it=>{
         if(dvIsHead(it)) return { no:it.no, name:it.name||'', unit:'-', priceTxt:'-', qtyTxt:'-', tuaTxt:'-',
-          sumTxt:'-', leftTxt:'-', moneyTxt:'-', sumFg:'var(--color-neutral-600)', sumBg:'transparent',
+          sumTxt:'-', leftTxt:'-', contractTxt:'-', moneyTxt:'-', sumFg:'var(--color-neutral-600)', sumBg:'transparent',
           cells:dls.map(()=>({head:true, edit:false, bg:'transparent'})) };
         const q=this.num(it.qty), pr=this.num(it.price), tg=this.dvTarget(it);
         const cum=dls.reduce((t,d,i)=>t+this.dvQty(p,i,it.no),0);
@@ -8812,13 +8845,20 @@ class Component extends DCLogic {
         return {
           no:it.no, name:it.name||'', unit:this.workUnit(it.unit), priceTxt:this.cmoney(pr),
           qtyTxt:this.n(q,3), tuaTxt:this.num(it.tua)? this.n(this.num(it.tua),3):'-',
-          sumTxt:this.n(cum,3), leftTxt:this.n(Math.round((tg-cum)*1000)/1000,3), moneyTxt:this.cmoney(this.dvAmt(it,cum)),
+          sumTxt:this.n(cum,3), leftTxt:this.n(Math.round((tg-cum)*1000)/1000,3), contractTxt:this.cmoney(Math.round(q*pr*100)/100), moneyTxt:this.cmoney(this.dvAmt(it,cum)),
           sumFg: over? 'var(--c-late)':'var(--color-text)',
           sumBg: over? 'var(--c-late-bg)':'transparent',
           cells:dls.map((d,i)=>({
             head:false, edit:true,
-            value:(d.q&&d.q[it.no]!==undefined)? d.q[it.no] : '',
-            bg: over? 'var(--c-late-bg)':'transparent',
+            locked: out.dvReadOnly || i!==dvAct,
+            fg: i===dvAct? 'inherit' : 'var(--color-neutral-700)',
+            /* แสดงทศนิยม 3 ตำแหน่ง (10,800.000) ยกเว้นช่องที่กำลังพิมพ์ ให้แสดงค่าดิบเพื่อแก้ง่าย — ค่าที่บันทึกไม่เปลี่ยน */
+            value:(()=>{ const raw=(d.q&&d.q[it.no]!==undefined)? d.q[it.no] : '';
+              if(this.state.dvFocus===p.id+'|'+i+'|'+it.no || String(raw).trim()==='') return raw;
+              return this.n(this.num(raw),3); })(),
+            onFocus:(e)=>{ const el=e.target; this.setState({dvFocus:p.id+'|'+i+'|'+it.no}, ()=>{ try{ el.select(); }catch(err){} }); },
+            onBlur:()=>{ if(this.state.dvFocus===p.id+'|'+i+'|'+it.no) this.setState({dvFocus:null}); },
+            bg: over? 'var(--c-late-bg)' : (i===dvAct? 'var(--color-accent-100)' : 'transparent'),
             onChange:(e)=>{
               const np=JSON.parse(JSON.stringify(p));
               np.deliveries=np.deliveries||[];
@@ -8835,6 +8875,8 @@ class Component extends DCLogic {
       });
       out.dvMoneyRow=dls.map((d,i)=>({txt:this.cmoney(this.dvMoney(p,i))}));
       out.dvGrandTxt=this.cmoney(dls.reduce((t,d,i)=>t+this.dvMoney(p,i),0));
+      /* ยอดรวมเป็นเงินตามสัญญา (ปริมาณตามสัญญา × หน่วยละ ของทุกรายการ) */
+      out.dvContractTxt=this.cmoney(Math.round(dvItemList.reduce((t,it)=>t+Math.round(this.num(it.qty)*this.num(it.price)*100)/100,0)*100)/100);
       out.dvOverWarn=dvItemList.some(it=>dls.reduce((t,d,i)=>t+this.dvQty(p,i,it.no),0) > this.dvTarget(it)+1e-9);
 
       out.itemRows=(p.items||[]).map((it,i)=>{
