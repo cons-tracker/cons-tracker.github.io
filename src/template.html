@@ -1750,6 +1750,15 @@ svg.leaflet-image-layer.leaflet-interactive path {
   .ct-link:hover{text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:3px}
   .ct-link:hover::before{transform:translateX(2px)}
   @media print{ .ct-link::before{content:none} }
+  /* ภาพตัวอย่างหลังส่งออก PNG บนมือถือ */
+  .img-prev{position:fixed;inset:0;z-index:30000;display:flex;flex-direction:column;background:var(--color-bg);padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom)}
+  .img-prev-bar{flex:none;display:flex;align-items:center;gap:8px;padding:10px 12px;background:var(--color-neutral-100);border-bottom:1px solid var(--color-divider)}
+  .img-prev-title{flex:1;min-width:0;font-weight:700;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .img-prev-bar .btn{white-space:nowrap;font-size:13px;cursor:pointer}
+  .img-prev-hint{flex:none;padding:6px 12px;font-size:12px;color:var(--color-neutral-800);background:var(--color-neutral-200);border-bottom:1px solid var(--color-divider)}
+  .img-prev-body{flex:1;min-height:0;overflow:auto;-webkit-overflow-scrolling:touch;padding:12px;display:flex;flex-direction:column;gap:12px;align-items:center}
+  .img-prev-body img{display:block;width:100%;max-width:1100px;height:auto;background:#fff;border:1px solid var(--color-divider);border-radius:6px;-webkit-touch-callout:default}
+  .img-prev-wait{margin:auto;text-align:center;color:var(--color-neutral-800);font-size:13px}
 </style>
 </helmet>
 <div data-print-root="1" style="min-height:100vh;padding:0 0 60px">
@@ -5204,19 +5213,66 @@ class Component extends DCLogic {
     const lib=window.htmlToImage;
     const sheets=Array.from(document.querySelectorAll('.printsheet'));
     if(!lib || !sheets.length){ this.showNotice('ไม่สามารถสร้างไฟล์ภาพได้ กรุณาใช้ PDF'); return; }
-    const dpr=4;
-    const opts=(el)=>{ const r=el.getBoundingClientRect(); return {pixelRatio:dpr,
-      width:Math.ceil(r.width),height:Math.ceil(r.height),backgroundColor:'#ffffff',
+    /* มือถือ/แท็บเล็ต: canvas ของ iOS จำกัดพื้นที่ราว 16.7 ล้านพิกเซล ถ้าเกินจะได้ภาพเปล่า จึงลดความละเอียดให้ไม่เกิน 12 ล้านพิกเซล
+       และการสั่งดาวน์โหลดไฟล์ตรง ๆ มักไม่ทำงาน จึงแสดงภาพตัวอย่างในแอปให้กดบันทึก/แชร์เองแทน */
+    const touch=this.isTouchDevice();
+    const opts=(el)=>{ const r=el.getBoundingClientRect(), w=Math.ceil(r.width), h=Math.ceil(r.height);
+      const dpr=touch? Math.max(1, Math.min(4, Math.sqrt(12000000/Math.max(1,w*h)))) : 4;
+      return {pixelRatio:dpr,width:w,height:h,backgroundColor:'#ffffff',
       style:{transform:'none',boxShadow:'none',WebkitFontSmoothing:'antialiased',textRendering:'geometricPrecision'}}; };
     /* หน้าภาพรวม: ขยายแผ่นชั่วคราวขณะจับภาพ ไม่ให้จอแคบตัดคอลัมน์ขวาของตาราง */
     const wide=(el,on)=>{ if(el.classList.contains('hm-print')) el.classList.toggle('hm-exporting',on); };
+    const nameOf=(i)=>base+(sheets.length>1?'-'+(i+1):'')+'.png';
     const ready=(document.fonts&&document.fonts.ready)?document.fonts.ready:Promise.resolve();
+    if(touch){
+      const pv=this.imgPreviewOpen(), files=[];
+      const toBlob=(el)=>lib.toBlob? lib.toBlob(el,opts(el)) : lib.toPng(el,opts(el)).then(u=>fetch(u).then(r=>r.blob()));
+      ready.then(()=>sheets.reduce((chain,el,i)=>chain
+        .then(()=>{ wide(el,true); return lib.toPng(el,opts(el)); })        // warm-up pass: caches fonts/images
+        .then(()=>toBlob(el))
+        .then(blob=>{ wide(el,false); if(!blob) throw new Error('empty'); files.push({blob, name:nameOf(i)}); }),
+        Promise.resolve()))
+        .then(()=>pv.show(files))
+        .catch(()=>{ sheets.forEach(el=>wide(el,false)); pv.close(); this.showNotice('สร้างไฟล์ภาพไม่สำเร็จ กรุณาใช้ PDF'); });
+      return;
+    }
     ready.then(()=>sheets.reduce((chain,el,i)=>chain
       .then(()=>{ wide(el,true); return lib.toPng(el,opts(el)); })          // warm-up pass: caches fonts/images
       .then(()=>lib.toPng(el,opts(el)))
-      .then(url=>{ wide(el,false); const a=document.createElement('a'); a.href=url; a.download=base+(sheets.length>1?'-'+(i+1):'')+'.png'; a.click(); }),
+      .then(url=>{ wide(el,false); const a=document.createElement('a'); a.href=url; a.download=nameOf(i); a.click(); }),
       Promise.resolve())).catch(()=>{ sheets.forEach(el=>wide(el,false)); this.showNotice('สร้างไฟล์ภาพไม่สำเร็จ กรุณาใช้ PDF'); });
   };
+  isTouchDevice(){
+    try{ return !!((window.matchMedia && window.matchMedia('(pointer:coarse)').matches)
+      || (navigator.maxTouchPoints>0 && /Android|iPhone|iPad|iPod/i.test(navigator.userAgent))); }catch(e){ return false; }
+  }
+  /* ภาพตัวอย่างหลังส่งออก PNG บนมือถือ: เปิดทับทั้งจอระหว่างสร้างภาพ แล้วแสดงรูปพร้อมปุ่มบันทึก/แชร์ */
+  imgPreviewOpen(){
+    const ov=document.createElement('div'); ov.className='noprint img-prev';
+    ov.innerHTML='<div class="img-prev-bar"><span class="img-prev-title">กำลังสร้างภาพ…</span>'
+      +'<button type="button" class="btn btn-primary img-prev-save" style="display:none"></button>'
+      +'<button type="button" class="btn btn-secondary img-prev-close">ปิด</button></div>'
+      +'<div class="img-prev-hint" style="display:none">แตะค้างที่รูปเพื่อบันทึกลงเครื่องได้เช่นกัน</div>'
+      +'<div class="img-prev-body"><div class="img-prev-wait">กรุณารอสักครู่ ภาพขนาดใหญ่อาจใช้เวลาหลายวินาที</div></div>';
+    document.body.appendChild(ov);
+    let urls=[];
+    const close=()=>{ urls.forEach(u=>{ try{ URL.revokeObjectURL(u); }catch(e){} }); urls=[]; if(ov.parentNode) ov.parentNode.removeChild(ov); };
+    ov.querySelector('.img-prev-close').onclick=close;
+    const show=(items)=>{
+      const body=ov.querySelector('.img-prev-body'); body.innerHTML='';
+      const files=items.map(it=>{ try{ return new File([it.blob], it.name, {type:'image/png'}); }catch(e){ return null; } }).filter(Boolean);
+      items.forEach(it=>{ const u=URL.createObjectURL(it.blob); urls.push(u);
+        const img=document.createElement('img'); img.src=u; img.alt=it.name; body.appendChild(img); });
+      ov.querySelector('.img-prev-title').textContent='ภาพตัวอย่าง'+(items.length>1? ' ('+items.length+' ภาพ)' : '');
+      ov.querySelector('.img-prev-hint').style.display='';
+      const btn=ov.querySelector('.img-prev-save'); btn.style.display='';
+      const canShare=files.length===items.length && navigator.canShare && navigator.share && (()=>{ try{ return navigator.canShare({files}); }catch(e){ return false; } })();
+      const download=()=>items.forEach((it,i)=>{ const a=document.createElement('a'); a.href=urls[i]; a.download=it.name; document.body.appendChild(a); a.click(); a.remove(); });
+      btn.textContent=canShare? 'บันทึก / แชร์' : 'ดาวน์โหลด';
+      btn.onclick=canShare? ()=>{ navigator.share({files}).catch(err=>{ if(!err || err.name!=='AbortError') download(); }); } : download;
+    };
+    return {show, close};
+  }
 
   ROLES={ admin:{name:'Admin', th:'ผู้ดูแลระบบ', perm:'จัดการผู้ใช้งาน และแก้ไขข้อมูลได้ทุกส่วน'},
           clerk:{name:'Clerk', th:'เสมียน', perm:'เพิ่ม/แก้ไขสัญญา รายการงาน แผนงาน และกรอกผลงานจริง'},
@@ -5528,9 +5584,25 @@ class Component extends DCLogic {
   }
   /* ส่งออก PDF หน้าภาพรวม: บังคับเรียงตามแขวง → เลขสัญญา (แต่ละแขวงขึ้นหน้าใหม่) ระหว่างพิมพ์ แล้วคืนการเรียงเดิมของจอ */
   exportHomePdf = () => {
-    const done=()=>{ window.removeEventListener('afterprint',done); this.unfitHomeDash(); if(this.state.hPrintDist) this.setState({hPrintDist:false}); };
+    /* คอมพิวเตอร์: window.print() ค้างรอจนปิดหน้าต่างพิมพ์ จึงคืนหน้าจอได้ทันทีที่คำสั่งจบ
+       มือถือ (Android/iOS): window.print() คืนค่าทันทีแล้วระบบค่อยสร้างภาพตัวอย่างทีหลัง ถ้าคืนหน้าจอตอนนั้น
+       เนื้อหาจะเปลี่ยนกลางคันจนภาพตัวอย่างไม่ขึ้น จึงคงโหมดพิมพ์ไว้จนผู้ใช้กลับมาที่หน้าแอป */
+    let finished=false, t0=0;
+    const evs=['pointerdown','keydown','focus'];
+    const done=()=>{ if(finished) return; finished=true;
+      window.removeEventListener('afterprint',back); evs.forEach(e=>window.removeEventListener(e,back,true));
+      document.removeEventListener('visibilitychange',vis);
+      this.unfitHomeDash(); if(this.state.hPrintDist) this.setState({hPrintDist:false}); };
+    const back=()=>{ if(Date.now()-t0>1200) done(); };   /* บางเครื่องยิง afterprint ทันทีที่เปิดหน้าพิมพ์ จึงไม่นับช่วงแรก */
+    const vis=()=>{ if(document.visibilityState==='visible') back(); };
     this.setState({hPrintDist:true}, ()=>{ this.syncPage();
-      setTimeout(()=>{ this.fitHomeDash(); window.addEventListener('afterprint',done); window.print(); setTimeout(done,0); },80); });
+      setTimeout(()=>{ this.fitHomeDash(); t0=Date.now();
+        window.addEventListener('afterprint',back);
+        window.print();
+        if(Date.now()-t0>400){ setTimeout(done,0); return; }
+        evs.forEach(e=>window.addEventListener(e,back,true));
+        document.addEventListener('visibilitychange',vis);
+      },80); });
   };
   /* สรุปแดชบอร์ดต้องอยู่ครบในแผ่นแรก (A4 แนวนอน พื้นที่ 1077 x 748 px): วัดความสูงในโหมด hm-pdf
      ถ้าเกินจึงย่อทั้งส่วนด้วย zoom และขยายความกว้างชดเชย ให้ยังเต็มความกว้างกระดาษ */
