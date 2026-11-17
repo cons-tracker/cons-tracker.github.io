@@ -2664,6 +2664,7 @@ svg.leaflet-image-layer.leaflet-interactive path {
             <button sc-camel-on-click="{{ exportScheduleAll }}" style="background:transparent;border:0;border-radius:var(--radius-sm);padding:8px 12px;font-size:13px;font-family:var(--font-body);color:var(--color-text);text-align:left;cursor:pointer" style-hover="background:var(--color-accent-100)">Schedule ทุกสัปดาห์ (A4 นอน)</button>
             <button sc-camel-on-click="{{ exportCurrent }}" style="background:transparent;border:0;border-radius:var(--radius-sm);padding:8px 12px;font-size:13px;font-family:var(--font-body);color:var(--color-text);cursor:pointer;text-align:left;white-space:nowrap" style-hover="background:var(--color-neutral-200)">รายงานประจำสัปดาห์</button>
             <button sc-camel-on-click="{{ exportItemsXlsx }}" style="background:transparent;border:0;border-radius:var(--radius-sm);padding:8px 12px;font-size:13px;font-family:var(--font-body);color:var(--color-text);cursor:pointer;text-align:left;white-space:nowrap" style-hover="background:var(--color-neutral-200)">รายการก่อสร้าง (Excel)</button>
+            <button sc-camel-on-click="{{ payExport }}" style="background:transparent;border:0;border-radius:var(--radius-sm);padding:8px 12px;font-size:13px;font-family:var(--font-body);color:var(--color-text);cursor:pointer;text-align:left;white-space:nowrap" style-hover="background:var(--color-neutral-200)">Payment ส่งงาน (Excel)</button>
             <button sc-camel-on-click="{{ exportTuaDoc }}" style="background:transparent;border:0;border-radius:var(--radius-sm);padding:8px 12px;font-size:13px;font-family:var(--font-body);color:var(--color-text);cursor:pointer;text-align:left;white-space:nowrap" style-hover="background:var(--color-neutral-200)">นำเสนอถัวจ่าย (Word)</button>
             <div class="lbl" style="font-size:11px;letter-spacing:.05em;padding:8px 12px 3px">งานนำเสนอ</div>
             <button sc-camel-on-click="{{ pptxExport }}" style="background:transparent;border:0;border-radius:var(--radius-sm);padding:8px 12px 8px 22px;font-size:13px;font-family:var(--font-body);color:var(--color-text);text-align:left;cursor:pointer" style-hover="background:var(--color-accent-100)">งานนำเสนอตรวจรับงาน (.pptx)</button>
@@ -2883,13 +2884,19 @@ svg.leaflet-image-layer.leaflet-interactive path {
                 <input type="date" value="{{ r.iDate }}" sc-camel-on-change="{{ r.setIDate }}" disabled="{{ dvReadOnly }}" style="border:1px solid var(--color-divider);border-radius:999px;padding:5px 11px;font-size:12px;background:var(--color-neutral-100);color:inherit">
               </label>
               <label style="display:flex;flex-direction:column;gap:2px">
-                <span class="lbl" style="font-size:10.5px">หักประกันผลงาน %</span>
-                <input sc-camel-input-mode="decimal" value="{{ r.retain }}" sc-camel-on-change="{{ r.setRetain }}" disabled="{{ dvReadOnly }}" placeholder="-" style="border:1px solid var(--color-divider);border-radius:999px;padding:5px 11px;font-size:12px;background:var(--color-neutral-100);color:inherit">
+                <span class="lbl" style="font-size:10.5px">{{ r.retainLbl }}</span>
+                <input sc-camel-input-mode="decimal" value="{{ r.retain }}" sc-camel-on-change="{{ r.setRetain }}" disabled="{{ r.retainLock }}" placeholder="-" style="border:1px solid var(--color-divider);border-radius:999px;padding:5px 11px;font-size:12px;background:var(--color-neutral-100);color:inherit">
               </label>
-              <label style="display:flex;flex-direction:column;gap:2px">
-                <span class="lbl" style="font-size:10.5px">หักจ่ายล่วงหน้า %</span>
-                <input sc-camel-input-mode="decimal" value="{{ r.advance }}" sc-camel-on-change="{{ r.setAdvance }}" disabled="{{ dvReadOnly }}" placeholder="-" style="border:1px solid var(--color-divider);border-radius:999px;padding:5px 11px;font-size:12px;background:var(--color-neutral-100);color:inherit">
-              </label>
+              <div style="display:flex;flex-direction:column;gap:2px">
+                <span class="lbl" style="font-size:10.5px">หักจ่ายล่วงหน้า</span>
+                <div style="display:flex;align-items:center;gap:6px">
+                  <label style="display:flex;align-items:center;gap:5px;font-size:12px;white-space:nowrap">
+                    <input type="checkbox" checked="{{ r.advOn }}" sc-camel-on-change="{{ r.setAdvOn }}" disabled="{{ r.advLock }}" style="width:15px;height:15px;accent-color:var(--color-accent)">
+                    <span class="val" style="font-size:12px">{{ r.advPct }}</span>
+                  </label>
+                  <span style="border:1px solid var(--color-divider);border-radius:999px;padding:5px 11px;font-size:11px;background:var(--color-neutral-100);white-space:nowrap;color:var(--color-neutral-700)">{{ r.advNote }}</span>
+                </div>
+              </div>
             </div>
             <div style="display:flex;flex-wrap:wrap;align-items:center;gap:6px 14px">
               <label style="display:flex;align-items:center;gap:7px;font-size:12px">
@@ -4020,6 +4027,57 @@ svg.leaflet-image-layer.leaflet-interactive path {
       <span>{{ roleShort }}</span>
     </button>
   </div>
+</sc-if>
+
+<!-- ส่งออก Payment (Excel): เลือกงวดส่งงาน และรายการที่ขอเบิกในงวดนั้น -->
+<sc-if value="{{ payOpen }}" hint-placeholder-val="{{ false }}">
+<div class="noprint" style="position:fixed;inset:0;background:color-mix(in srgb, var(--color-neutral-900) 50%, transparent);z-index:1200;display:flex;align-items:flex-start;justify-content:center;padding:clamp(10px,3vw,26px) clamp(8px,3vw,16px);overflow:auto">
+  <div style="background:var(--color-neutral-100);border-radius:var(--radius-lg);width:100%;max-width:640px;box-shadow:var(--shadow-lg);display:flex;flex-direction:column">
+    <div style="display:flex;align-items:center;gap:10px;padding:14px 18px;border-bottom:1px solid var(--color-divider)">
+      <div class="hd" style="font-size:15px">Payment ส่งงาน (Excel)</div>
+      <button sc-camel-on-click="{{ pay.close }}" style="margin-left:auto;background:transparent;border:1px solid var(--color-divider);border-radius:999px;padding:5px 13px;font-family:var(--font-body);font-size:12.5px;color:var(--color-text);cursor:pointer">ปิด</button>
+    </div>
+    <div style="padding:16px 18px;display:flex;flex-direction:column;gap:16px">
+      <div>
+        <div class="hd" style="font-size:12.5px;margin-bottom:7px">งวดส่งงาน</div>
+        <sc-if value="{{ pay.noRounds }}" hint-placeholder-val="{{ false }}">
+          <div class="lbl" style="font-size:11.5px;font-weight:400;line-height:1.6">ยังไม่มีงวดส่งงาน — เพิ่มงวดและกรอกปริมาณที่แท็บ “ส่งงาน / งวดงาน” ก่อน</div>
+        </sc-if>
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          <sc-for list="{{ pay.rounds }}" as="r" hint-placeholder-count="2">
+            <button sc-camel-on-click="{{ r.pick }}" style="white-space:nowrap;border-radius:999px;padding:6px 14px;font-size:12.5px;font-family:var(--font-body);cursor:pointer;border:1px solid {{ r.bd }};background:{{ r.bg }};color:{{ r.fg }}">{{ r.label }}</button>
+          </sc-for>
+        </div>
+      </div>
+      <div>
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:7px">
+          <div class="hd" style="font-size:12.5px">รายการที่ขอเบิกในงวดนี้</div>
+          <span class="lbl" style="font-size:11px;font-weight:400">เลือกแล้ว {{ pay.selCount }} รายการ · เป็นเงิน {{ pay.amtTxt }} บาท</span>
+          <span style="margin-left:auto"></span>
+          <sc-if value="{{ pay.hasRound }}" hint-placeholder-val="{{ true }}">
+            <button sc-camel-on-click="{{ pay.roundOn }}" style="white-space:nowrap;background:var(--color-accent-100);color:var(--color-accent-700);border:1px solid var(--color-accent-300);border-radius:999px;padding:4px 11px;font-family:var(--font-body);font-size:11.5px;cursor:pointer">เลือกตาม{{ pay.roundLabel }}</button>
+          </sc-if>
+          <button sc-camel-on-click="{{ pay.noneOn }}" style="white-space:nowrap;background:transparent;color:var(--color-neutral-700);border:1px solid var(--color-divider);border-radius:999px;padding:4px 11px;font-family:var(--font-body);font-size:11.5px;cursor:pointer">ล้าง</button>
+        </div>
+        <div style="max-height:260px;overflow:auto;border:1px solid var(--color-divider);border-radius:var(--radius-md);padding:8px 10px;display:flex;flex-direction:column;gap:5px">
+          <sc-for list="{{ pay.items }}" as="i" hint-placeholder-count="5">
+            <label style="display:flex;gap:8px;align-items:flex-start;font-size:12px;line-height:1.45;opacity:{{ i.op }}">
+              <input type="checkbox" checked="{{ i.on }}" disabled="{{ i.off }}" sc-camel-on-change="{{ i.toggle }}" style="margin-top:2px;width:15px;height:15px;accent-color:var(--color-accent);flex:0 0 auto">
+              <span class="lbl" style="font-weight:400;flex:0 0 auto;min-width:26px">{{ i.no }}</span>
+              <span style="flex:1 1 auto;overflow-wrap:anywhere">{{ i.name }}</span>
+              <span class="val" style="flex:0 0 auto;font-variant-numeric:tabular-nums;white-space:nowrap">{{ i.qtyTxt }}</span>
+            </label>
+          </sc-for>
+        </div>
+        <div class="lbl" style="font-size:11px;font-weight:400;line-height:1.6;margin-top:6px">รายการที่ไม่ได้กรอกปริมาณในงวดนี้เลือกไม่ได้ · ไฟล์มี 4 sheet: สรุปค่างาน, 01_รับรองผลงาน, 02_บัญชีค่างาน, 03_แนบ2 (แนบ 2 ทำเฉพาะรายการที่เลือก)</div>
+      </div>
+    </div>
+    <div style="padding:12px 18px 16px;display:flex;gap:8px;justify-content:flex-end;border-top:1px solid var(--color-divider)">
+      <button sc-camel-on-click="{{ pay.close }}" class="btn btn-secondary" style="white-space:nowrap;font-size:13px;cursor:pointer">ยกเลิก</button>
+      <button sc-camel-on-click="{{ pay.build }}" disabled="{{ pay.cantBuild }}" class="btn btn-primary" style="white-space:nowrap;font-size:13px;cursor:pointer">สร้างไฟล์ Excel</button>
+    </div>
+  </div>
+</div>
 </sc-if>
 
 <sc-if value="{{ pptOpen }}" hint-placeholder-val="{{ false }}">
@@ -6450,6 +6508,562 @@ class Component extends DCLogic {
     document.body.appendChild(a); a.click();
     setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); },1500);
   };
+  /* ===== Payment ส่งงาน (.xlsx) ตามแบบไฟล์ PAYMENT ของหน่วยงาน: 4 sheet
+     สรุปค่างาน · 01_รับรองผลงาน (พ.1-37) · 02_บัญชีค่างาน (แนบ 1) · 03_แนบ2 (รายการละ 1 หน้า)
+     ตัวเลขมาจากแท็บ "ส่งงาน / งวดงาน" คิดค่างานตามเงื่อนไข Overrun (dvAmt) ตัวอักษร TH Sarabun New 16 ทั้งไฟล์ ===== */
+  payExport = () => {
+    this.setState({exportMenu:false});
+    const p=this.byId(this.state.pid); if(!p) return;
+    const dl=this.dvList(p);
+    if(!dl.length){ this.showNotice('ยังไม่มีงวดส่งงาน — เพิ่มงวดและกรอกปริมาณที่แท็บ “ส่งงาน / งวดงาน” ก่อน'); return; }
+    const di=dl.length-1;
+    this.setState({payDlg:{pid:p.id, di, sel:this.payRoundSel(p,di)}});
+  };
+  /* รายการที่มีปริมาณส่งงานในงวด di (ค่าเริ่มต้นของการเลือก) */
+  payRoundSel(p,di){ const sel={}; (p.items||[]).forEach(it=>{ if(this.num(it.qty)>0 && di>=0 && this.dvQty(p,di,it.no)>0) sel[it.no]=true; }); return sel; }
+  /* จำนวนเงินเป็นตัวอักษรไทย แบบฟังก์ชัน BAHTTEXT ของ Excel เช่น 6245764.87 → หกล้านสองแสนสี่หมื่นห้าพันเจ็ดร้อยหกสิบสี่บาทแปดสิบเจ็ดสตางค์ */
+  bahtText(v){
+    const n=Math.round(Math.abs(Number(v)||0)*100), baht=Math.floor(n/100), sat=n%100;
+    const NUM=['','หนึ่ง','สอง','สาม','สี่','ห้า','หก','เจ็ด','แปด','เก้า'], POS=['','สิบ','ร้อย','พัน','หมื่น','แสน'];
+    const six=(x,lead)=>{ const s=String(x); let out='';
+      for(let i=0;i<s.length;i++){ const d=+s[i], pos=s.length-1-i; if(!d) continue;
+        if(pos===1 && d===1) out+='สิบ';
+        else if(pos===1 && d===2) out+='ยี่สิบ';
+        else if(pos===0 && d===1 && (s.length>1 || lead)) out+='เอ็ด';
+        else out+=NUM[d]+POS[pos]; }
+      return out; };
+    const read=(x)=>{ if(x>=1e6){ const hi=Math.floor(x/1e6), lo=x%1e6; return read(hi)+'ล้าน'+(lo? six(lo,true) : ''); } return six(x,false); };
+    if(!baht && !sat) return 'ศูนย์บาทถ้วน';
+    return (v<0?'ลบ':'')+(baht? read(baht)+'บาท' : '')+(sat? read(sat)+'สตางค์' : 'ถ้วน');
+  }
+  async buildPaymentXlsx(){
+    const g=this.state.payDlg; if(!g) return;
+    const p=this.byId(g.pid); if(!p) return;
+    const dl=this.dvList(p), di=g.di, d=dl[di]; if(!d){ this.showNotice('กรุณาเลือกงวดส่งงาน'); return; }
+    /* ตราครุฑหัวใบรับรองผลการปฏิบัติงาน (รูปเดียวกับไฟล์ Word) — โหลดไม่ได้ก็สร้างไฟล์ต่อโดยไม่มีตรา */
+    const garuda=await fetch((window.__resources&&window.__resources.garuda)||'garuda.png')
+      .then(r=>r.ok? r.arrayBuffer() : null).then(ab=>ab? new Uint8Array(ab) : null).catch(()=>null);
+    const sel=g.sel||{};
+    const m2=(v)=>Math.round(v*100)/100, q3=(v)=>Math.round(v*1000)/1000;
+    const clean=(s)=>String(s===undefined||s===null?'':s).replace(/\s+/g,' ').trim();
+    const unitOf=(it)=>this.workUnit(it.unit);
+    /* ---------- ข้อมูลหัวเอกสาร ---------- */
+    const D=(x)=>x? this.cdate(new Date(x+'T00:00:00')) : '';
+    const shortTxt=String(p.contractNo||'').replace(/^\s*สัญญาเลขที่\s*/,'').replace(/\s*ลงวันที่[\s\S]*$/,'').replace(/\s+/g,'');
+    const signTxt=p.contractDate? D(p.contractDate) : ((String(p.contractNo||'').match(/ลงวันที่\s*(.+)$/)||[])[1]||'').trim();
+    const contractLine='สัญญาเลขที่ '+shortTxt+(signTxt? '  ลงวันที่ '+signTxt : '');
+    const headLines=[contractLine, p.program1, p.program2, p.program3, p.projectName, p.location].map(clean).filter(Boolean);
+    const roundNo=String((d&&d.no)||(di+1)).trim(), final=!!d.final;
+    const mDate=d.dDate? new Date(d.dDate+'T00:00:00') : new Date();
+    const monthTxt=this.MONTHS[mDate.getMonth()], yearTxt=String(mDate.getFullYear()+543);
+    const sendLine=(pre)=>pre+'ส่งมอบงานครั้งที่ '+roundNo+(final? ' (งวดสุดท้าย)' : '')+'  ประจำเดือน  '+monthTxt+' พ.ศ.  '+yearTxt;
+    const contractor=clean(p.contractor)||'....................................', rep=clean(p.contractorRep);
+    const iDateTxt=(()=>{ if(!d.iDate) return 'ตรวจรับเมื่อวันที่ …......... เดือน .………...…..……..…...... พ.ศ. …................';
+      const x=new Date(d.iDate+'T00:00:00'); return 'ตรวจรับเมื่อวันที่ '+x.getDate()+' เดือน '+this.MONTHS[x.getMonth()]+' พ.ศ. '+(x.getFullYear()+543); })();
+    /* ---------- ตัวเลขแต่ละรายการ ---------- */
+    const isHead=(it)=>!this.num(it.qty) && !this.num(it.price) && clean(it.name)!=='';
+    const rowsAll=(p.items||[]).filter(it=>this.num(it.qty)>0 || isHead(it)).map(it=>{
+      if(isHead(it)) return {it, head:true, no:String(it.no||'').trim(), name:clean(it.name)};
+      const q=this.num(it.qty), pr=this.num(it.price), on=!!sel[it.no] && this.dvQty(p,di,it.no)>0;
+      const prev=di>0? q3(this.dvCum(p,di-1,it.no)) : 0, now=on? q3(this.dvQty(p,di,it.no)) : 0, cum=q3(prev+now);
+      const prevM=this.dvAmt(it,prev), cumM=this.dvAmt(it,cum), nowM=m2(cumM-prevM);
+      const tg=this.dvTarget(it), field=q3(tg), fieldM=this.dvAmt(it,field);
+      const hasTua=it.tua!==undefined && it.tua!==null && String(it.tua).trim()!=='';
+      const times=dl.slice(0,di).filter((x,j)=>this.dvQty(p,j,it.no)>0).length;
+      return {it, head:false, no:String(it.no||'').trim(), name:clean(it.name), unit:unitOf(it), q, pr, cM:m2(q*pr),
+        prev, now, cum, prevM, nowM, cumM, field, fieldM, hasTua, tua:hasTua? q3(this.num(it.tua)) : 0, on, times};
+    });
+    const items=rowsAll.filter(r=>!r.head);
+    const picked=items.filter(r=>r.on && r.now>0);
+    if(!picked.length){ this.showNotice('ยังไม่ได้เลือกรายการที่ขอเบิกในงวดนี้'); return; }
+    const amt=m2(picked.reduce((t,r)=>t+r.nowM,0));
+    const fd=this.num(d.fineDays), fpd=this.num(p.finePerDay);
+    /* งวดสุดท้าย: คืนเงินประกันผลงานที่หักไว้ในงวดก่อน ๆ (ตามสูตรในไฟล์ต้นแบบ: คงเป็นเงิน = รวม + คืนประกัน − ล่วงหน้า − ค่าปรับ) */
+    /* ใช้กติกาเดียวกับ PPTX (dvPay): หักประกันทุกงวด งวดสุดท้ายคืน · หักเงินล่วงหน้า 20% ของค่างานงวดนี้ รวมไม่เกินวงเงินล่วงหน้า */
+    const PY=this.dvPay(p,di,amt), rt=PY.rt, ad=PY.ad;   /* % ที่ใช้จริง (สืบทอดจากงวดแรก) */
+    const retain=PY.retain, adv=PY.adv, fine=PY.fine, pay=PY.pay;
+    const retainLbl=final? 'คืน เงินประกันผลงาน' : 'หัก เงินประกันผลงาน';
+    const pctTxt=(v)=>v? (Number.isInteger(v)? v : this.n(v,2))+'%' : '-';
+    /* ---------- ตัวสร้าง xlsx ---------- */
+    const esc=(s)=>String(s===undefined||s===null?'':s).replace(/[\x00-\x08\x0b\x0c\x0e-\x1f]/g,'')
+      .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    const FMT={qty:166, qty0:164, money:167, money0:165, baht:168, sat:169, sat2:172, pct:170, cnt:171};
+    const xfs=['<xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/>'], xfMap={};
+    /* s = {b:ตัวหนา, u:ขีดเส้นใต้, h:แนวนอน, v:แนวตั้ง, w:ตัดบรรทัด, bd:'all'|'none'|'lr'|'lrb'|'lrt', f:รูปแบบตัวเลข, ind:ย่อหน้า} */
+    const BD={none:0, all:1, lr:2, lrb:3, lrt:4, t:5, b:6, lrd:7, lb:8, rb:9, l:10};   /* lrd = เส้นข้างบาง + เส้นล่างเป็นเส้นประบาง */
+    const S=(s)=>{ s=s||{}; const key=JSON.stringify(s); if(xfMap[key]!==undefined) return xfMap[key];
+      /* ตัวอักษรทั้งไฟล์ 14 · z:18 = หัวเรื่อง/รายละเอียดโครงการของสรุปค่างาน (ใหญ่กว่า 2 ขนาด = 16) */
+      const font=s.z===18? (s.b? 4 : 3) : s.z===14? (s.b? 6 : 5) : (s.u? 2 : (s.b? 1 : 0)), num=s.f? FMT[s.f] : 0, bd=BD[s.bd||'none'];
+      xfs.push('<xf numFmtId="'+num+'" fontId="'+font+'" fillId="0" borderId="'+bd+'" xfId="0" applyNumberFormat="1" applyFont="1" applyBorder="1" applyAlignment="1"><alignment horizontal="'+(s.h||'left')+'" vertical="'+(s.v||'center')+'"'+(s.w?' wrapText="1"':'')+(s.sh?' shrinkToFit="1"':'')+(s.ind?' indent="'+s.ind+'"':'')+'/></xf>');
+      xfMap[key]=xfs.length-1; return xfMap[key]; };
+    const L=(i)=>{ let s=''; i++; while(i>0){ const m=(i-1)%26; s=String.fromCharCode(65+m)+s; i=Math.floor((i-1)/26); } return s; };
+    const CI=(c)=>c.split('').reduce((t,ch)=>t*26+ch.charCodeAt(0)-64,0)-1;
+    /* วัดความยาวข้อความเพื่อกำหนดความสูงแถว (เซลล์ผสานปรับความสูงเองไม่ได้) — 16pt = 21.33px */
+    const cv=document.createElement('canvas').getContext('2d');
+    cv.font="21.33px 'TH Sarabun New', sans-serif"; const digit=Math.max(1,cv.measureText('0').width)+0.6;
+    const lines=(txt,widthCh,bold)=>{ cv.font=(bold?'bold ':'')+"21.33px 'TH Sarabun New', sans-serif";
+      return String(txt).split('\n').reduce((t,ln)=>t+Math.max(1,Math.ceil(cv.measureText(ln).width/(Math.max(1,widthCh*digit-10)*0.95))),0); };
+    /* จำนวนบรรทัดเมื่อ Excel ตัดคำทีละคำ: วัดความกว้างจริงของ TH Sarabun New 14 เทียบกับช่องกว้าง w หน่วย (= w × เลข 0 + 5 px) */
+    const wrapCount=(t,w)=>{ cv.font="18.67px 'TH Sarabun New', sans-serif";
+      const room=(w*Math.round(cv.measureText('0').width)+5-8)*0.97; let n=1, cur='';
+      String(t).split(/\s+/).filter(Boolean).forEach(x=>{ const nx=cur? cur+' '+x : x; if(!cur || cv.measureText(nx).width<=room) cur=nx; else { n++; cur=x; } });
+      return n; };
+    const sheet=(name,cols,opt)=>{
+      const rows=[], merges=[], breaks=[], hts=[]; let r=0;
+      const api={ name, cols, opt:opt||{}, rows, merges, breaks, hts,
+        get r(){ return r; },
+        /* row(ความสูง, [[คอลัมน์, ค่า, สไตล์, สูตร?], ...]) — ค่า null = เซลล์ว่างที่มีสไตล์ */
+        row(ht, cells){ r++; const cs=[];
+          (cells||[]).forEach(([c,v,s,f])=>{ const ref=c+r, st=S(s);
+            if(f) cs.push('<c r="'+ref+'" s="'+st+'"><f>'+esc(f)+'</f><v>'+(Number(v)||0)+'</v></c>');
+            else if(v===null||v===undefined||v==='') cs.push('<c r="'+ref+'" s="'+st+'"/>');
+            else if(typeof v==='number') cs.push('<c r="'+ref+'" s="'+st+'"><v>'+v+'</v></c>');
+            else cs.push('<c r="'+ref+'" s="'+st+'" t="inlineStr"><is><t xml:space="preserve">'+esc(v)+'</t></is></c>'); });
+          cs.sort((a,b)=>CI(a.match(/r="([A-Z]+)/)[1])-CI(b.match(/r="([A-Z]+)/)[1]));
+          hts.push(ht);
+          rows.push('<row r="'+r+'" ht="'+ht+'" customHeight="1">'+cs.join('')+'</row>'); return r; },
+        /* ช่วงผสาน c1:c2 ที่แถวปัจจุบัน + เซลล์ว่างที่มีสไตล์เดียวกัน (ให้เส้นขอบครบ) */
+        span(c1,c2,v,s,f){ const a=CI(c1), b=CI(c2), out=[[c1,v,s,f]]; for(let i=a+1;i<=b;i++) out.push([L(i),null,s]); return out; },
+        merge(ref){ merges.push(ref); },
+        pageBreak(){ breaks.push(r); } };
+      return api; };
+    const W=(cols,a,b)=>cols.slice(CI(a),CI(b)+1).reduce((t,w)=>t+w,0);
+    const HT=(n)=>Math.max(21, n*18+3);   /* ตัวอักษร 14: ระยะบรรทัดจริง ~17.5 pt */
+    const HT14=(n)=>n>1? n*18+3 : 20;   /* แถวที่ตัวอักษร 14: ระยะบรรทัดจริง ~17.5 pt → 18 pt ต่อบรรทัด */
+    /* แถวแบบกระชับ (สรุปค่างาน ให้พอดี A4 แผ่นเดียว): บรรทัดเดียว 17 pt
+       หลายบรรทัดต้องใช้ระยะบรรทัดเต็มของ TH Sarabun New 16 (~21 pt/บรรทัด) ไม่เช่นนั้นบรรทัดล่างทับแถวถัดไป */
+    const HTs=(n)=>n>1? Math.round(n*16.5+1) : 17;   /* ตัว 14: ระยะบรรทัดในเซลล์ ~16.5 pt — เตี้ยสุดที่ไม่ทับตัวอักษร (ข้อความจัดกึ่งกลางแนวตั้ง) */
+    const PUNIT=5.8, KW=(w)=>Math.round(w*0.7*100)/100;   /* ความกว้าง 1 หน่วยคอลัมน์ ≈ 5.8 pt เมื่อฟอนต์ปกติ TH Sarabun New 14 */
+
+    /* =============== sheet 1: สรุปค่างาน (A4 แนวนอน) =============== */
+    const c1=[6,74,7,11,13,16,13,16,12,15,12,15,9,12];   /* ช่องรายการกว้างขึ้น (74) ชื่อยาวตัดบรรทัดน้อยลง */
+    const s1=sheet('สรุปค่างาน',c1,{landscape:true, titleRows:'$5:$6', fitH:1, narrow:true, zoom:100});
+    { const T={b:1,h:'center'}, TH={b:1,h:'center',bd:'all',w:1};
+      /* หัวเรื่องและรายละเอียดโครงการ ตัวอักษร 18 (ใหญ่กว่ารายการในตาราง 2 ขนาด) แล้วเว้น 1 บรรทัดก่อนตาราง
+         วัดจำนวนบรรทัดที่ขนาด 16 จึงลดความกว้างที่ใช้วัดลงตามสัดส่วน 16/18 */
+      s1.row(25,s1.span('A','N','สรุปปริมาณงานและบัญชีค่างาน',{b:1,h:'center',z:18})); s1.merge('A1:N1');
+      /* รายละเอียดโครงการ (แผนงาน/กิจกรรม) แบ่งเป็น 2 บรรทัดยาวพอ ๆ กัน และ ทางหลวง/ตอน + ที่ตั้ง เป็นบรรทัดเดียว — ข้อความยาวให้ Excel ย่อให้พอดีแถว */
+      const J=(...a)=>a.map(clean).filter(Boolean).join(' ');
+      cv.font="21.33px 'TH Sarabun New', sans-serif";
+      const half=(t)=>{ const ws=t.split(' '); if(ws.length<2) return [t]; const tot=cv.measureText(t).width; let best=1, bd=1e9;
+        for(let i=1;i<ws.length;i++){ const d=Math.abs(cv.measureText(ws.slice(0,i).join(' ')).width-tot/2); if(d<bd){ bd=d; best=i; } }
+        return [ws.slice(0,best).join(' '), ws.slice(best).join(' ')]; };
+      const det=J(p.program2,p.program3);
+      [contractLine, clean(p.program1)].concat(det? half(det) : [], [J(p.projectName,p.location)]).filter(Boolean).forEach(t=>{ const rr=s1.r+1;
+        s1.row(22,s1.span('A','N',t,{h:'center',sh:1,z:18})); s1.merge('A'+rr+':N'+rr); });
+      s1.row(16,[]);
+      const h1=s1.r+1, h2=h1+1;
+      s1.row(19,[['A','ลำดับ',TH],['B','รายการ',TH],['C','หน่วย',TH],['D','หน่วยละ',TH]].concat(s1.span('E','F','งานตามสัญญา',TH),s1.span('G','H','ปริมาณในสนาม',TH),s1.span('I','J','งานที่มากกว่าสัญญา',TH),s1.span('K','L','งานที่น้อยกว่าสัญญา',TH),[['M','% นน.',TH],['N','หมายเหตุ',TH]]));
+      s1.row(19,[['A','ที่',TH],['B',null,TH],['C',null,TH],['D','( บาท )',TH],['E','ปริมาณงาน',TH],['F','เป็นเงิน ( บาท )',TH],['G','ปริมาณงาน',TH],['H','เป็นเงิน ( บาท )',TH],['I','ปริมาณงาน',TH],['J','เป็นเงิน ( บาท )',TH],['K','ปริมาณงาน',TH],['L','เป็นเงิน ( บาท )',TH],['M','ของงาน',TH],['N',null,TH]]);
+      ['B','C','N'].forEach(c=>s1.merge(c+h1+':'+c+h2)); ['E:F','G:H','I:J','K:L'].forEach(x=>{ const [a,b]=x.split(':'); s1.merge(a+h1+':'+b+h1); });
+      s1.opt.titleRows='$'+h1+':$'+h2;
+      const first=s1.r+1;
+      /* ตัดคำทีละคำแบบ Excel โดยวัดความกว้างจริงของ TH Sarabun New 14 → คืนข้อความทีละบรรทัด
+         ช่องกว้าง w หน่วย = w × ความกว้างเลข 0 (ปัดเป็นพิกเซล) + 5 px ลบขอบในเซลล์ */
+      const wrapL=(t,w)=>{ cv.font="18.67px 'TH Sarabun New', sans-serif";
+        const room=(w*Math.round(cv.measureText('0').width)+5-8)*0.97, out=[]; let cur='';
+        String(t).split(/\s+/).filter(Boolean).forEach(x=>{ const nx=cur? cur+' '+x : x;
+          if(!cur || cv.measureText(nx).width<=room) cur=nx; else { out.push(cur); cur=x; } });
+        if(cur) out.push(cur); return out.length? out : ['']; };
+      /* รายการที่ชื่อยาวหลายบรรทัด: แยกเป็นแถวละบรรทัด สูงเท่ากันทุกแถว ช่องลำดับ และหน่วย…หมายเหตุ ประสานเซลล์แนวตั้ง ค่าอยู่กลางแถว
+         เส้นนอนระหว่างรายการเป็นเส้นประบาง (เฉพาะแถวสุดท้ายของรายการ) */
+      const RH=17;
+      rowsAll.forEach(o=>{
+        const ls=wrapL(o.name,c1[1]), n=ls.length, r0=s1.r+1;
+        const more=!o.head && o.field>o.q+1e-9, less=!o.head && o.field<o.q-1e-9, pct=(!o.head && o.q)? o.field/o.q*100 : 0;
+        const vals=o.head? {} : { C:[o.unit,{h:'center'}], D:[o.pr,{h:'right',f:'money0'}], E:[o.q,{h:'right',f:'qty'}], F:[o.cM,{h:'right',f:'money'}],
+          G:[o.field,{h:'right',f:'qty'}], H:[o.fieldM,{h:'right',f:'money'}],
+          I:[more? q3(o.field-o.q) : null,{h:'right',f:'qty'}], J:[more? m2(o.fieldM-o.cM) : null,{h:'right',f:'money'}],
+          K:[less? q3(o.q-o.field) : null,{h:'right',f:'qty'}], L:[less? m2(o.cM-o.fieldM) : null,{h:'right',f:'money'}],
+          M:[m2(pct),{h:'right',f:'money0'}], N:[pct>125+1e-9? 'Overrun' : (pct<75-1e-9? 'Underrun' : ''),{h:'center'}] };
+        ls.forEach((ln,k)=>{ const bd=k===n-1? 'lrd' : 'lr', st=(x)=>Object.assign({bd,v:'center'},x||{});
+          s1.row(RH,[['A',k? null : o.no,st({h:'center'})],['B',ln,st({})]].concat('CDEFGHIJKLMN'.split('').map(c=>{ const v=vals[c]; return [c,(!k&&v)? v[0] : null,st(v? v[1] : {})]; }))); });
+        if(n>1) ['A'].concat('CDEFGHIJKLMN'.split('')).forEach(c=>s1.merge(c+r0+':'+c+(r0+n-1)));
+      });
+      const last=s1.r, TB={b:1,bd:'all',h:'right',f:'money'};
+      const sum=(c,arr)=>m2(arr.reduce((t,v)=>t+v,0));
+      const tr=s1.r+1;
+      s1.row(24,s1.span('A','E','รวม',{b:1,bd:'all',h:'center'}).concat([
+        ['F',sum('F',items.map(o=>o.cM)),TB,'SUBTOTAL(9,F'+first+':F'+last+')'],['G',null,{bd:'all'}],
+        ['H',sum('H',items.map(o=>o.fieldM)),TB,'SUBTOTAL(9,H'+first+':H'+last+')'],['I',null,{bd:'all'}],
+        ['J',sum('J',items.map(o=>o.field>o.q+1e-9? m2(o.fieldM-o.cM) : 0)),TB,'SUBTOTAL(9,J'+first+':J'+last+')'],['K',null,{bd:'all'}],
+        ['L',sum('L',items.map(o=>o.field<o.q-1e-9? m2(o.cM-o.fieldM) : 0)),TB,'SUBTOTAL(9,L'+first+':L'+last+')'],['M',null,{bd:'all'}],['N',null,{bd:'all'}]]));
+      s1.merge('A'+tr+':E'+tr);
+      /* เส้นวงเล็บลากจากยอดรวม 2 ช่องมาหากัน แล้วชี้ลงกล่อง "เหลือ" (ผลต่าง) แบบไฟล์ต้นแบบ
+         ตามสัญญา − ในสนาม (F−H) และ น้อยกว่าสัญญา − มากกว่าสัญญา (L−J) */
+      const totC=sum('',items.map(o=>o.cM)), totF=sum('',items.map(o=>o.fieldM));
+      const totMore=sum('',items.map(o=>o.field>o.q+1e-9? m2(o.fieldM-o.cM) : 0)), totLess=sum('',items.map(o=>o.field<o.q-1e-9? m2(o.cM-o.fieldM) : 0));
+      s1.row(16,[['F',null,{bd:'lb'}],['G',null,{bd:'b'}],['H',null,{bd:'rb'}],['J',null,{bd:'lb'}],['K',null,{bd:'b'}],['L',null,{bd:'rb'}]]);   /* ขาวงเล็บยาวขึ้น */
+      s1.row(16,[['G',null,{bd:'l'}],['K',null,{bd:'l'}]]);
+      s1.row(21,[['F','เหลือ',{b:1,h:'right',v:'center'}],['G',m2(totC-totF),{b:1,bd:'all',h:'right',v:'center',f:'money'},'F'+tr+'-H'+tr],
+        ['J','เหลือ',{b:1,h:'right',v:'center'}],['K',m2(totLess-totMore),{b:1,bd:'all',h:'right',v:'center',f:'money'},'L'+tr+'-J'+tr]]);
+      /* ให้ตารางเต็มแผ่น A4: Excel ย่อให้พอดีความกว้าง ถ้าเนื้อหาเตี้ยกว่าแผ่น เพิ่มความสูงแถวรายการเท่า ๆ กันจนเต็มแผ่น
+         (ไม่เกิน +8 pt ต่อแถว) ถ้าสูงเกินแผ่น Excel ย่อให้อยู่แผ่นเดียว (พอดี 1 x 1 แผ่น) */
+      { const wPt=c1.reduce((t,w)=>t+w*PUNIT+3.75,0), sw=Math.min(1,((11.69-0.2)*72)/wPt), pageH=((8.27-0.2)*72)/sw*0.90;   /* เผื่อ 10%: Excel ปัดความสูงแถวตอนพิมพ์ ถ้าเต็มพอดีแถวท้ายจะตกไปแผ่น 2 */
+        const tot=s1.hts.reduce((t,h)=>t+h,0), nItem=last-first+1, add=nItem>0? Math.min(8,Math.floor((pageH-tot)/nItem*10)/10) : 0;
+        if(add>0) for(let r=first;r<=last;r++){ const i=r-1, h=Math.round((s1.hts[i]+add)*100)/100;
+          s1.rows[i]=s1.rows[i].replace(/ ht="[\d.]+"/,' ht="'+h+'"'); s1.hts[i]=h; }
+        /* อัตราย่อคงที่ให้อยู่ A4 แผ่นเดียวแน่นอน (ไม่พึ่ง "พอดี 1 หน้า" ซึ่ง Excel บางเครื่องตั้งเป็น "พอดีคอลัมน์" แล้วตกไปแผ่น 2) */
+        const totH=s1.hts.reduce((t,h)=>t+h,0), shH=((8.27-0.2)*72)/totH;
+        s1.opt.scale=Math.max(10,Math.min(100,Math.floor(Math.min(sw,shH)*97))); delete s1.opt.fitH; }
+    }
+
+    /* ---------- ส่วนที่ใช้ร่วมกันของ 01 / 02 / 03 ---------- */
+    /* คณะกรรมการตรวจรับพัสดุ (จากรายละเอียดโครงการ): ประธานก่อน แล้วกรรมการ */
+    const comAll=(p.committee||[]).filter(c=>c && clean(c.name));
+    const chairC=comAll.find(c=>c.role==='ประธานกรรมการ')||comAll[0], memC=comAll.filter(c=>c!==chairC);
+    const comOrder=chairC? [chairC].concat(memC) : [];
+    cv.font="21.33px 'TH Sarabun New', sans-serif";
+    const tw=(t)=>cv.measureText(t).width, spW=Math.max(1,tw(' ')), dotW=Math.max(1,tw('.'));
+    /* เส้นจุดยาวประมาณ widthCh ตัวอักษร (ไม่เกินช่อง) — ชื่อเติมช่องว่างท้ายให้อยู่กึ่งกลางใต้เส้นจุด (เซลล์ชิดขวา) */
+    const dotsFor=(widthCh)=>{ const room=widthCh*digit*0.85-tw('ลงชื่อ ')-spW; return 'ลงชื่อ '+'.'.repeat(Math.max(12,Math.floor(room/dotW)))+' '; };
+    const nameFor=(name,dots)=>{ const segW=tw(dots)-tw('ลงชื่อ '), t='( '+clean(name)+' )';
+      return t+' '.repeat(Math.max(1,Math.round((segW-tw(t))/2/spW))); };
+    /* ลายมือชื่อเต็ม (หน้าสุดท้าย): ประธานกลางหน้า แล้วกรรมการแถวละ 2 คน
+       g = { chair:[จุดเริ่ม,จุดจบ,หน้าที่เริ่ม,หน้าที่จบ], left:[...], right:[...] } — เส้นจุดชิดขวาจบที่เส้นแบ่ง หน้าที่ชิดซ้ายเริ่มที่เส้นแบ่ง
+       จึงตรงแนวกันทุกแถวโดยไม่ขึ้นกับความกว้างตัวอักษร */
+    const signFull=(sh,cols,g)=>{
+      if(!comOrder.length) return;
+      /* ข้อความที่ยาวกว่าช่อง (เช่น ตำแหน่งยาว) ให้ Excel ย่อตัวอักษรให้พอดีช่อง ไม่ล้นไปทับช่องข้าง ๆ / ไม่ถูกตัดที่ขอบกระดาษ */
+      const fit=(t,a,b,st)=>tw(t)>W(cols,a,b)*digit*0.96? Object.assign({sh:1},st) : st;
+      const put=(r,spec,c,role)=>{ const [a,b,x,y]=spec, dts=dotsFor(Math.min(W(cols,a,b),28)), nm=nameFor(c.name,dts), pos=clean(c.pos);
+        return { top:sh.span(a,b,dts,{h:'right'}).concat(sh.span(x,y,role,fit(role,x,y,{}))), bot:sh.span(a,b,nm,fit(nm,a,b,{h:'right'})).concat(sh.span(x,y,pos,fit(pos,x,y,{}))), m:[a+':'+b, x+':'+y] }; };
+      const emit=(parts)=>{ const r1=sh.r+1;
+        sh.row(24,[].concat(...parts.map(p=>p.top))); sh.row(22,[].concat(...parts.map(p=>p.bot)));
+        parts.forEach(p=>p.m.forEach(m=>{ const [a,b]=m.split(':'); if(a!==b){ sh.merge(a+r1+':'+b+r1); sh.merge(a+(r1+1)+':'+b+(r1+1)); } })); };
+      const gap=g.gap||0;   /* gap = ที่ว่างเพิ่มเหนือเส้นจุดแต่ละชุด ไว้ลงนาม */
+      if(chairC){ sh.row(14+gap,[]); emit([put(0,g.chair,chairC,'ประธานกรรมการตรวจรับพัสดุ')]); }
+      for(let i=0;i<memC.length;i+=2){ sh.row(12+gap,[]);
+        emit([put(0,g.left,memC[i],'กรรมการตรวจรับพัสดุ')].concat(memC[i+1]? [put(0,g.right,memC[i+1],'กรรมการตรวจรับพัสดุ')] : [])); }
+    };
+    /* แถบชื่อคณะกรรมการท้ายทุกแผ่นที่ยังไม่ใช่แผ่นสุดท้าย (แบบไฟล์ต้นแบบ): เส้นจุด / ( ชื่อ ) / หน้าที่ — เรียงคนละช่องเต็มความกว้าง */
+    const groupsOf=(cols,n)=>{ const tot=cols.reduce((t,w)=>t+w,0), cum=[]; cols.reduce((t,w,i)=>(cum[i]=t+w),0);
+      const ends=[]; for(let k=1;k<n;k++){ const tgt=tot*k/n; let best=0, bd=1e9;
+        cum.forEach((c,i)=>{ if(i>=cols.length-1 || (ends.length && i<=ends[ends.length-1])) return; const d=Math.abs(c-tgt); if(d<bd){ bd=d; best=i; } }); ends.push(best); }
+      const out=[]; let s=0; ends.concat([cols.length-1]).forEach(e=>{ out.push([L(s),L(e)]); s=e+1; }); return out; };
+    const strip=(sh,cols)=>{
+      if(!comOrder.length) return;
+      const gs=groupsOf(cols,Math.min(comOrder.length,cols.length)), r1=sh.r+1;
+      const line=(fn,st)=>[].concat(...gs.map(([a,b],i)=>comOrder[i]? sh.span(a,b,fn(comOrder[i],a,b),st) : []));
+      sh.row(21,[]); sh.row(21,[]);   /* เว้น 2 บรรทัดให้ลงนามเหนือเส้นจุด */
+      sh.row(22,line((c,a,b)=>'.'.repeat(Math.max(10,Math.floor(W(cols,a,b)*digit*0.8/dotW))),{h:'center'}));
+      sh.row(21,line(c=>'( '+clean(c.name)+' )',{h:'center'}));
+      sh.row(21,line(c=>c===chairC? 'ประธานกรรมการ' : 'กรรมการ',{h:'center'}));
+      gs.forEach(([a,b])=>{ if(a!==b) [r1+2,r1+3,r1+4].forEach(r=>sh.merge(a+r+':'+b+r)); });   /* r1, r1+1 = แถวเว้นลงนาม */
+    };
+    /* ความสูงที่ใช้ได้ต่อแผ่น (หน่วยความสูงแถวก่อนย่อ): Excel ย่อทั้งแผ่นให้พอดีความกว้าง A4 จึงประมาณอัตราย่อจากความกว้างคอลัมน์
+       (≈ 4.5 pt ต่อหน่วยความกว้าง + ขอบช่อง 3.75 pt — เทียบจากไฟล์ต้นแบบ: 01 กว้าง 172 หน่วย พิมพ์ที่ 73%)
+       ถ้าประมาณคลาด ตั้ง fitToHeight = จำนวนแผ่น ไว้แล้ว Excel จะย่อเพิ่มให้เอง */
+    /* ความกว้างจริงใน Excel: ฟอนต์ปกติของไฟล์คือ TH Sarabun New 16 ทำให้ 1 หน่วยความกว้าง ≈ 6.4 pt (+ขอบช่อง 3.75 pt)
+       (วัดจากภาพตัวอย่างก่อนพิมพ์จริง: ที่ 89% เส้นแบ่งหน้าตกกลางช่องหมายเหตุของแนบ 2)
+       ไฟล์ต้นแบบใช้ฟอนต์ปกติที่เล็กกว่า ตัวเลขความกว้างคอลัมน์ของต้นแบบจึงคูณ 0.7 ก่อนใช้ ให้กว้างจริงเท่าต้นแบบ */
+    /* PUNIT, KW ประกาศไว้ก่อนสรุปค่างาน */
+    /* รายละเอียดโครงการ (สัญญา/โครงการ/ทางหลวง/ที่ตั้ง): บรรทัดละแถวเดียว ข้อความยาวให้ Excel ย่อตัวอักษรลงให้พอดี (shrinkToFit) แทนการตัดบรรทัด */
+    const SH={h:'center',sh:1};
+    /* อัตราย่อพิมพ์คงที่ (%) สำหรับ sheet ที่มีตัวแบ่งหน้าเอง — ห้ามใช้ "พอดี N หน้า" เพราะ Excel จะไม่สนตัวแบ่งหน้าที่ใส่ไว้
+       = ย่อให้พอดีความกว้าง และ (ถ้าระบุ) ให้แผ่นที่สูงที่สุดพอดีความสูง เผื่อไว้ 3% */
+    const scaleFor=(cols,m,maxPageHt)=>{ const wPt=cols.reduce((t,w)=>t+w*PUNIT+3.75,0), sw=Math.min(1,((8.27-m.l-m.r)*72)/wPt);
+      const sh=maxPageHt? ((11.69-m.t-m.b)*72)/maxPageHt : 1;
+      return Math.max(10,Math.min(100,Math.floor(Math.min(sw,sh)*97))); };
+    const pageBudget=(cols,m,fill)=>{ const wPt=cols.reduce((t,w)=>t+w*PUNIT+3.75,0), sw=Math.min(1,((8.27-m.l-m.r)*72)/wPt);
+      return ((11.69-m.t-m.b)*72)/sw*(fill||0.88); };   /* เผื่อ 12%: Excel ปัดความสูงแถวตอนพิมพ์ ถ้าเผื่อน้อยแถวท้ายแผ่นจะล้นไปแผ่นถัดไป */
+    const heightOf=(cols,fn)=>{ const tmp=sheet('_',cols); fn(tmp); return tmp.hts.reduce((t,h)=>t+h,0); };
+    /* แบ่งหน้าตาราง: ใส่รายการจนเต็มแผ่น → เติมแถวว่างให้เส้นตารางลงถึงท้ายแผ่น → แถบชื่อกรรมการ → ขึ้นแผ่นใหม่ (หัวตารางพิมพ์ซ้ำทุกแผ่น)
+       รายการหมดแล้วส่วนท้าย (ยอดรวม/หัก/ลายมือชื่อ) ไม่พอแผ่นปัจจุบัน ให้ปิดแผ่นแล้วขึ้นแผ่นใหม่ */
+    const paginate=(sh,cols,m,o)=>{
+      const budget=pageBudget(cols,m,o.fill), stripH=heightOf(cols,t=>strip(t,cols)), tailH=heightOf(cols,o.tail);
+      const start=sh.hts.reduce((t,h)=>t+h,0), sumH=(pg)=>pg.reduce((t,it)=>t+it.h,0);
+      /* วางแผนก่อน: ใส่รายการเต็มแผ่น (เว้นที่แถบชื่อกรรมการ) */
+      const pages=[[]]; let u=start;
+      o.items.forEach(it=>{ if(u+it.h+stripH>budget && pages[pages.length-1].length){ pages.push([]); u=o.headH; } pages[pages.length-1].push(it); u+=it.h; });
+      /* "รวมเงิน" ต้องต่อท้ายรายการสุดท้ายทันที (แบบต้นแบบ): ถ้าส่วนท้ายไม่พอแผ่นสุดท้าย ย้ายรายการท้าย ๆ ไปขึ้นแผ่นใหม่พร้อมส่วนท้าย */
+      { const lp=pages.length-1, base=lp? o.headH : start;
+        if(base+sumH(pages[lp])+tailH>budget && pages[lp].length>1){ const mv=[pages[lp].pop()];   /* ย้ายรายการท้าย ๆ ไปแผ่นสุดท้ายให้มากที่สุดที่ยังพอกับส่วนท้าย */
+          while(pages[lp].length>1 && o.headH+sumH(mv)+pages[lp][pages[lp].length-1].h+tailH<=budget) mv.unshift(pages[lp].pop());
+          pages.push(mv); } }
+      let used=start;
+      pages.forEach((pg,k)=>{
+        if(k){ let gap=budget-used-stripH-2; while(gap>6){ const h=Math.min(400,gap); o.filler(h); gap-=h; } o.closeRow(); strip(sh,cols); sh.pageBreak(); used=o.headH; }
+        pg.forEach(it=>{ it.emit(); used+=it.h; }); });
+      o.tail(sh);
+      sh.opt.scale=scaleFor(cols,m,0);   /* เนื้อหาแต่ละแผ่นไม่เกิน budget ที่คิดจากอัตราย่อนี้อยู่แล้ว */
+    };
+
+    /* =============== sheet 2: 01_รับรองผลงาน (พ.1-37) =============== */
+    /* ความกว้างช่องตัวเลข/หน่วย: แคบที่สุดที่ยังอ่านได้ — วัดข้อความที่ยาวที่สุดของแต่ละช่อง (รวมหัวตารางและยอดรวม) ด้วย TH Sarabun New 14
+       แล้วเผื่อขอบ/ระยะเยื้อง 22 px ไม่ขึ้น #### และไม่ชิดเส้น · ช่องรายการ (B:E) ได้ความกว้างที่เหลือ (รวมทั้งแผ่น ≈ 128 หน่วย) */
+    const c2=(()=>{ const fx=(v,dg)=>typeof v==='number'? v.toLocaleString('en-US',{minimumFractionDigits:dg,maximumFractionDigits:dg}) : String(v||'');
+      const fit=(ts,bs)=>{ let px=0; cv.font="18.67px 'TH Sarabun New', sans-serif"; ts.forEach(t=>{ px=Math.max(px,cv.measureText(t).width); });
+        cv.font="bold 18.67px 'TH Sarabun New', sans-serif"; (bs||[]).forEach(t=>{ px=Math.max(px,cv.measureText(t).width); }); return Math.ceil((px+16-5)/7*10)/10; };
+      const tot=(k)=>m2(items.reduce((t,o)=>t+o[k],0));
+      const nums=[fit(items.map(o=>fx(o.q,3)),['จำนวน']), fit(items.map(o=>o.unit),['หน่วย']), fit(items.map(o=>fx(o.pr,2)),['หน่วยละ']),
+        fit(items.map(o=>fx(o.cM,2)),[fx(tot('cM'),2),'เป็นเงิน']), fit(items.map(o=>fx(o.now,3)),['จำนวน']), fit(items.map(o=>fx(o.nowM,2)),[fx(amt,2),'เป็นเงิน']),
+        fit(items.map(o=>fx(o.cum,3)),['จำนวน']), fit(items.map(o=>fx(o.cumM,2)),[fx(tot('cumM'),2),'เป็นเงิน'])];
+      const name=Math.max(46,128-5-nums.reduce((t,w)=>t+w,0)), k=name/35;
+      return [5].concat([15,8,6,6].map(w=>Math.round(w*k*10)/10),nums); })();
+    const m2s={l:0.04,r:0.04,t:0.8,b:0.1,h:0.04,f:0};   /* ขอบแบบไฟล์ต้นแบบ (ซ้าย-ขวา 1 มม. หัวกระดาษชิดขอบบน) ขอบบนพอดีหัวกระดาษ 3 บรรทัด */
+    const s2=sheet('01_รับรองผลงาน',c2,{zoom:85,margins:m2s,header:'&R&"TH Sarabun New,Bold"&12พ.1-37   \nกรมทางหลวง   \nหน้าที่ &P ของ &N   '});
+    { const C={h:'center',w:1};
+      /* แถวแรกเว้นที่ให้ตราครุฑ (รูปวางกึ่งกลางทับแถวนี้) */
+      if(garuda){ s2.row(64,[]); s2.opt.garuda=true; }
+      { const rr=s2.r+1; s2.row(30,s2.span('A','M','ใบรับรองผลการปฏิบัติงาน',{b:1,h:'center'})); s2.merge('A'+rr+':M'+rr); }
+      headLines.forEach(t=>{ const rr=s2.r+1; s2.row(22,s2.span('A','M',t,SH)); s2.merge('A'+rr+':M'+rr); });
+      { const rr=s2.r+1; s2.row(24,s2.span('A','M',sendLine('ขอ'),{h:'center'})); s2.merge('A'+rr+':M'+rr); }
+      const TH={b:1,h:'center',bd:'all',w:1}, h1=s2.r+1, h2=h1+1, h3=h1+2;
+      s2.row(22,[['A','ลำดับที่',TH]].concat(s2.span('B','E','รายการ',TH),s2.span('F','I','ตามสัญญา',TH),s2.span('J','K','ทำได้ครั้งนี้',TH),s2.span('L','M','สะสมถึงเดือนนี้',TH)));
+      s2.row(22,[['A',null,TH]].concat(s2.span('B','E',null,TH),[['F','จำนวน',TH],['G','หน่วย',TH],['H','หน่วยละ',TH],['I','เป็นเงิน',TH],['J','จำนวน',TH],['K','เป็นเงิน',TH],['L','จำนวน',TH],['M','เป็นเงิน',TH]]));
+      s2.row(22,[['A',null,TH]].concat(s2.span('B','E',null,TH),[['F',null,TH],['G',null,TH],['H','(บาท)',TH],['I','(บาท)',TH],['J',null,TH],['K','(บาท)',TH],['L',null,TH],['M','(บาท)',TH]]));
+      s2.merge('A'+h1+':A'+h3); s2.merge('B'+h1+':E'+h3); s2.merge('F'+h1+':I'+h1);   /* "ลำดับที่" ประสาน 3 แถว */ s2.merge('J'+h1+':K'+h1); s2.merge('L'+h1+':M'+h1);
+      ['F','G','J','L'].forEach(c=>s2.merge(c+h2+':'+c+h3));
+      s2.opt.titleRows='$'+h1+':$'+h3;
+      /* ชื่อรายการตัวอักษร 14 (วัดบรรทัดที่ขนาด 16 จึงขยายความกว้างที่ใช้วัดตาม 16/14) · ตัวเลขเว้นขอบขวา 1 ช่องไม่ให้ชิดเส้น */
+      /* ทั้งแถวรายการใช้ตัวอักษร 14 (ตัวเลขยาวอย่าง 13,500.000 ไม่ขึ้น ####) */
+      const first=s2.r+1, cs={bd:'lr',z:14}, R=(f)=>Object.assign({h:'right',f,v:'top',ind:1},cs), NM=Object.assign({w:1,v:'top'},cs);
+      const items2=rowsAll.map(o=>({ h:HT14(wrapCount(o.name,W(c2,'B','E'))), emit(){ const rr=s2.r+1;
+        if(o.head) s2.row(this.h,[['A',o.no,Object.assign({h:'center',v:'top'},cs)]].concat(s2.span('B','E',o.name,NM),
+          'FGHIJKLM'.split('').map(c=>[c,'-',Object.assign({h:c==='G'?'center':'right',v:'top'},cs)])));
+        else s2.row(this.h,[['A',o.no,Object.assign({h:'center',v:'top'},cs)]].concat(s2.span('B','E',o.name,NM),[
+          ['F',o.q,R('qty')],['G',o.unit,Object.assign({h:'center',v:'top'},cs)],['H',o.pr,R('money0')],['I',o.cM,R('money')],
+          ['J',o.now,R('qty')],['K',o.nowM,R('money')],['L',o.cum,R('qty')],['M',o.cumM,R('money')]]));
+        s2.merge('B'+rr+':E'+rr); } }));
+      let last=0;
+      const tail2=(sh)=>{
+        const TB={b:1,bd:'all',h:'right',f:'money'}, tr=sh.r+1, lastRow=last||sh.r;
+        sh.row(24,sh.span('A','H','รวมเงิน',{b:1,bd:'all',h:'center'}).concat([
+          ['I',m2(items.reduce((t,o)=>t+o.cM,0)),TB,'SUM(I'+first+':I'+lastRow+')'],['J',null,{bd:'all'}],
+          ['K',amt,TB,'SUM(K'+first+':K'+lastRow+')'],['L',null,{bd:'all'}],
+          ['M',m2(items.reduce((t,o)=>t+o.cumM,0)),TB,'SUM(M'+first+':M'+lastRow+')']]));
+        sh.merge('A'+tr+':H'+tr);
+        { const rr=sh.r+1; const t='คณะกรรมการตรวจรับพัสดุผู้มีรายนามข้างท้ายนี้ได้พร้อมกันตรวจงานซึ่ง  '+contractor+' เป็นผู้รับจ้าง ทำการแล้วเสร็จ'+(final? '' : 'บางส่วน');
+          sh.row(HT(lines(t,W(c2,'A','M'))),sh.span('A','M',t,{w:1})); sh.merge('A'+rr+':M'+rr); }
+        /* note = ข้อความในวงเล็บต่อจาก % (ช่อง D:H) เช่น ( หักไว้ 20 % ตามรายการที่ขอเบิก ) */
+        const money=(lbl,pct,amount,f,o,note)=>{ const rr=sh.r+1;
+          sh.row(22,sh.span('A','B',lbl,o||{}).concat([['C',pct,{h:'center'}]],note? sh.span('D','H','( '+note+' )',{sh:1}) : [],[['I','เป็นเงิน',{h:'right'}]],sh.span('J','K',amount,Object.assign({h:'right',f:'money'},o||{}),f),[['M','บาท',{}]]));
+          sh.merge('A'+rr+':B'+rr); sh.merge('J'+rr+':K'+rr); if(note) sh.merge('D'+rr+':H'+rr); return rr; };
+        const rAmt=money('รวมเงินตามรายการที่ขอเบิก',picked.length+' รายการ',amt,'K'+tr);
+        const rRet=money(retainLbl, pctTxt(rt), retain);
+        const rAdv=money('หัก เงินจ่ายล่วงหน้า', pctTxt(ad), adv, undefined, undefined, PY.advNote);
+        const rFine=sh.r+1;
+        sh.row(22,sh.span('A','B','หัก เงินค่าปรับวันละ',{}).concat([['C',fpd,{h:'right',f:'money0'}],['D','บาท',{}],['E','จำนวน',{h:'right'}],['F',fd||'-',{h:'center'}],['G','วัน',{}],['I','เป็นเงิน',{h:'right'}]],sh.span('J','K',fine,{h:'right',f:'money'}),[['M','บาท',{}]]));
+        sh.merge('A'+rFine+':B'+rFine); sh.merge('J'+rFine+':K'+rFine);
+        const rPay=sh.r+1;
+        sh.row(24,sh.span('A','B','คงเป็นเงินที่ต้องจ่าย',{b:1}).concat([['I','เป็นเงิน',{h:'right'}]],sh.span('J','K',pay,{b:1,u:1,h:'right',f:'money'},'J'+rAmt+(final?'+':'-')+'J'+rRet+'-J'+rAdv+'-J'+rFine),[['M','บาท',{}]]));
+        sh.merge('A'+rPay+':B'+rPay); sh.merge('J'+rPay+':K'+rPay);
+        { const rr=sh.r+1; sh.row(24,sh.span('A','M','(เงิน'+this.bahtText(pay)+')',{b:1,h:'right',sh:1})); sh.merge('A'+rr+':M'+rr); }
+        if(clean(d.note)){ const t='หมายเหตุ  '+clean(d.note), rr=sh.r+1; sh.row(HT(lines(t,W(c2,'A','M'))),sh.span('A','M',t,{w:1,v:'top'})); sh.merge('A'+rr+':M'+rr); }
+        sh.row(10,[]);
+        { const rr=sh.r+1; sh.row(22,sh.span('A','M','คณะกรรมการตรวจรับพัสดุ '+iDateTxt,{h:'center'})); sh.merge('A'+rr+':M'+rr); }
+        signFull(sh,c2,{chair:['A','H','I','M'], left:['A','D','E','G'], right:['H','J','K','M']});
+        sh.row(16,[]);
+        { const t='ข้าพเจ้า '+contractor+(rep? ' โดย '+rep : '')+' ได้ร่วมในการตรวจรับงานของคณะกรรมการฯ แล้ว รับว่าการตรวจรับงานของคณะกรรมการฯ ตามใบรับรองผลการปฏิบัติงานดังกล่าวข้างต้นข้าพเจ้าเห็นชอบด้วยทุกประการ', rr=sh.r+1;
+          sh.row(HT(lines(t,W(c2,'A','M')-6)),sh.span('A','M',t,{w:1,ind:4})); sh.merge('A'+rr+':M'+rr); }
+        sh.row(14,[]);
+        { const rr=sh.r+1; sh.row(24,sh.span('A','M','ลงนาม ………………………………………………… ผู้รับจ้าง',{h:'center'})); sh.merge('A'+rr+':M'+rr);
+          const r2=sh.r+1; sh.row(22,sh.span('A','M','( '+(rep||'.................................................')+' )',{h:'center'})); sh.merge('A'+r2+':M'+r2); }
+      };
+      /* แถวว่างต่อเส้นตารางลงถึงท้ายแผ่น และแถวปิดตาราง (เส้นล่าง) ก่อนแถบชื่อกรรมการ */
+      const fillRow=(sh,cols,bd,spans)=>(h)=>{ const rr=sh.r+1; sh.row(h,[].concat(...spans.map(([a,b])=>sh.span(a,b,null,{bd})))); spans.forEach(([a,b])=>{ if(a!==b) sh.merge(a+rr+':'+b+rr); }); };
+      const sp2=[['A','A'],['B','E']].concat('FGHIJKLM'.split('').map(c=>[c,c]));
+      paginate(s2,c2,m2s,{ items:items2.map(it=>({h:it.h, emit:()=>{ it.emit(); last=s2.r; }})), headH:66, fill:0.94,   /* ใส่รายการได้เกือบเต็มแผ่น แถบลงนามอยู่ชิดขอบล่าง */
+        filler:fillRow(s2,c2,'lr',sp2), closeRow:()=>fillRow(s2,c2,'lrb',sp2)(4), tail:(sh)=>tail2(sh) });
+    }
+
+    /* =============== sheet 3: 02_บัญชีค่างาน (เอกสารแนบ 1) =============== */
+    const c3=[8,24,24,24,24,22,11].map(w=>KW(w));   /* กว้างรวม 137 หน่วยเท่าไฟล์ต้นแบบ (พิมพ์ที่ ~89% ได้รายการต่อแผ่นเท่าต้นแบบ) */
+    const m3s={l:0.236,r:0.079,t:0.63,b:0.1,h:0.157,f:0};   /* ขอบแบบไฟล์ต้นแบบ */
+    const s3=sheet('02_บัญชีค่างาน',c3,{zoom:100,margins:m3s,header:'&R&"TH Sarabun New,Regular"&14เอกสารแนบใบรับรองผลการปฏิบัติงาน 1   \nหน้าที่ &P ของ &N   '});
+    { const C={h:'center',w:1};
+      s3.row(24,s3.span('A','G','บัญชีค่างานต่าง ๆ',{b:1,h:'center'})); s3.merge('A1:G1');
+      headLines.forEach(t=>{ const rr=s3.r+1; s3.row(22,s3.span('A','G',t,SH)); s3.merge('A'+rr+':G'+rr); });
+      { const rr=s3.r+1; s3.row(22,s3.span('A','G','โดยมี '+contractor,{})); s3.merge('A'+rr+':G'+rr); }
+      { const rr=s3.r+1; s3.row(22,s3.span('A','G',sendLine('ขอ'),{})); s3.merge('A'+rr+':G'+rr); }
+      const TH={b:1,h:'center',bd:'all',w:1}, h1=s3.r+1, h2=h1+1;
+      s3.row(22,[['A','ลำดับ',TH]].concat(s3.span('B','E','รายการ',TH),s3.span('F','G','จำนวนเงิน',TH)));
+      s3.row(22,[['A',null,TH]].concat(s3.span('B','E',null,TH),[['F','บาท',TH],['G','สตางค์',TH]]));
+      s3.merge('A'+h1+':A'+h2); s3.merge('B'+h1+':E'+h2); s3.merge('F'+h1+':G'+h1);
+      s3.opt.titleRows='$'+h1+':$'+h2;
+      const first=s3.r+1, cs={bd:'lr'};
+      let last=0;
+      const items3=rowsAll.map(o=>{ const h=HT14(wrapCount(o.name,W(c3,'B','E')));   /* ชื่อรายการตัวอักษร 14 */
+        return { h, emit:()=>{ const rr=s3.r+1;
+          const v= o.head? 0 : m2(o.nowM), baht=Math.floor(v+1e-9), sat=Math.round((v-baht)*100);
+          s3.row(h,[['A',o.no,Object.assign({h:'center',v:'top'},cs)]].concat(s3.span('B','E',o.name,Object.assign({w:1,v:'top',z:14},cs)),[
+            ['F',baht,Object.assign({h:'right',f:'baht',v:'top',ind:1},cs)],['G',v? sat : 0,Object.assign({h:'center',f:v? 'sat2' : 'sat',v:'top'},cs)]]));
+          s3.merge('B'+rr+':E'+rr); last=s3.r; } }; });
+      const tail3=(sh)=>{
+        const lastRow=last||sh.r;
+        sh.row(6,'ABCDEFG'.split('').map(c=>[c,null,{bd:'t'}]));
+        const line=(lbl,mid,amount,f,o)=>{ const rr=sh.r+1;
+          sh.row(22,sh.span('A','C',lbl,o||{}).concat([['D',mid,{h:'center'}],['E','เป็นเงิน',{h:'right'}],['F',amount,Object.assign({h:'right',f:'money'},o||{}),f],['G','บาท',{h:'center'}]]));
+          sh.merge('A'+rr+':C'+rr); return rr; };
+        const rA=line('รวมเงินตามรายการที่ขอเบิก',picked.length+'  รายการ',amt,'SUM(F'+first+':F'+lastRow+')+SUM(G'+first+':G'+lastRow+')/100');
+        const rR=line(retainLbl, pctTxt(rt), retain);
+        const rD=line(PY.advNote? 'หัก เงินจ่ายล่วงหน้า  ( '+PY.advNote+' )' : 'หัก เงินจ่ายล่วงหน้า', pctTxt(ad), adv, undefined, PY.advNote? {sh:1} : undefined);
+        /* บรรทัดค่าปรับแยกช่อง: ป้าย A:B | "… บาท" C | "จำนวน … วัน" D — ไม่ล้นไปทับ "เป็นเงิน" */
+        const rF=sh.r+1;
+        sh.row(22,sh.span('A','B','หัก เงินค่าปรับวันละ',{}).concat([['C',this.cmoney(fpd)+' บาท',{h:'right',sh:1}],['D','จำนวน  '+(fd||'-')+'  วัน',{h:'center',sh:1}],['E','เป็นเงิน',{h:'right'}],['F',fine,{h:'right',f:'money'}],['G','บาท',{h:'center'}]]));
+        sh.merge('A'+rF+':B'+rF);
+        line('คงเป็นเงินที่ต้องจ่าย','',pay,'F'+rA+(final?'+':'-')+'F'+rR+'-F'+rD+'-F'+rF,{b:1});
+        { const rr=sh.r+1; sh.row(24,sh.span('A','G','(เงิน'+this.bahtText(pay)+')',{b:1,h:'right',sh:1})); sh.merge('A'+rr+':G'+rr); }
+        sh.row(12,[]); sh.row(22,[]); sh.row(22,[]);   /* ชุดลงนามลงมาอีก 2 บรรทัด */
+        { const rr=sh.r+1; sh.row(22,sh.span('A','G','คณะกรรมการตรวจรับพัสดุ '+iDateTxt,{h:'center'})); sh.merge('A'+rr+':G'+rr); }
+        signFull(sh,c3,{gap:22, chair:['A','D','E','G'], left:['A','B','C','C'], right:['D','E','F','G']});
+      };
+      const fillRow=(bd)=>(h)=>{ const rr=s3.r+1; s3.row(h,[['A',null,{bd}]].concat(s3.span('B','E',null,{bd}),[['F',null,{bd}],['G',null,{bd}]])); s3.merge('B'+rr+':E'+rr); };
+      paginate(s3,c3,m3s,{ items:items3, headH:44, filler:fillRow('lr'), closeRow:()=>fillRow('lrb')(4), tail:(sh)=>tail3(sh) });
+    }
+
+    /* =============== sheet 4: 03_แนบ2 (เอกสารแนบ 2) รายการละ 1 แผ่น ตามแบบไฟล์ต้นแบบ =============== */
+    const c4=[8,26,18,8,9,14,19];   /* แนบ 2: ช่องตัวเลข (C) กว้างพอสำหรับ 10,800.000 และใช้ความกว้างกระดาษเต็ม */
+    const m4s={l:0.276,r:0.157,t:0.59,b:0.3,h:0.118,f:0};   /* ขอบแบบไฟล์ต้นแบบ */
+    const s4=sheet('03_แนบ2',c4,{zoom:55,margins:m4s,header:'&R&"TH Sarabun New,Regular"&14เอกสารแนบใบรับรองผลการปฏิบัติงาน 2   \nหน้าที่ &P ของ &N   '});
+    { const C={h:'center',w:1}, TH={b:1,h:'center',bd:'all',w:1};
+      const kmTxt=((clean(p.projectName).match(/กม\.?\s*[\d+.,]+\s*[-–]\s*กม\.?\s*[\d+.,]+/)||[])[0]||'').replace(/\s*[-–]\s*/,' - ');
+      /* เนื้อหา 1 รายการ (1 แผ่น) — sh อาจเป็น sheet ทดลองที่ใช้วัดความสูงก่อนสร้างจริง
+         fill = ความสูงแถวว่างก่อนลายมือชื่อ ดันชื่อคณะกรรมการลงไปท้ายแผ่น */
+      const blk=(sh,o,fill)=>{
+        const top=sh.r+1;
+        { const t='รายการที่ '+o.no+'. '+o.name; sh.row(22,sh.span('A','G',t,{b:1,h:'center',sh:1})); sh.merge('A'+top+':G'+top); }
+        headLines.forEach(t=>{ const rr=sh.r+1; sh.row(20,sh.span('A','G',t,SH)); sh.merge('A'+rr+':G'+rr); });
+        { const rr=sh.r+1; sh.row(20,sh.span('A','G','โดยมี '+contractor,{sh:1})); sh.merge('A'+rr+':G'+rr); }
+        /* "ส่งมอบงานตามรายการนี้ ครั้งที่" ชิดขวาของแผ่น */
+        { const rr=sh.r+1; sh.row(20,sh.span('A','D',sendLine(''),{sh:1}).concat(sh.span('E','G','ส่งมอบงานตามรายการนี้  ครั้งที่ ...'+(o.times+1)+'...',{h:'right',sh:1})));
+          sh.merge('A'+rr+':D'+rr); sh.merge('E'+rr+':G'+rr); }
+        sh.row(6,[]);
+        const h1=sh.r+1, h2=h1+1;
+        sh.row(20,[['A','ลำดับที่',TH]].concat(sh.span('B','C','กม. - กม.',TH),sh.span('D','E','ปริมาณงานทำได้',TH),sh.span('F','G','หมายเหตุ',TH)));
+        sh.row(20,[['A',null,TH]].concat(sh.span('B','C',null,TH),sh.span('D','E',o.unit,TH),sh.span('F','G',null,TH)));
+        sh.merge('A'+h1+':A'+h2); sh.merge('B'+h1+':C'+h2); sh.merge('D'+h1+':E'+h1); sh.merge('D'+h2+':E'+h2); sh.merge('F'+h1+':G'+h2);
+        /* ตารางยาวแบบต้นแบบ: แถวข้อมูล 1 แถว + แถวว่างให้เขียนเพิ่ม เส้นล่างปิดตาราง แล้ว "รวม" ใต้ตาราง มีกรอบเฉพาะช่องปริมาณ */
+        const t1=sh.r+1, N=8;
+        /* หมายเหตุ: รายการที่มีถัวจ่าย = อนุมัติถัวจ่าย + ผลการทดลอง · ไม่มีถัวจ่าย = ผลการทดลองเริ่มบรรทัดบนสุด (เลขที่/อันดับที่ เว้นให้เติม) */
+        const DOT='';   /* เลขที่/อันดับที่ เว้นว่างไว้ให้เติมเอง */
+        const note=o.hasTua? ['- เบิกจ่ายตามอนุมัติถัวจ่ายตามบันทึก','เลขที่ '+DOT,'ผลการทดลอง "ใช้ได้" ตามข้อกำหนด',' - อันดับที่ '+DOT,' - อันดับที่ '+DOT]
+          : ['ผลการทดลอง "ใช้ได้" ตามข้อกำหนด',' - อันดับที่ '+DOT,' - อันดับที่ '+DOT];
+        for(let i=0;i<N;i++){ const rr=sh.r+1, cs={bd: i===N-1? 'lrb' : 'lr'};
+          sh.row(20,[['A',i? null : '1',Object.assign({h:'center',v:'top'},cs)]].concat(sh.span('B','C',i? null : (kmTxt||'-'),Object.assign({h:'left',v:'top',ind:1},cs)),
+            sh.span('D','E',i? null : o.now,Object.assign({h:'right',f:'qty0',v:'center',ind:1},cs)),sh.span('F','G',note[i]||null,Object.assign({h:'left',sh:1},cs))));
+          sh.merge('B'+rr+':C'+rr); sh.merge('D'+rr+':E'+rr); sh.merge('F'+rr+':G'+rr); }
+        const tl=sh.r, tr=sh.r+1;
+        sh.row(20,sh.span('B','C','รวม',{b:1,h:'right',ind:2}).concat(sh.span('D','E',o.now,{b:1,bd:'all',h:'right',f:'qty0',ind:1},'SUM(D'+t1+':D'+tl+')')));
+        sh.merge('B'+tr+':C'+tr); sh.merge('D'+tr+':E'+tr);
+        sh.row(10,[]);
+        /* บรรทัดสรุป: ค่าอยู่คอลัมน์ C หน่วย/บาทคอลัมน์ D · บรรทัดที่มีเงินด้วย: "เป็นเงิน" E จำนวนเงิน F "บาท" G · ค่าศูนย์แสดง "-" */
+        const LB=(t)=>sh.span('A','B',' '+t,{});
+        const one=(t,v,f,u)=>{ const rr=sh.r+1; sh.row(20,LB(t).concat([['C',v,{h:'right',f}],['D',u,{h:'center'}]])); sh.merge('A'+rr+':B'+rr); };
+        const two=(t,qv,f,u,mv)=>{ const rr=sh.r+1;
+          sh.row(20,LB(t).concat(qv===null? [] : [['C',qv,{h:'right',f}],['D',u,{h:'center'}]],[['E','เป็นเงิน',{h:'right'}],['F',mv,{h:'right',f:'money'}],['G','บาท',{h:'left',ind:1}]]));
+          sh.merge('A'+rr+':B'+rr); };
+        one('ผลงานที่ทำได้ตั้งแต่ต้นจนถึงครั้งที่แล้ว',o.prev,'qty',o.unit);
+        one('ผลงานที่ทำได้ในครั้งนี้',o.now,'qty',o.unit);
+        one('ค่างานในสัญญาตามรายการราคา   '+o.unit+'   ละ',o.pr,'money','บาท');
+        one('ค่างานในครั้งนี้คิดเป็นเงิน',o.nowM,'money','บาท');
+        { const rr=sh.r+1; sh.row(20,sh.span('A','G','(เงิน'+this.bahtText(o.nowM)+')',{b:1,h:'center',sh:1})); sh.merge('A'+rr+':G'+rr); }
+        two('ค่างานในสัญญาตามรายการนี้ทั้งหมดมี',o.q,'qty',o.unit,o.cM);
+        two('ค่างานที่ได้รับถัวจ่ายแล้วทั้งหมดมี',o.hasTua? o.tua : 0,'qty',o.unit,o.hasTua? this.dvAmt(o.it,o.tua) : 0);
+        two('ได้รับเงินค่างานตามรายการนี้ไปแล้ว',o.times,'baht','ครั้ง',o.prevM);
+        two('คงเหลือจ่ายสำหรับครั้งนี้และครั้งต่อไป',null,'','',m2((o.hasTua? this.dvAmt(o.it,o.tua) : o.cM)-o.prevM));
+        let gap=Math.floor(fill||0); while(gap>4){ const h=Math.min(400,gap); sh.row(h,[]); gap-=h; }
+        /* ประธานกลางหน้า (เส้นแบ่ง C|D ≈ กึ่งกลางความกว้าง) กรรมการซ้าย A:B|C ขวา D:F|G
+           — เส้นจุดฝั่งขวากว้างพอสำหรับชื่อยาว (เดิม D:E แคบ ชื่อล้นไปทับตำแหน่งของกรรมการฝั่งซ้าย) */
+        signFull(sh,c4,{gap:18, chair:['A','C','D','G'], left:['A','B','C','C'], right:['D','F','G','G']});   /* gap: เว้นที่ลงนามเหนือแต่ละชุดมากขึ้น (ตามตัวอย่าง) */
+      };
+      /* วัดความสูงแต่ละรายการ → อัตราย่อให้รายการที่ยาวที่สุดพอดี 1 แผ่น → เติมช่องว่างให้ลายมือชื่ออยู่ท้ายแผ่นทุกรายการ
+         ตัวแบ่งหน้าก่อนทุกรายการ (ไม่ใช้ "พอดี N หน้า" เพราะ Excel จะไม่สนตัวแบ่งหน้า) */
+      const hs=picked.map(o=>heightOf(c4,t=>blk(t,o,0)));
+      /* รายการที่ยาวที่สุดใช้ไม่เกิน 85% ของความสูงแผ่นหลังย่อ (เผื่อ Excel ปัดความสูงแถว ลายเซ็นไม่ตกไปแผ่นถัดไป) */
+      const scale4=Math.min(scaleFor(c4,m4s,0),Math.floor(((11.69-m4s.t-m4s.b)*72)*0.85/Math.max.apply(null,hs.concat([1]))*100));
+      const cap=((11.69-m4s.t-m4s.b)*72)/(scale4/100)*0.74+22;   /* +22 = ชุดลงนามลงมาอีก 1 บรรทัด */   /* ลายเซ็นอยู่ราว 80% ของความสูงแผ่น (ไม่ชิดขอบล่าง) เผื่อ: Excel ปัดความสูงแถวตามพิกเซล ถ้าเติมเต็มแผ่นลายเซ็นจะตกไปแผ่นถัดไป */
+      picked.forEach((o,k)=>{ if(k) s4.pageBreak(); blk(s4,o,cap-hs[k]); });
+      s4.opt.scale=scale4;
+    }
+
+    /* ---------- รวมเป็นไฟล์ ---------- */
+    const sheets=[s1,s2,s3,s4];
+    const NS='xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"', RNS='xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"';
+    const XML='<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n';
+    /* sheet ที่มีตัวแบ่งหน้าเอง (opt.scale) ต้องปิด fitToPage — ถ้าเปิด Excel จะไม่สนตัวแบ่งหน้า (รายการใหม่ไม่ขึ้นหน้าใหม่) */
+    const sheetXml=(s)=>XML+'<worksheet '+NS+' '+RNS+'><sheetPr>'+(s.opt.scale? '' : '<pageSetUpPr fitToPage="1"/>')+'</sheetPr>'
+      /* เปิดไฟล์มาเป็นมุมมอง "ดูตัวแบ่งหน้า" เห็นขอบกระดาษ A4 และเลขหน้าทุกแผ่น */
+      +'<sheetViews><sheetView showGridLines="0" view="pageBreakPreview" zoomScale="100" zoomScaleNormal="100" zoomScaleSheetLayoutView="100" workbookViewId="0"/></sheetViews>'
+      +'<sheetFormatPr defaultRowHeight="21" customHeight="1"/>'
+      +'<cols>'+s.cols.map((w,i)=>'<col min="'+(i+1)+'" max="'+(i+1)+'" width="'+w+'" customWidth="1"/>').join('')+'</cols>'
+      +'<sheetData>'+s.rows.join('')+'</sheetData>'
+      +(s.merges.length? '<mergeCells count="'+s.merges.length+'">'+s.merges.map(m=>'<mergeCell ref="'+m+'"/>').join('')+'</mergeCells>' : '')
+      /* narrow: ขอบกระดาษแคบสุด (0.1") และจัดกึ่งกลางแนวนอน — ใช้กับสรุปค่างานที่ต้องอยู่ใน A4 แผ่นเดียว
+         margins: ขอบที่กำหนดเองของ 01/02/03 (ขอบแคบ เหลือที่ด้านบนพอสำหรับหัวกระดาษ) */
+      +(s.opt.narrow? '<printOptions horizontalCentered="1" verticalCentered="1"/><pageMargins left="0.1" right="0.1" top="0.1" bottom="0.1" header="0" footer="0"/>'
+        : s.opt.margins? '<printOptions horizontalCentered="1"/><pageMargins left="'+s.opt.margins.l+'" right="'+s.opt.margins.r+'" top="'+s.opt.margins.t+'" bottom="'+s.opt.margins.b+'" header="'+s.opt.margins.h+'" footer="'+s.opt.margins.f+'"/>'
+        : '<pageMargins left="0.4" right="0.3" top="'+(s.opt.header? '0.9' : '0.5')+'" bottom="0.5" header="0.25" footer="0.25"/>')
+      +'<pageSetup paperSize="9" orientation="'+(s.opt.landscape? 'landscape' : 'portrait')+'"'
+        +(s.opt.scale? ' scale="'+s.opt.scale+'"' : ' fitToWidth="1" fitToHeight="'+(s.opt.fitH||0)+'"')+'/>'
+      /* หัวกระดาษไม่ย่อตามแผ่น (scaleWithDoc=0) ไม่เช่นนั้นข้อความชิดขวาถูกตัดที่ขอบกระดาษ */
+      +(s.opt.header? '<headerFooter scaleWithDoc="0" alignWithMargins="1"><oddHeader>'+esc(s.opt.header)+'</oddHeader></headerFooter>' : '')
+      +(s.breaks.length? '<rowBreaks count="'+s.breaks.length+'" manualBreakCount="'+s.breaks.length+'">'+s.breaks.map(b=>'<brk id="'+b+'" max="16383" man="1"/>').join('')+'</rowBreaks>' : '')
+      +'<ignoredErrors><ignoredError sqref="A1:N'+Math.max(1,s.r)+'" numberStoredAsText="1"/></ignoredErrors>'
+      +(s.opt.garuda? '<drawing r:id="rId1"/>' : '')
+      +'</worksheet>';
+    const font=(b,u,sz)=>'<font>'+(b?'<b/>':'')+(u?'<u/>':'')+'<sz val="'+(sz||14)+'"/><name val="TH Sarabun New"/><family val="2"/><charset val="222"/></font>';
+    const ln='<left style="thin"><color auto="1"/></left>', rn='<right style="thin"><color auto="1"/></right>', tp='<top style="thin"><color auto="1"/></top>', bt='<bottom style="thin"><color auto="1"/></bottom>';
+    const border=(l,r,t,b)=>'<border>'+(l?ln:'<left/>')+(r?rn:'<right/>')+(t?tp:'<top/>')
+      +(b==='dot'? '<bottom style="hair"><color auto="1"/></bottom>' : (b?bt:'<bottom/>'))+'<diagonal/></border>';
+    const q='&quot;';
+    const stylesXml=XML+'<styleSheet '+NS+'><numFmts count="9"><numFmt numFmtId="172" formatCode="00"/>'
+      +'<numFmt numFmtId="164" formatCode="#,##0.000"/><numFmt numFmtId="165" formatCode="#,##0.00"/>'
+      +'<numFmt numFmtId="166" formatCode="#,##0.000;-#,##0.000;'+q+'-'+q+'"/><numFmt numFmtId="167" formatCode="#,##0.00;-#,##0.00;'+q+'-'+q+'"/>'
+      +'<numFmt numFmtId="168" formatCode="#,##0;-#,##0;'+q+'-'+q+'"/><numFmt numFmtId="169" formatCode="00;-00;'+q+'-'+q+'"/>'
+      +'<numFmt numFmtId="170" formatCode="0%"/><numFmt numFmtId="171" formatCode="#,##0"/></numFmts>'
+      +'<fonts count="7">'+font(0,0)+font(1,0)+font(1,1)+font(0,0,16)+font(1,0,16)+font(0,0,14)+font(1,0,14)+'</fonts>'
+      +'<fills count="2"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill></fills>'
+      +'<borders count="11">'+border(0,0,0,0)+border(1,1,1,1)+border(1,1,0,0)+border(1,1,0,1)+border(1,1,1,0)+border(0,0,1,0)+border(0,0,0,1)+border(1,1,0,'dot')
+      +border(1,0,0,1)+border(0,1,0,1)+border(1,0,0,0)+'</borders>'
+      +'<cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs>'
+      +'<cellXfs count="'+xfs.length+'">'+xfs.join('')+'</cellXfs>'
+      +'<cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles></styleSheet>';
+    const enc=new TextEncoder(), file=(name,xml)=>({name,data:enc.encode(xml)});
+    const qn=(n)=>"'"+n.replace(/'/g,"''")+"'";
+    const titles=sheets.map((s,i)=>s.opt.titleRows? '<definedName name="_xlnm.Print_Titles" localSheetId="'+i+'">'+esc(qn(s.name))+'!'+s.opt.titleRows+'</definedName>' : '').join('');
+    /* ตราครุฑ: drawing วางแบบยึดเซลล์ (oneCellAnchor) กึ่งกลางความกว้างแผ่น 01 สูง 0.85 นิ้ว ในแถวแรก
+       ตำแหน่งคำนวณจากความกว้างคอลัมน์ (≈4.5 pt/หน่วย + 3.75 pt) แบบเดียวกับการแบ่งหน้า */
+    const gi=sheets.indexOf(s2), extra=[];
+    if(s2.opt.garuda){
+      const EMU=12700, colPt=(w)=>w*PUNIT+3.75, totPt=c2.reduce((t,w)=>t+colPt(w),0);
+      const hPt=61, wPt=hPt*533400/517525, x=totPt/2-wPt/2;
+      let col=0, acc=0; while(col<c2.length-1 && acc+colPt(c2[col])<=x){ acc+=colPt(c2[col]); col++; }
+      const drw=XML+'<xdr:wsDr xmlns:xdr="http://schemas.openxmlformats.org/drawingml/2006/spreadsheetDrawing" xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">'
+        +'<xdr:oneCellAnchor><xdr:from><xdr:col>'+col+'</xdr:col><xdr:colOff>'+Math.round((x-acc)*EMU)+'</xdr:colOff><xdr:row>0</xdr:row><xdr:rowOff>'+Math.round(1.5*EMU)+'</xdr:rowOff></xdr:from>'
+        +'<xdr:ext cx="'+Math.round(wPt*EMU)+'" cy="'+Math.round(hPt*EMU)+'"/>'
+        +'<xdr:pic><xdr:nvPicPr><xdr:cNvPr id="2" name="ตราครุฑ"/><xdr:cNvPicPr><a:picLocks noChangeAspect="1"/></xdr:cNvPicPr></xdr:nvPicPr>'
+        +'<xdr:blipFill><a:blip r:embed="rId1"/><a:stretch><a:fillRect/></a:stretch></xdr:blipFill>'
+        +'<xdr:spPr><a:xfrm><a:off x="0" y="0"/><a:ext cx="'+Math.round(wPt*EMU)+'" cy="'+Math.round(hPt*EMU)+'"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom></xdr:spPr></xdr:pic>'
+        +'<xdr:clientData/></xdr:oneCellAnchor></xdr:wsDr>';
+      const R='<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">';
+      extra.push(file('xl/drawings/drawing1.xml',drw),
+        file('xl/drawings/_rels/drawing1.xml.rels',XML+R+'<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="../media/garuda.png"/></Relationships>'),
+        file('xl/worksheets/_rels/sheet'+(gi+1)+'.xml.rels',XML+R+'<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/drawing" Target="../drawings/drawing1.xml"/></Relationships>'),
+        {name:'xl/media/garuda.png', data:garuda});
+    }
+    const blob=this.zipStore([
+      file('[Content_Types].xml',XML+'<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Default Extension="png" ContentType="image/png"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/>'
+        +sheets.map((s,i)=>'<Override PartName="/xl/worksheets/sheet'+(i+1)+'.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>').join('')
+        +(s2.opt.garuda? '<Override PartName="/xl/drawings/drawing1.xml" ContentType="application/vnd.openxmlformats-officedocument.drawing+xml"/>' : '')
+        +'<Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/></Types>'),
+      file('_rels/.rels',XML+'<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/></Relationships>'),
+      file('xl/workbook.xml',XML+'<workbook '+NS+' '+RNS+'><bookViews><workbookView activeTab="1"/></bookViews><sheets>'
+        +sheets.map((s,i)=>'<sheet name="'+esc(s.name)+'" sheetId="'+(i+1)+'" r:id="rId'+(i+1)+'"/>').join('')+'</sheets>'
+        +(titles? '<definedNames>'+titles+'</definedNames>' : '')+'</workbook>'),
+      file('xl/_rels/workbook.xml.rels',XML+'<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">'
+        +sheets.map((s,i)=>'<Relationship Id="rId'+(i+1)+'" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet'+(i+1)+'.xml"/>').join('')
+        +'<Relationship Id="rId'+(sheets.length+1)+'" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/></Relationships>')
+    ].concat(sheets.map((s,i)=>file('xl/worksheets/sheet'+(i+1)+'.xml',sheetXml(s))),[file('xl/styles.xml',stylesXml)],extra),
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    const short=this.contractShort(p).replace(/\s*\/\s*/g,'-').replace(/[\\:*?"<>|]/g,'-').replace(/\s+/g,' ').trim();
+    const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
+    a.download='PAYMENT '+(short||'โครงการ')+' ส่งงานครั้งที่ '+roundNo+'.xlsx';
+    document.body.appendChild(a); a.click();
+    setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); },1500);
+    this.setState({payDlg:null});
+  }
   coverWeeks(p){
     const D=(x)=>{ const d=new Date(String(x)+'T00:00:00'); return isNaN(d)?null:d; };
     const s0=D(p.contractDate||p.startDate); if(!s0) return [];
@@ -6978,6 +7592,37 @@ class Component extends DCLogic {
     return Math.round((this.dvAmt(it,prev+now)-this.dvAmt(it,prev))*100)/100;
   }
   dvMoney(p,di){ return Math.round((p.items||[]).reduce((s,it)=>s+this.dvItemMoney(p,di,it),0)*100)/100; }
+  /* ยอดหักของงวดส่งงาน di (ใช้ร่วมกันทั้ง PPTX และ Payment Excel) — amtNow = ค่างานงวดนี้ (ไม่ระบุ = ทั้งงวด)
+     · เงินประกันผลงาน: หัก retain% ทุกงวด · งวดสุดท้ายไม่หัก แต่ "คืน" เงินประกันที่หักไว้ทุกงวดก่อนหน้าทั้งหมด
+     · เงินจ่ายล่วงหน้า: ถ้างวดนั้นกรอก advance% (เช่น 15% ของวงเงินสัญญา) หักคืน 20% ของค่างานงวดนั้น
+       รวมทุกงวดไม่เกินวงเงินล่วงหน้า (advance% × วงเงินสัญญา) · งวดสุดท้ายหักส่วนที่ยังค้างให้หมด (ไม่เกินค่างานงวดนั้น) */
+  /* ค่า % ที่ใช้จริงของงวด i = ค่าจากงวดแรกสุดที่กรอกไว้ (กรอกงวดแรกครั้งเดียว งวดถัดไปใช้ตาม) */
+  dvEff(p,i,k){ const dl=this.dvList(p); for(let j=0;j<=i&&j<dl.length;j++){ const v=(dl[j]||{})[k]; if(v!==undefined && v!==null && String(v).trim()!=='') return this.num(v); } return 0; }
+  /* งวดที่ i ใช้ค่าที่สืบทอดจากงวดก่อน (ช่องกรอกของงวดนั้นแสดงค่าเดิมและแก้ไม่ได้) */
+  dvInherited(p,i,k){ return i>0 && this.dvEff(p,i-1,k)>0; }
+  dvPay(p,di,amtNow){
+    const dl=this.dvList(p), m2=(v)=>Math.round(v*100)/100;
+    const cv=this.num(p.contractValue)||m2((p.items||[]).reduce((t,it)=>t+this.num(it.qty)*this.num(it.price),0));
+    let advDone=0, retDone=0, r=null;
+    for(let j=0;j<=di&&j<dl.length;j++){
+      const d=dl[j]||{}, amt=(j===di&&amtNow!==undefined)? m2(amtNow) : this.dvMoney(p,j);
+      const rt=this.dvEff(p,j,'retain'), ad=this.dvEff(p,j,'advance'), final=!!d.final;
+      /* งวดปกติหักประกัน rt% · งวดสุดท้ายคืนเงินประกันที่หักไว้ทุกงวดก่อนหน้า */
+      const retain=final? retDone : m2(amt*rt/100);
+      if(!final) retDone=m2(retDone+retain);
+      /* เงินล่วงหน้า: หัก 20% ของค่างานงวดนี้ จนครบวงเงิน (ad% × วงเงินสัญญา) · ไม่พอ 20% หรืองวดสุดท้าย = หักส่วนที่เหลือทั้งหมด */
+      let adv=0, advNote='';
+      if(ad>0){ const left=Math.max(0,m2(m2(cv*ad/100)-advDone)), p20=m2(amt*0.2);
+        if(left<=0) advNote='หักครบแล้ว';
+        else if(final || left<=p20){ adv=Math.min(left,amt); advNote='หักส่วนที่เหลือทั้งหมด'; }
+        else { adv=p20; advNote='หักไว้ 20 % ตามรายการที่ขอเบิก'; } }
+      advDone=m2(advDone+adv);
+      const fine=m2(this.num(d.fineDays)*this.num(p.finePerDay));
+      r={amt, rt, ad, final, retain, retainLbl:final? 'คืน เงินประกันผลงาน' : 'หัก เงินประกันผลงาน', adv, advNote, advDone, advCap:m2(cv*ad/100), fine,
+        pay:m2(amt+(final? retain : -retain)-adv-fine)};
+    }
+    return r||{amt:0,rt:0,ad:0,final:false,retain:0,retainLbl:'หัก เงินประกันผลงาน',adv:0,advNote:'',advDone:0,advCap:0,fine:0,pay:0};
+  }
   /* ปริมาณเป้าหมายของรายการ: ถ้ากรอกถัวจ่ายไว้ใช้ถัวจ่าย ไม่เช่นนั้นใช้ปริมาณตามสัญญา */
   dvTarget(it){ const raw=it.tua; return (raw!==undefined && raw!==null && String(raw).trim()!=='')? this.num(raw) : this.num(it.qty); }
   dvRoundTxt(d,i){ return 'ครั้งที่ '+((d&&d.no)||(i+1))+((d&&d.final)?' (งวดสุดท้าย)':''); }
@@ -7301,30 +7946,38 @@ class Component extends DCLogic {
     /* สรุป PAYMENT */
     {
       const amt=items.reduce((t,it)=>t+(di>=0? this.dvItemMoney(p,di,it):0),0);
-      const rt=this.num(cur&&cur.retain), ad=this.num(cur&&cur.advance), fd=this.num(cur&&cur.fineDays);
-      const retain=amt*rt/100, adv=amt*ad/100, fine=fd*this.num(p.finePerDay);
-      const pay=amt-retain-adv-fine;
-      const cumAll=items.reduce((t,it)=>t+(di>=0? this.dvAmt(it,this.dvCum(p,di,it.no)):0),0);
+      const fd=this.num(cur&&cur.fineDays);
+      /* หักประกันผลงานทุกงวด (งวดสุดท้าย "คืน") · หักเงินล่วงหน้า 20% ของค่างานงวดนี้ รวมไม่เกินวงเงินล่วงหน้า */
+      const P=di>=0? this.dvPay(p,di,amt) : this.dvPay(p,-1);
+      const rt=P.rt, ad=P.ad, retain=P.retain, adv=P.adv, fine=P.fine, pay=P.pay;
+      /* ยอดเบิกจ่ายสะสม = ค่างานทุกงวดตั้งแต่งวดแรกถึงงวดนี้ ของทุกรายการในสัญญา (ไม่ใช่เฉพาะรายการที่เลือกลงสไลด์) */
+      const cumAll=Math.round(this.dvList(p).slice(0,di+1).reduce((t,x,j)=>t+(j===di? amt : this.dvMoney(p,j)),0)*100)/100;
       const cv=this.num(p.contractValue);
       const x=S(); head(x,'สรุป PAYMENT  ส่งงาน'+RD);
       const money=(v,o)=>C(v? M(v):'-',Object.assign({align:'right',bold:true},o||{}));
       const HF={fill:HEAD};
       const rows=[
         [C('รวมเงินตามรายการที่ขอเบิก  '+items.length+'  รายการ',{bold:true,fill:HEAD}),money(amt,HF),C('บาท',{align:'center',fill:HEAD})],
-        [C('หัก เงินประกันผลงาน  '+N(rt,0)+'  %'),money(retain),C('บาท',{align:'center'})],
-        [C('หัก เงินค่าจ่ายล่วงหน้า  '+N(ad,0)+'  %'),money(adv),C('บาท',{align:'center'})],
+        [C(P.final? P.retainLbl : P.retainLbl+'  '+N(rt,0)+'  %'),money(retain),C('บาท',{align:'center'})],
+        /* หมายเหตุการหักล่วงหน้า (หักไว้ 20 % / หักส่วนที่เหลือทั้งหมด) ตัวเล็กลงต่อท้ายป้าย */
+        /* ป้ายหักล่วงหน้า + วงเล็บหมายเหตุ ตัวอักษรเท่าบรรทัดอื่น (ช่องแรกกว้างพอ) */
+        [C('หัก เงินค่าจ่ายล่วงหน้า  '+N(ad,0)+'  %'+(P.advNote? '  ('+P.advNote+')' : ''),{}),money(adv),C('บาท',{align:'center'})],
         [C('หัก เงินค่าปรับ วันละ '+M(p.finePerDay)+' บาท  จำนวน '+(fd? N(fd,0):'-')+' วัน'),money(fine),C('บาท',{align:'center'})],
         [C('คงเป็นเงินที่ต้องจ่าย',{bold:true,fill:HEAD}),money(pay,HF),C('บาท',{align:'center',fill:HEAD})],
         [C('วงเงินค่างานก่อสร้างโครงการนี้'),money(cv),C('บาท',{align:'center'})],
         [C('รวมเป็นเงินที่สะสม'+RD),money(cumAll),C('บาท',{align:'center'})],
         [C('คงเหลือ',{bold:true}),money(cv-cumAll),C('บาท',{align:'center'})]
       ];
-      tbl(x,rows,[5.6,2.4,1.0],22,0.6);
+      tbl(x,rows,[6.3,2.0,0.9],22,0.6);   /* ช่องแรกกว้างขึ้น ให้บรรทัดหักล่วงหน้า + วงเล็บ อยู่บรรทัดเดียวที่ตัว 22 */
       foots(x);
     }
 
-    const tag=String(p.projectName||p.contractNo||'โครงการ').replace(/[\/\\:*?"<>|]/g,'-').slice(0,90).trim();
-    const fname=tag+' '+RD+'.pptx';
+    /* ชื่อไฟล์: งานนำเสนอตรวจรับงาน งวดที่ N_ทล.XXXX_สัญญา ... (ใช้ "/" ในชื่อไฟล์ไม่ได้ จึงคั่นด้วย "_" และเลขสัญญาใช้ "-" แทน "/") */
+    const hwNo=((String(p.projectName||'')+' '+String(p.location||'')).match(/ทางหลวง(?:หมายเลข)?\s*(\d+)/)||[])[1]||'';
+    const ctNo=String(p.contractNo||'').replace(/^\s*สัญญาเลขที่\s*/,'').replace(/\s*ลงวันที่[\s\S]*$/,'').replace(/\s+/g,'');
+    const rdNo=cur? String(cur.no||(di+1)).trim() : '1';
+    const fname=['งานนำเสนอตรวจรับงาน งวดที่ '+rdNo, hwNo? 'ทล.'+hwNo : '', ctNo? 'สัญญา '+ctNo : ''].filter(Boolean).join('_')
+      .replace(/[\/\:*?"<>|]/g,'-').slice(0,150).trim()+'.pptx';
     try{
       const blob=await pptx.write({outputType:'blob'});
       const a=document.createElement('a');
@@ -8328,6 +8981,36 @@ class Component extends DCLogic {
         build:this.buildPptx, close:this.closePptDlg
       };
     }
+    /* Payment (Excel): เลือกงวด แล้วเลือกรายการที่ขอเบิก (เฉพาะรายการที่กรอกปริมาณในงวดนั้น) */
+    const yg=this.state.payDlg;
+    out.payOpen=!!yg;
+    out.payExport=this.payExport;
+    if(yg){
+      const yp=this.byId(yg.pid)||{}, ydl=this.dvList(yp);
+      const setY=(o)=>this.setState({payDlg:Object.assign({},this.state.payDlg,o)});
+      const PB=(on)=>({ bg:on?'var(--color-accent)':'var(--color-neutral-100)', fg:on?'var(--color-bg)':'var(--color-neutral-800)', bd:on?'var(--color-accent)':'var(--color-divider)' });
+      const inRound=(it)=>yg.di>=0 && this.dvQty(yp,yg.di,it.no)>0;
+      const list=(yp.items||[]).filter(it=>this.num(it.qty)>0);
+      const sel=yg.sel||{};
+      const amt=list.reduce((t,it)=>t+(sel[it.no] && inRound(it)? this.dvItemMoney(yp,yg.di,it) : 0),0);
+      out.pay={
+        noRounds: ydl.length===0,
+        rounds: ydl.map((d,i)=>Object.assign({label:this.dvRoundLabel(d,i), pick:()=>setY({di:i, sel:this.payRoundSel(yp,i)})}, PB(yg.di===i))),
+        hasRound: yg.di>=0 && !!ydl[yg.di],
+        roundLabel: (yg.di>=0 && ydl[yg.di])? this.dvRoundLabel(ydl[yg.di],yg.di) : '',
+        roundOn:()=>setY({sel:this.payRoundSel(yp,(this.state.payDlg||yg).di)}),
+        noneOn:()=>setY({sel:{}}),
+        items: list.map(it=>{ const can=inRound(it);
+          return { no:it.no, name:it.name||'', on:!!(can && sel[it.no]), off:!can, op: can? '1' : '.45',
+            qtyTxt: can? this.n(this.dvQty(yp,yg.di,it.no),3)+' '+this.workUnit(it.unit) : '-',
+            toggle:()=>{ const s=Object.assign({},(this.state.payDlg||yg).sel||{}); if(s[it.no]) delete s[it.no]; else s[it.no]=true; setY({sel:s}); } }; }),
+        selCount: list.filter(it=>sel[it.no] && inRound(it)).length,
+        amtTxt: this.cmoney(Math.round(amt*100)/100),
+        cantBuild: !(yg.di>=0 && ydl[yg.di]),
+        build:()=>this.buildPaymentXlsx(),
+        close:()=>this.setState({payDlg:null})
+      };
+    } else out.pay={rounds:[],items:[]};
     const tg=this.state.tuaDlg;
     out.tuaOpen=!!tg;
     if(tg){
@@ -8938,8 +9621,14 @@ class Component extends DCLogic {
         full:!!d.full, setFull:setFull(i),
         dDate:d.dDate||'', setDDate:setDv(i,'dDate'),
         iDate:d.iDate||'', setIDate:setDv(i,'iDate'),
-        retain:d.retain===undefined?'':d.retain, setRetain:setDv(i,'retain'),
-        advance:d.advance===undefined?'':d.advance, setAdvance:setDv(i,'advance'),
+        /* หักประกัน / หักล่วงหน้า: กรอกงวดแรกครั้งเดียว งวดถัดไปแสดงค่าเดิมและแก้ไม่ได้ · งวดสุดท้าย = คืนประกันผลงาน */
+        retain:(this.dvEff(p,i,'retain')||(d.retain===undefined?'':d.retain))||'', setRetain:setDv(i,'retain'),
+        retainLock:!!(this.dvInherited(p,i,'retain')||!this.canEditProject()),
+        retainLbl:d.final? 'คืนประกันผลงาน %' : 'หักประกันผลงาน %',
+        advOn:this.dvEff(p,i,'advance')>0, advPct:(this.dvEff(p,i,'advance')||15)+'%',
+        advLock:!!(this.dvInherited(p,i,'advance')||!this.canEditProject()),
+        setAdvOn:(e)=>{ const np=JSON.parse(JSON.stringify(p)); const x=(np.deliveries||[])[i]; if(!x) return; x.advance=e.target.checked? '15' : ''; this.writeProject(np); },
+        advNote:this.dvEff(p,i,'advance')>0? '('+(this.dvPay(p,i).advNote||'หักไว้ 20 % ตามรายการที่ขอเบิก')+')' : '-',
         fineDays:d.fineDays===undefined?'':d.fineDays, setFineDays:setDv(i,'fineDays'),
         note:d.note||'', setNote:setDv(i,'note'),
         moneyTxt:this.cmoney(this.dvMoney(p,i)),
