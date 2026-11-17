@@ -3366,7 +3366,7 @@ svg.leaflet-image-layer.leaflet-interactive path {
     <div style="display:flex;align-items:flex-start;gap:10px;padding:12px 12px 12px 18px;border-bottom:1px solid var(--color-divider);flex:0 0 auto">
       <div style="min-width:0;flex:1 1 auto">
         <div class="hd" style="font-size:15px;line-height:1.3">{{ appt.contractLine }}</div>
-        <div class="lbl" style="font-size:11.5px;font-weight:400;margin-top:1px">{{ appt.heading }}</div>
+        <div style="font-size:13.5px;font-weight:700;margin-top:2px;color:#c2410c">{{ appt.heading }}</div>
       </div>
       <button sc-camel-on-click="{{ closeAppt }}" aria-label="ปิด" style="flex:0 0 auto;width:34px;height:34px;display:flex;align-items:center;justify-content:center;border:1px solid var(--color-divider);background:var(--color-neutral-200);color:var(--color-text);border-radius:999px;cursor:pointer;padding:0">
         <svg sc-camel-view-box="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"></path></svg>
@@ -3504,9 +3504,8 @@ svg.leaflet-image-layer.leaflet-interactive path {
 
       <sc-if value="{{ appt.hasContract }}" hint-placeholder-val="{{ true }}">
       <div style="margin-top:16px;border-top:1px solid var(--color-divider);padding-top:12px">
-        <div class="hd" style="font-size:14px;margin-bottom:8px">ข้อมูลสัญญา</div>
         <!-- วันเริ่ม / วันสิ้นสุด / ระยะเวลา แถวเดียวกัน · ค่างาน / ค่าปรับวันละ แถวเดียวกัน (ตาราง 12 ช่อง) -->
-        <div style="display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:0 12px;border-top:1px solid var(--color-divider)">
+        <div style="display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:0 12px">
           <sc-for list="{{ appt.contract }}" as="c" hint-placeholder-count="5">
             <div style="grid-column:span {{ c.span }};min-width:0;padding:8px 0;border-bottom:1px solid var(--color-divider)">
               <div style="font-size:12.5px;font-weight:700;line-height:1.4;color:var(--color-text)">{{ c.label }}</div>
@@ -3517,10 +3516,9 @@ svg.leaflet-image-layer.leaflet-interactive path {
       </div>
       </sc-if>
 
-      <div style="margin-top:16px;border-top:1px solid var(--color-divider);padding-top:12px">
-        <div class="hd" style="font-size:14px;margin-bottom:8px">ผู้เกี่ยวข้องในการตรวจรับ</div>
+      <div style="margin-top:6px">
         <!-- คณะกรรมการเต็มแถว · ช่างควบคุมงาน / ผู้ช่วยช่างควบคุมงาน แถวเดียวกัน · ผู้ควบคุมงานด้านวัสดุ / ผู้รับจ้าง แถวเดียวกัน -->
-        <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 14px;border-top:1px solid var(--color-divider)">
+        <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 14px">
           <sc-for list="{{ appt.people }}" as="g" hint-placeholder-count="5">
             <div style="grid-column:span {{ g.span }};min-width:0;padding:8px 0;border-bottom:1px solid var(--color-divider)">
               <div style="font-size:12.5px;font-weight:700;line-height:1.4;color:var(--color-text);margin-bottom:2px">{{ g.label }}</div>
@@ -9265,7 +9263,8 @@ class Component extends DCLogic {
       const hours=[]; for(let i=0;i<24;i++) hours.push(String(i).padStart(2,'0'));
       const mins=[]; for(let i=0;i<60;i+=5) mins.push(String(i).padStart(2,'0'));
       out.appt={ heading: canEditAppt? 'รายละเอียดนัดตรวจรับงาน' : 'นัดตรวจรับงาน',
-        contractLine: ap? (ap.contractNo||'ยังไม่ระบุเลขสัญญา') : 'นัดตรวจรับงาน',
+        /* หัวหน้าต่าง: เลขที่สัญญา (ไม่แสดง "ลงวันที่ …") */
+        contractLine: ap? (String(ap.contractNo||'').replace(/\s*ลงวันที่[\s\S]*$/,'').trim()||'ยังไม่ระบุเลขสัญญา') : 'นัดตรวจรับงาน',
         canEdit:canEditAppt, readOnly:!canEditAppt, pid:ad.pid||'',
         setPid:this.setAppt('pid'), setStatus:this.setAppt('status'),
         date:ad.date||'', setDate:this.setAppt('date'),
