@@ -2076,12 +2076,12 @@ svg.leaflet-image-layer.leaflet-interactive path {
               </sc-if>
               <button sc-camel-on-click="{{ a.toggle }}" aria-expanded="{{ a.ariaExp }}" style="display:flex;flex-direction:column;gap:3px;text-align:left;width:100%;border:0;background:transparent;padding:0;cursor:pointer;font-family:var(--font-body)">
                 <div style="display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;width:100%;padding-right:{{ a.navPad }};min-height:22px">
-                  <span class="val" style="font-size:14px;font-weight:700;color:{{ a.fg }}">{{ a.time }}</span>
+                  <span class="val" style="font-size:14px;font-weight:700;color:{{ a.fg }}"><span style="color:var(--color-text)">เวลานัด </span>{{ a.time }}</span>
                   <span class="lbl" style="font-size:11.5px;font-weight:700;color:{{ a.fg }}">{{ a.doneTxt }}</span>
                 </div>
                 <div class="val" style="font-size:12.5px;font-weight:700;line-height:1.35;color:var(--color-text)">{{ a.contractNo }}<span style="font-weight:700;color:{{ a.fg }}">&nbsp;&nbsp;{{ a.inspTxt }}</span></div>
                 <div class="lbl" style="font-size:12px;font-weight:400;line-height:1.4"><sc-for list="{{ a.projWords }}" as="w" hint-placeholder-count="6"><span style="white-space:pre;display:inline-block">{{ w }}</span></sc-for></div>
-                <div class="lbl" style="font-size:12px;font-weight:400;line-height:1.4">สถานที่&nbsp; {{ a.place }}</div>
+                <div class="val" style="font-size:12.5px;font-weight:700;line-height:1.4;color:var(--color-text)">สถานที่ / จุดนัดพบ&nbsp; <span style="color:#c2410c">{{ a.place }}</span></div>
                 <sc-for list="{{ a.chairGroups }}" as="gr" hint-placeholder-count="1">
                   <div style="width:100%;margin-top:4px;padding-top:4px;border-top:1px solid {{ a.bd }}">
                     <div style="font-size:11px;font-weight:700;line-height:1.4;color:{{ a.fg }}">{{ gr.label }}</div>
@@ -9190,7 +9190,7 @@ class Component extends DCLogic {
             /* "ตรวจรับงานครั้งที่ N งวดที่ N" ต่อท้ายเลขสัญญา (ไม่แสดง "ลงวันที่ …") */
             const ph=String(a.phase||'').trim(), no=String(a.phaseNo||'').trim().replace(/^\(\s*(.*?)\s*\)$/,'$1');
             const inspTxt=[ph? (/^\d+$/.test(ph)? 'ตรวจรับงานครั้งที่ '+ph : ph) : '', no].filter(Boolean).join(' ');
-            return { time:'เวลานัด '+(this.timeTh(a.time)||'ไม่ระบุเวลา'), status:this.normStatus(a.status), inspTxt,
+            return { time:this.timeTh(a.time)||'ไม่ระบุเวลา', status:this.normStatus(a.status), inspTxt,
               /* ชื่อทางหลวง: ตัดบรรทัดได้เฉพาะที่ช่องว่าง (ไม่ตัดกลางคำ เช่น "ห้วย|หูด") */
               projWords:String(a.project.projectName||'-').trim().split(/\s+/).map((w,i,arr)=>w+(i<arr.length-1? ' ' : '')),
               /* แสดงสถานะเฉพาะ "ตรวจแล้ว" (ตำแหน่งเดิมของ "นัดแล้ว" เป็นสัญลักษณ์นำทาง) */
