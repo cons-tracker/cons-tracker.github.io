@@ -2065,7 +2065,7 @@ svg.leaflet-image-layer.leaflet-interactive path {
       </sc-if>
       <sc-for list="{{ calAgenda }}" as="g" hint-placeholder-count="2">
         <div style="display:flex;flex-direction:column;gap:6px">
-          <div class="val" style="font-size:12.5px;font-weight:700;color:var(--color-text)">{{ g.dateTh }}</div>
+          <div class="val" style="font-size:16px;font-weight:700;color:var(--color-text)">{{ g.dateTh }}</div>
           <sc-for list="{{ g.appts }}" as="a" hint-placeholder-count="1">
             <div style="position:relative;border:1px solid {{ a.bd }};background:{{ a.bg }};border-radius:var(--radius-md);padding:10px 12px">
               <!-- สัญลักษณ์นำทางมุมขวาบน (แทนข้อความสถานะ "นัดแล้ว") วางนอกปุ่มพับ/ขยาย เพราะลิงก์ซ้อนในปุ่มไม่ได้ -->
@@ -2079,9 +2079,9 @@ svg.leaflet-image-layer.leaflet-interactive path {
                   <span class="val" style="font-size:14px;font-weight:700;color:{{ a.fg }}">{{ a.time }}</span>
                   <span class="lbl" style="font-size:11.5px;font-weight:700;color:{{ a.fg }}">{{ a.doneTxt }}</span>
                 </div>
-                <div class="val" style="font-size:12.5px;font-weight:700;line-height:1.35;color:var(--color-text)">{{ a.contractNo }}</div>
-                <div class="lbl" style="font-size:12px;font-weight:400;line-height:1.4">{{ a.projectName }}</div>
-                <div class="lbl" style="font-size:12px;font-weight:400;line-height:1.4">{{ a.phase }} · {{ a.place }}</div>
+                <div class="val" style="font-size:12.5px;font-weight:700;line-height:1.35;color:var(--color-text)">{{ a.contractNo }}<span style="font-weight:700;color:{{ a.fg }}">&nbsp;&nbsp;{{ a.inspTxt }}</span></div>
+                <div class="lbl" style="font-size:12px;font-weight:400;line-height:1.4"><sc-for list="{{ a.projWords }}" as="w" hint-placeholder-count="6"><span style="white-space:pre;display:inline-block">{{ w }}</span></sc-for></div>
+                <div class="lbl" style="font-size:12px;font-weight:400;line-height:1.4">สถานที่&nbsp; {{ a.place }}</div>
                 <sc-for list="{{ a.chairGroups }}" as="gr" hint-placeholder-count="1">
                   <div style="width:100%;margin-top:4px;padding-top:4px;border-top:1px solid {{ a.bd }}">
                     <div style="font-size:11px;font-weight:700;line-height:1.4;color:{{ a.fg }}">{{ gr.label }}</div>
@@ -3505,11 +3505,12 @@ svg.leaflet-image-layer.leaflet-interactive path {
       <sc-if value="{{ appt.hasContract }}" hint-placeholder-val="{{ true }}">
       <div style="margin-top:16px;border-top:1px solid var(--color-divider);padding-top:12px">
         <div class="hd" style="font-size:14px;margin-bottom:8px">ข้อมูลสัญญา</div>
-        <div style="display:flex;flex-direction:column">
+        <!-- วันเริ่ม / วันสิ้นสุด / ระยะเวลา แถวเดียวกัน · ค่างาน / ค่าปรับวันละ แถวเดียวกัน (ตาราง 12 ช่อง) -->
+        <div style="display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:0 12px;border-top:1px solid var(--color-divider)">
           <sc-for list="{{ appt.contract }}" as="c" hint-placeholder-count="5">
-            <div style="display:flex;flex-wrap:wrap;gap:2px 12px;padding:8px 0;border-top:1px solid var(--color-divider)">
-              <div style="flex:0 0 170px;font-size:13px;font-weight:700;line-height:1.5;color:var(--color-accent-700)">{{ c.label }}</div>
-              <div class="val" style="flex:1 1 270px;min-width:0;font-size:13px;line-height:1.5;font-variant-numeric:tabular-nums">{{ c.value }}</div>
+            <div style="grid-column:span {{ c.span }};min-width:0;padding:8px 0;border-bottom:1px solid var(--color-divider)">
+              <div style="font-size:12.5px;font-weight:700;line-height:1.4;color:var(--color-text)">{{ c.label }}</div>
+              <div class="val" style="font-size:13px;line-height:1.5;font-variant-numeric:tabular-nums;overflow-wrap:anywhere">{{ c.value }}</div>
             </div>
           </sc-for>
         </div>
@@ -3518,13 +3519,14 @@ svg.leaflet-image-layer.leaflet-interactive path {
 
       <div style="margin-top:16px;border-top:1px solid var(--color-divider);padding-top:12px">
         <div class="hd" style="font-size:14px;margin-bottom:8px">ผู้เกี่ยวข้องในการตรวจรับ</div>
-        <div style="display:flex;flex-direction:column">
+        <!-- คณะกรรมการเต็มแถว · ช่างควบคุมงาน / ผู้ช่วยช่างควบคุมงาน แถวเดียวกัน · ผู้ควบคุมงานด้านวัสดุ / ผู้รับจ้าง แถวเดียวกัน -->
+        <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 14px;border-top:1px solid var(--color-divider)">
           <sc-for list="{{ appt.people }}" as="g" hint-placeholder-count="5">
-            <div style="display:flex;flex-wrap:wrap;gap:2px 12px;padding:8px 0;border-top:1px solid var(--color-divider)">
-              <div style="flex:0 0 170px;font-size:13px;font-weight:700;line-height:1.5;color:var(--color-accent-700)">{{ g.label }}</div>
-              <div style="flex:1 1 270px;min-width:0;display:flex;flex-direction:column;gap:3px">
+            <div style="grid-column:span {{ g.span }};min-width:0;padding:8px 0;border-bottom:1px solid var(--color-divider)">
+              <div style="font-size:12.5px;font-weight:700;line-height:1.4;color:var(--color-text);margin-bottom:2px">{{ g.label }}</div>
+              <div style="display:flex;flex-direction:column;gap:2px">
                 <sc-for list="{{ g.names }}" as="nm" hint-placeholder-count="2">
-                  <div class="val" style="font-size:13px;line-height:1.5">{{ nm }}</div>
+                  <div class="val" style="font-size:13px;line-height:1.5;overflow-wrap:anywhere">{{ nm }}</div>
                 </sc-for>
               </div>
             </div>
@@ -9187,7 +9189,12 @@ class Component extends DCLogic {
           dateTh:'วัน'+DOWFULL[d.getDay()]+'ที่ '+d.getDate()+' '+this.MONTHS_S[d.getMonth()]+' '+(d.getFullYear()+543),
           appts:byDate[iso].slice().sort((a,b)=>String(a.time||'').localeCompare(String(b.time||''))).map(a=>{
             const s=this.apptBoxStyle(a.status,a.project);
-            return { time:this.timeTh(a.time)||'ไม่ระบุเวลา', status:this.normStatus(a.status),
+            /* "ตรวจรับงานครั้งที่ N งวดที่ N" ต่อท้ายเลขสัญญา (ไม่แสดง "ลงวันที่ …") */
+            const ph=String(a.phase||'').trim(), no=String(a.phaseNo||'').trim().replace(/^\(\s*(.*?)\s*\)$/,'$1');
+            const inspTxt=[ph? (/^\d+$/.test(ph)? 'ตรวจรับงานครั้งที่ '+ph : ph) : '', no].filter(Boolean).join(' ');
+            return { time:'เวลานัด '+(this.timeTh(a.time)||'ไม่ระบุเวลา'), status:this.normStatus(a.status), inspTxt,
+              /* ชื่อทางหลวง: ตัดบรรทัดได้เฉพาะที่ช่องว่าง (ไม่ตัดกลางคำ เช่น "ห้วย|หูด") */
+              projWords:String(a.project.projectName||'-').trim().split(/\s+/).map((w,i,arr)=>w+(i<arr.length-1? ' ' : '')),
               /* แสดงสถานะเฉพาะ "ตรวจแล้ว" (ตำแหน่งเดิมของ "นัดแล้ว" เป็นสัญลักษณ์นำทาง) */
               doneTxt:this.normStatus(a.status)==='ตรวจแล้ว'? 'ตรวจแล้ว ✓' : '',
               navPad:this.navUrlOf(a.project)? '44px' : '0',
@@ -9196,7 +9203,7 @@ class Component extends DCLogic {
               cellTxt:(a.time||'')+' '+(String(a.project.contractNo||'').replace(/^สัญญาเลขที่\s*/,'')||'-'),
               hasNew:false, newTxt:'',
               phase:this.phaseLabel(a), place:a.place||'-',
-              contractNo:String(a.project.contractNo||'').replace(/^สัญญาเลขที่\s*/,'')||'ไม่ระบุเลขสัญญา',
+              contractNo:String(a.project.contractNo||'').replace(/^สัญญาเลขที่\s*/,'').replace(/\s*ลงวันที่[\s\S]*$/,'').trim()||'ไม่ระบุเลขสัญญา',
               projectName:a.project.projectName||'-',
               bg:s.bg, fg:s.fg, bd:s.bd, open:this.openAppt(a.pid,a.id) }; }) });
       });
@@ -9322,8 +9329,8 @@ class Component extends DCLogic {
               opts:[{v:'',t:'-'}].concat(NUMS.map(n=>({v:n, t:'(งวดที่ '+n+')'}))).concat([{v:'งวดสุดท้าย', t:'(งวดสุดท้าย)'}]) }
           ]; })(),
         fields:[ AF('สถานที่ / จุดนัดพบ','place','text',2,'เช่น หน้างาน , กม.3+200 , แขวงทางหลวงฯ') ],
-        readRows:[ {label:'เลขที่สัญญา', value: ap? (String(ap.contractNo||'').replace(/^\s*สัญญาเลขที่\s*/,'')||'-'):'-', span:2},
-          {label:'โครงการ', value: ap? this.apptTitle(ap):'-', span:2},
+        /* เลขที่สัญญาแสดงที่หัวหน้าต่างแล้ว จึงไม่ซ้ำในเนื้อหา */
+        readRows:[ {label:'โครงการ', value: ap? this.apptTitle(ap):'-', span:2},
         ],
         emRows:[ {label:'วันที่นัด', value:this.th(ad.date), span:1},
           {label:'เวลานัด', value:this.timeTh(ad.time)||'-', span:1},
@@ -9332,8 +9339,11 @@ class Component extends DCLogic {
           {label:'สถานที่ / จุดนัดพบ', value:ad.place||'-', span:2},
         ],
         navUrl:this.navUrlOf(ap), hasNav:!!this.navUrlOf(ap),
-        hasContract:!!ap, contract: ap? this.contractFacts(ap) : [],
-        people: ap? this.peopleGroups(ap) : [] };
+        /* ข้อมูลสัญญา: กลุ่มวันที่ (วันเริ่ม/สิ้นสุด/ระยะเวลา) แบ่งแถวแรกเท่า ๆ กัน · ค่างาน/ค่าปรับ คนละครึ่งแถว (ตาราง 12 ช่อง) */
+        hasContract:!!ap, contract: ap? (()=>{ const f=this.contractFacts(ap), nd=Math.max(1,f.length-2);
+          return f.map((c,i)=>Object.assign({},c,{span: i<nd? Math.max(3,Math.floor(12/nd)) : 6})); })() : [],
+        /* ผู้เกี่ยวข้อง: คณะกรรมการเต็มแถว ที่เหลือแถวละ 2 กลุ่ม */
+        people: ap? this.peopleGroups(ap).map((g,i)=>Object.assign({},g,{span: i===0? 2 : 1})) : [] };
     } else { const _dp={isDate:true,isPlain:false,open:false,displayTxt:'เลือกวันที่',cells:[],dowNames:[],monthTh:'',toggle:()=>{},close:()=>{},prev:()=>{},next:()=>{},clear:()=>{},goToday:()=>{}};
       out.appt={hasContract:false,contract:[],people:[],fields:[],numFields:[],pHits:[],readRows:[],emRows:[],projectOptions:[],statusOptions:[],hourOptions:[],minOptions:[],dateTh:'',newDateTh:'',dateF:_dp}; }
 
