@@ -7381,14 +7381,18 @@ class Component extends DCLogic {
     const rest=com.filter(c=>c!==chair);
     const dirP=this.personBy('ผอ.ขท.'+dist);
     const sign=p.contractDate? cdn(new Date(p.contractDate+'T00:00:00')) : '';
-    const body=['ตามสัญญาเลขที่ '+shortTxt, sign?('ลงวันที่ '+sign):'',
+    /* วันสิ้นสุดสัญญา: ขยายสัญญาแล้ว — ตั้งแต่สัปดาห์ที่มีวันสิ้นสุดสัญญา (เดิม) เป็นต้นไป แสดงทั้งเดิมและใหม่
+       สัปดาห์ก่อนหน้านั้นแสดงเฉพาะวันสิ้นสุดสัญญาเดิม */
+    const body=(w)=>['ตามสัญญาเลขที่ '+shortTxt, sign?('ลงวันที่ '+sign):'',
       'งบประมาณรายจ่ายประจำปีงบประมาณ พ.ศ. '+(p.fiscalYear||''),
       p.program1||'', p.jobCode?('รหัสงาน '+p.jobCode):'', p.program2||'', p.projectName||'',
       'เริ่มสัญญาวันที่ '+cdn(p.startDate?new Date(p.startDate+'T00:00:00'):null),
       (()=>{ const E=(x)=>x? cdn(new Date(x+'T00:00:00')) : '';
         const o=E(p.endDateOrig), n=E(p.endDate);
-        if(o&&n&&p.endDateOrig!==p.endDate) return 'สิ้นสุดสัญญาวันที่ '+o+' ขยายสัญญาสิ้นสุดวันที่ '+n;
-        return 'สิ้นสุดสัญญาวันที่ '+(n||o); })(),
+        if(o&&n&&p.endDateOrig!==p.endDate){
+          const after=w && w.e && w.e>=new Date(p.endDateOrig+'T00:00:00');
+          return after? 'สิ้นสุดสัญญา(เดิม) วันที่ '+o+' สิ้นสุดสัญญา(ใหม่) วันที่ '+n : 'สิ้นสุดสัญญา วันที่ '+o; }
+        return 'สิ้นสุดสัญญา วันที่ '+(n||o); })(),
       'ระยะเวลาทำการ '+(this.durOf(p)||p.duration||0)+' วัน',
       'ค่างาน '+this.cmoney(p.contractValue)+' บาท',
       'ค่าปรับผิดสัญญาวันละ '+this.cmoney(p.finePerDay)+' บาท',
@@ -7430,7 +7434,7 @@ class Component extends DCLogic {
       x+=P(R('เรียน   ผอ.ขท.'+dist),{before:120});
       x+=P(R('ผู้ควบคุมขอรายงานการปฏิบัติงานของผู้รับจ้างดังต่อไปนี้'));
       x+=P('',{sz:12});
-      x+=P(R(body),{jc:'thaiDistribute',first:1134});
+      x+=P(R(body(w)),{jc:'thaiDistribute',first:1134});
       x+=P('',{sz:12});
       x+=P(R('รายงานการปฏิบัติงานสัปดาห์ที่ '+(w.no||(i+1))+' ระหว่างวันที่ '+cdn(w.s)+' – '+cdn(w.e)),{first:1134});
       x+=P(R('จึงเรียนมาเพื่อโปรดทราบพร้อมรายละเอียดแนบ'),{first:1134,before:120});
