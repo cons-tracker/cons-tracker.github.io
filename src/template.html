@@ -6966,16 +6966,16 @@ class Component extends DCLogic {
         para(sh,'A','M','คณะกรรมการตรวจรับพัสดุผู้มีรายนามข้างท้ายนี้ได้พร้อมกันตรวจงานซึ่ง  '+contractor+' เป็นผู้รับจ้าง ทำการแล้วเสร็จ'+(final? '' : 'บางส่วน'));
         /* note = ข้อความในวงเล็บต่อจาก % (ช่อง D:H) เช่น ( หักไว้ 20 % ตามรายการที่ขอเบิก ) */
         const money=(lbl,pct,amount,f,o,note)=>{ const rr=sh.r+1;
-          sh.row(22,sh.span('A','B',lbl,o||{}).concat([['C',pct,{h:'center'}]],note? sh.span('D','H','( '+note+' )',{sh:1}) : [],[['I','เป็นเงิน',{h:'right'}]],sh.span('J','K',amount,Object.assign({h:'right',f:'moneyD'},o||{}),f),[['M','บาท',{}]]));
+          sh.row(22,sh.span('A','B',lbl,o||{}).concat([['C',pct,{h:'center'}]],note? sh.span('D','H','( '+note+' )',{sh:1}) : [],[['I','เป็นเงิน',{h:'right'}]],sh.span('J','K',amount,Object.assign({h:'right',f:'moneyD'},o||{}),f),[['L','บาท',{ind:1}]]));
           sh.merge('A'+rr+':B'+rr); sh.merge('J'+rr+':K'+rr); if(note) sh.merge('D'+rr+':H'+rr); return rr; };
         const rAmt=money('รวมเงินตามรายการที่ขอเบิก',picked.length+' รายการ',amt,'K'+tr);
         const rRet=money(retainLbl, pctTxt(rt), retain, fRet('J'+rAmt));
         const rAdv=money('หัก เงินจ่ายล่วงหน้า', pctTxt(ad), adv, fAdv('J'+rAmt), undefined, PY.advNote);
         const rFine=sh.r+1;
-        sh.row(22,sh.span('A','B','หัก เงินค่าปรับวันละ',{}).concat([['C',fpd,{h:'right',f:'money0'}],['D','บาท',{}],['E','จำนวน',{h:'right'}],['F',fd||'-',{h:'center'}],['G','วัน',{}],['I','เป็นเงิน',{h:'right'}]],sh.span('J','K',fine,{h:'right',f:'moneyD'},fFine('C'+rFine,'F'+rFine)),[['M','บาท',{}]]));
+        sh.row(22,sh.span('A','B','หัก เงินค่าปรับวันละ',{}).concat([['C',fpd,{h:'right',f:'money0'}],['D','บาท',{}],['E','จำนวน',{h:'right'}],['F',fd||'-',{h:'center'}],['G','วัน',{}],['I','เป็นเงิน',{h:'right'}]],sh.span('J','K',fine,{h:'right',f:'moneyD'},fFine('C'+rFine,'F'+rFine)),[['L','บาท',{ind:1}]]));
         sh.merge('A'+rFine+':B'+rFine); sh.merge('J'+rFine+':K'+rFine);
         const rPay=sh.r+1;   /* ยอดคงเป็นเงินที่ต้องจ่าย: ตัวหนา ไม่ขีดเส้นใต้ */
-        sh.row(24,sh.span('A','B','คงเป็นเงินที่ต้องจ่าย',{b:1}).concat([['I','เป็นเงิน',{h:'right'}]],sh.span('J','K',pay,{b:1,h:'right',f:'money'},'J'+rAmt+(final?'+':'-')+'J'+rRet+'-J'+rAdv+'-J'+rFine),[['M','บาท',{}]]));
+        sh.row(24,sh.span('A','B','คงเป็นเงินที่ต้องจ่าย',{b:1}).concat([['I','เป็นเงิน',{h:'right'}]],sh.span('J','K',pay,{b:1,h:'right',f:'money'},'J'+rAmt+(final?'+':'-')+'J'+rRet+'-J'+rAdv+'-J'+rFine),[['L','บาท',{ind:1}]]));
         sh.merge('A'+rPay+':B'+rPay); sh.merge('J'+rPay+':K'+rPay);
         /* ตัวอักษรจำนวนเงิน: ท้ายข้อความตรงแนวเส้นขวาของช่องจำนวนเงิน (K) ก่อนคำว่า "บาท" */
         para(sh,'A','K','(เงิน'+this.bahtText(pay)+')',{b:1,h:'right'});
@@ -7119,8 +7119,19 @@ class Component extends DCLogic {
         return {body:L, tail};
       };
       const blk=(sh,o,fill,L)=>{ const rh=L.rh, ov=ovLines(o);
+        /* หมายเหตุ: รายการที่มีถัวจ่าย = อนุมัติถัวจ่าย + ผลการทดลอง · ไม่มีถัวจ่าย = ผลการทดลองเริ่มบรรทัดบนสุด (เลขที่/อันดับที่ เว้นให้เติม)
+           เลขที่บันทึกอนุมัติถัวจ่าย: ข้อความที่กรอกในสถานะโครงการ กรณี "ถัวจ่าย" (เช่น สทล.5.7/4906 ลว. 17 ก.ค. 2569)
+           งาน CLEARING AND GRUBBING: งวดที่ไม่ใช่งวดสุดท้าย = จ่าย 80% · งวดสุดท้าย = ส่วนที่เหลือ 20% (จัดกึ่งกลาง) แทนผลการทดลอง
+           — ถ้ามีถัวจ่ายด้วย ใส่ข้อความถัวจ่ายก่อน แล้วตามด้วยหมายเหตุ 80%/20% */
+        const DOT='';   /* เลขที่/อันดับที่ เว้นว่างไว้ให้เติมเอง */
+        const clr=/CLEARING\s*(AND|&)\s*GRUBBING/i.test(clean(o.name));
+        const tuaN=o.hasTua? ['- เบิกจ่ายตามอนุมัติถัวจ่ายตามบันทึก','เลขที่ '+(tuaMemo||DOT)] : [];
+        const clrN=!clr? [] : final? ['คิดจ่ายค่างาน','ส่วนที่เหลือ 20 %']
+          : ['คิดจ่ายค่างาน 80 %','ของปริมาณงานที่ทำจริงในสนาม','ส่วนที่เหลือ 20 % จ่ายเมื่อ','ทำการ Final Clearing Clean Up'];
+        const note=tuaN.concat(clr? clrN : ['ผลการทดลอง "ใช้ได้" ตามข้อกำหนด',' - อันดับที่ '+DOT,' - อันดับที่ '+DOT]);
+        const cFrom=tuaN.length, cN=clrN.length;   /* แถวหมายเหตุที่จัดกึ่งกลาง */
         /* ช่อง กม. - กม.: แถวแรก = ช่วง กม. · แถวที่ 3 เป็นต้นไป = รายละเอียด Overrun · บรรทัด "รวมเป็นเงิน" อยู่แถวล่างสุดของตาราง (เหนือช่องรวม) */
-        const N=Math.max(L.N,(o.hasTua? 5 : 3)+5, ov? 2+ov.body.length+1+ov.tail.length : 0);   /* แถวว่างใต้หมายเหตุอย่างน้อย 5 แถว (เดิม 2 + เพิ่มให้เขียนอีก 3) */
+        const N=Math.max(L.N,note.length+5, ov? 2+ov.body.length+1+ov.tail.length : 0);   /* แถวว่างใต้หมายเหตุอย่างน้อย 5 แถว (เดิม 2 + เพิ่มให้เขียนอีก 3) */
         const kmCol=(i)=>{ if(!ov) return null; const j=i-3;   /* เริ่มแถวที่ 4 (เว้น 2 แถวใต้ช่วง กม.) — จำนวนแถวตาราง N ไม่เปลี่ยน */
           if(j>=0 && j<ov.body.length) return ov.body[j];
           const k=i-(N-ov.tail.length); return (k>=0 && k<ov.tail.length)? ov.tail[k] : null; };
@@ -7140,15 +7151,10 @@ class Component extends DCLogic {
         sh.merge('A'+h1+':A'+h2); sh.merge('B'+h1+':C'+h2); sh.merge('D'+h1+':E'+h1); sh.merge('D'+h2+':E'+h2); sh.merge('F'+h1+':G'+h2);
         /* ตารางยาวแบบต้นแบบ: แถวข้อมูล 1 แถว + แถวว่างให้เขียนเพิ่ม เส้นล่างปิดตาราง แล้ว "รวม" ใต้ตาราง มีกรอบเฉพาะช่องปริมาณ */
         const t1=sh.r+1;
-        /* หมายเหตุ: รายการที่มีถัวจ่าย = อนุมัติถัวจ่าย + ผลการทดลอง · ไม่มีถัวจ่าย = ผลการทดลองเริ่มบรรทัดบนสุด (เลขที่/อันดับที่ เว้นให้เติม) */
-        const DOT='';   /* เลขที่/อันดับที่ เว้นว่างไว้ให้เติมเอง */
-        /* เลขที่บันทึกอนุมัติถัวจ่าย: ข้อความที่กรอกในสถานะโครงการ กรณี "ถัวจ่าย" (เช่น สทล.5.7/4906 ลว. 17 ก.ค. 2569) */
-        const note=o.hasTua? ['- เบิกจ่ายตามอนุมัติถัวจ่ายตามบันทึก','เลขที่ '+(tuaMemo||DOT),'ผลการทดลอง "ใช้ได้" ตามข้อกำหนด',' - อันดับที่ '+DOT,' - อันดับที่ '+DOT]
-          : ['ผลการทดลอง "ใช้ได้" ตามข้อกำหนด',' - อันดับที่ '+DOT,' - อันดับที่ '+DOT];
         for(let i=0;i<N;i++){ const rr=sh.r+1, cs={bd: i===N-1? 'lrb' : 'lr'}, kc=i? kmCol(i) : null;
           sh.row(rh,[['A',i? null : '1',Object.assign({h:'center',v:'center'},cs)]].concat(sh.span('B','C',i? (kc? kc.t : null) : (kmTxt||'-'),
               Object.assign({h:'left',v:'center',ind:1},kc? {sh:1,z:10,b:kc.b? 1 : undefined} : {},cs)),
-            sh.span('D','E',i? null : o.now,Object.assign({h:'right',f:'qty0',v:'center',ind:1},cs)),sh.span('F','G',note[i]||null,Object.assign({h:'left',sh:1},cs))));
+            sh.span('D','E',i? null : o.now,Object.assign({h:'right',f:'qty0',v:'center',ind:1},cs)),sh.span('F','G',note[i]||null,Object.assign({h:i>=cFrom && i<cFrom+cN? 'center' : 'left',sh:1},cs))));
           sh.merge('B'+rr+':C'+rr); sh.merge('D'+rr+':E'+rr); sh.merge('F'+rr+':G'+rr); }
         const tl=sh.r, tr=sh.r+1;
         sh.row(20,sh.span('B','C','รวม',{b:1,h:'right',ind:2}).concat(sh.span('D','E',o.now,{b:1,bd:'all',h:'right',f:'qty0',ind:1},'SUM(D'+t1+':D'+tl+')')));
