@@ -8441,7 +8441,7 @@ class Component extends DCLogic {
     const p=this.byId(this.state.pid);
     if(!p){ this.showNotice('กรุณาเลือกโครงการก่อน'); return; }
     const months={}; this.sdMonths(p).forEach(o=>{ months[o.m]=true; });
-    const sel={}; this.SD_DOCS.forEach(o=>{ sel[o.k]=true; });
+    const sel={};   /* เปิดหน้าต่างมายังไม่เลือกเอกสาร ให้ผู้ใช้ติ๊กเอง (มีปุ่ม "เลือกทั้งหมด") */
     this.setState({sdDlg:{pid:p.id, sel, di:this.dvActive(p), asg:this.sdAsgDefault(p), mode:'asg', months, busy:false}});
   };
   buildSupportDocs = async () => {
