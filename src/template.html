@@ -2666,6 +2666,7 @@ svg.leaflet-image-layer.leaflet-interactive path {
             <button sc-camel-on-click="{{ exportItemsXlsx }}" style="background:transparent;border:0;border-radius:var(--radius-sm);padding:8px 12px;font-size:13px;font-family:var(--font-body);color:var(--color-text);cursor:pointer;text-align:left;white-space:nowrap" style-hover="background:var(--color-neutral-200)">รายการก่อสร้าง (Excel)</button>
             <button sc-camel-on-click="{{ payExport }}" style="background:transparent;border:0;border-radius:var(--radius-sm);padding:8px 12px;font-size:13px;font-family:var(--font-body);color:var(--color-text);cursor:pointer;text-align:left;white-space:nowrap" style-hover="background:var(--color-neutral-200)">Payment ส่งงาน (Excel)</button>
             <button sc-camel-on-click="{{ exportTuaDoc }}" style="background:transparent;border:0;border-radius:var(--radius-sm);padding:8px 12px;font-size:13px;font-family:var(--font-body);color:var(--color-text);cursor:pointer;text-align:left;white-space:nowrap" style-hover="background:var(--color-neutral-200)">นำเสนอถัวจ่าย (Word)</button>
+            <button sc-camel-on-click="{{ exportSupportDocs }}" style="background:transparent;border:0;border-radius:var(--radius-sm);padding:8px 12px;font-size:13px;font-family:var(--font-body);color:var(--color-text);cursor:pointer;text-align:left;white-space:nowrap" style-hover="background:var(--color-neutral-200)">เอกสารประกอบ (Word)</button>
             <div class="lbl" style="font-size:11px;letter-spacing:.05em;padding:8px 12px 3px">งานนำเสนอ</div>
             <button sc-camel-on-click="{{ pptxExport }}" style="background:transparent;border:0;border-radius:var(--radius-sm);padding:8px 12px 8px 22px;font-size:13px;font-family:var(--font-body);color:var(--color-text);text-align:left;cursor:pointer" style-hover="background:var(--color-accent-100)">งานนำเสนอตรวจรับงาน (.pptx)</button>
             <button sc-camel-on-click="{{ monthlyPptxExport }}" style="background:transparent;border:0;border-radius:var(--radius-sm);padding:8px 12px 8px 22px;font-size:13px;font-family:var(--font-body);color:var(--color-text);text-align:left;cursor:pointer;white-space:nowrap" style-hover="background:var(--color-accent-100)">งานนำเสนอประชุมประจำเดือน (.pptx)</button>
@@ -3596,7 +3597,7 @@ svg.leaflet-image-layer.leaflet-interactive path {
         <sc-if value="{{ loginErr }}" hint-placeholder-val="{{ false }}">
           <div style="font-size:12.5px;color:var(--c-late);font-weight:700">{{ loginErrTxt }}</div>
         </sc-if>
-        <button sc-camel-on-click="{{ doLogin }}" class="btn btn-primary" style="font-size:14px;cursor:pointer;width:100%">เข้าสู่ระบบ</button>
+        <button sc-camel-on-click="{{ doLogin }}" class="btn btn-primary" style="font-size:14px;cursor:pointer;width:100%">เข้าสู่ระบบ (เฉพาะเจ้าหน้าที่)</button>
         <div class="lbl" style="font-size:11.5px;font-weight:400;background:var(--color-neutral-200);border-radius:var(--radius-md);padding:9px 12px;line-height:1.5">ต้องการบัญชีผู้ใช้ใหม่ ให้แจ้งผู้ดูแลระบบ (Admin) เพิ่มให้ พร้อมกำหนดบทบาทตอนสร้างบัญชี</div>
       </div>
     </sc-if>
@@ -3849,6 +3850,36 @@ svg.leaflet-image-layer.leaflet-interactive path {
         </div>
       </sc-if>
 
+      <!-- ผู้ควบคุมงาน / ผู้ควบคุมงานด้านวัสดุ / เจ้าหน้าที่พัสดุ: ชื่อ + ตำแหน่ง (เลือกจากรายการ หรือพิมพ์เอง) -->
+      <div style="margin-top:16px">
+        <div class="hd" style="font-size:13px;margin-bottom:6px">ผู้ควบคุมงาน</div>
+        <div style="display:grid;grid-template-columns:1fr;gap:8px">
+          <sc-for list="{{ staffRows }}" as="s" hint-placeholder-count="3">
+            <div style="display:flex;flex-direction:column;gap:3px">
+              <span class="lbl" style="font-size:12px">{{ s.label }}</span>
+              <div style="display:flex;gap:5px;flex-wrap:wrap">
+                <input value="{{ s.name }}" sc-camel-on-change="{{ s.onName }}" placeholder="ชื่อ-นามสกุล" style="flex:1 1 200px;min-width:0;border:1px solid var(--color-divider);border-radius:var(--radius-sm);padding:6px 8px;font-size:13px">
+                <div style="flex:1 1 200px;min-width:0;display:flex;gap:4px">
+                  <sc-if value="{{ s.posCustom }}" hint-placeholder-val="{{ false }}">
+                    <input value="{{ s.pos }}" sc-camel-on-change="{{ s.onPosText }}" placeholder="พิมพ์ตำแหน่ง" style="flex:1;min-width:0;border:1px solid var(--color-accent-300);border-radius:var(--radius-sm);padding:6px 8px;font-size:13px;font-family:inherit;color:inherit;background:var(--color-accent-100)">
+                    <button sc-camel-on-click="{{ s.posBackToList }}" title="เลือกจากรายการ" style="flex:0 0 auto;background:var(--color-neutral-200);color:var(--color-text);border:1px solid var(--color-divider);border-radius:var(--radius-sm);padding:4px 8px;font-size:12px;font-family:inherit;cursor:pointer">รายการ</button>
+                  </sc-if>
+                  <sc-if value="{{ s.posFromList }}" hint-placeholder-val="{{ true }}">
+                    <sc-raw-select value="{{ s.pos }}" sc-camel-on-change="{{ s.onPos }}" style="flex:1;min-width:0;border:1px solid var(--color-divider);border-radius:var(--radius-sm);padding:6px 8px;font-size:13px;font-weight:400;font-family:inherit;color:inherit;background:transparent">
+                      <option value="">เลือกตำแหน่ง</option>
+                      <sc-for list="{{ s.posOptions }}" as="po" hint-placeholder-count="6">
+                        <option value="{{ po }}">{{ po }}</option>
+                      </sc-for>
+                      <option value="__other">อื่นๆ (พิมพ์เอง)</option>
+                    </sc-raw-select>
+                  </sc-if>
+                </div>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+
       <div style="margin-top:16px">
         <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
           <div class="hd" style="font-size:13px">ผู้ช่วยผู้ควบคุมงาน</div>
@@ -3856,8 +3887,23 @@ svg.leaflet-image-layer.leaflet-interactive path {
         </div>
         <div style="display:grid;grid-template-columns:1fr;gap:8px">
           <sc-for list="{{ assistantRows }}" as="a" hint-placeholder-count="2">
-            <div style="display:flex;gap:5px">
-              <input value="{{ a.name }}" sc-camel-on-change="{{ a.onChange }}" placeholder="ชื่อ-นามสกุล" style="flex:1;min-width:0;border:1px solid var(--color-divider);border-radius:var(--radius-sm);padding:6px 8px;font-size:13px">
+            <div style="display:flex;gap:5px;flex-wrap:wrap">
+              <input value="{{ a.name }}" sc-camel-on-change="{{ a.onChange }}" placeholder="ชื่อ-นามสกุล" style="flex:1 1 200px;min-width:0;border:1px solid var(--color-divider);border-radius:var(--radius-sm);padding:6px 8px;font-size:13px">
+              <div style="flex:1 1 200px;min-width:0;display:flex;gap:4px">
+                <sc-if value="{{ a.posCustom }}" hint-placeholder-val="{{ false }}">
+                  <input value="{{ a.pos }}" sc-camel-on-change="{{ a.onPosText }}" placeholder="พิมพ์ตำแหน่ง" style="flex:1;min-width:0;border:1px solid var(--color-accent-300);border-radius:var(--radius-sm);padding:6px 8px;font-size:13px;font-family:inherit;color:inherit;background:var(--color-accent-100)">
+                  <button sc-camel-on-click="{{ a.posBackToList }}" title="เลือกจากรายการ" style="flex:0 0 auto;background:var(--color-neutral-200);color:var(--color-text);border:1px solid var(--color-divider);border-radius:var(--radius-sm);padding:4px 8px;font-size:12px;font-family:inherit;cursor:pointer">รายการ</button>
+                </sc-if>
+                <sc-if value="{{ a.posFromList }}" hint-placeholder-val="{{ true }}">
+                  <sc-raw-select value="{{ a.pos }}" sc-camel-on-change="{{ a.onPos }}" style="flex:1;min-width:0;border:1px solid var(--color-divider);border-radius:var(--radius-sm);padding:6px 8px;font-size:13px;font-weight:400;font-family:inherit;color:inherit;background:transparent">
+                    <option value="">เลือกตำแหน่ง</option>
+                    <sc-for list="{{ a.posOptions }}" as="po" hint-placeholder-count="6">
+                      <option value="{{ po }}">{{ po }}</option>
+                    </sc-for>
+                    <option value="__other">อื่นๆ (พิมพ์เอง)</option>
+                  </sc-raw-select>
+                </sc-if>
+              </div>
               <button sc-camel-on-click="{{ a.remove }}" style="white-space:nowrap;background:var(--color-accent-100);color:var(--color-accent-700);border:1px solid var(--color-accent-300);border-radius:999px;padding:4px 8px;font-size:12px;cursor:pointer">ลบ</button>
             </div>
           </sc-for>
@@ -4025,6 +4071,9 @@ svg.leaflet-image-layer.leaflet-interactive path {
     <button sc-camel-on-click="{{ openRoles }}" style="display:flex;flex-direction:column;align-items:center;gap:3px;border:0;background:transparent;padding:5px 2px;cursor:pointer;color:var(--color-neutral-700);font-family:var(--font-body);font-weight:400;font-size:11px;border-radius:var(--radius-md)">
       <svg sc-camel-view-box="0 0 24 24" width="21" height="21" fill="none" stroke="currentColor" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.4"></circle><path d="M5 20c1.6-3.4 4-5 7-5s5.4 1.6 7 5"></path></svg>
       <span>{{ roleShort }}</span>
+      <sc-if value="{{ roleGuest }}" hint-placeholder-val="{{ true }}">
+        <span style="font-size:9.5px;line-height:1;margin-top:-2px;white-space:nowrap">(เฉพาะเจ้าหน้าที่)</span>
+      </sc-if>
     </button>
   </div>
 </sc-if>
@@ -4161,6 +4210,127 @@ svg.leaflet-image-layer.leaflet-interactive path {
     <div style="padding:12px 18px 16px;display:flex;gap:8px;justify-content:flex-end;border-top:1px solid var(--color-divider)">
       <button sc-camel-on-click="{{ ppt.close }}" class="btn btn-secondary" style="white-space:nowrap;font-size:13px;cursor:pointer">ยกเลิก</button>
       <button sc-camel-on-click="{{ ppt.build }}" disabled="{{ ppt.busy }}" class="btn btn-primary" style="white-space:nowrap;font-size:13px;cursor:pointer">{{ ppt.busyTxt }}</button>
+    </div>
+  </div>
+</div>
+</sc-if>
+
+<!-- เอกสารประกอบ (Word): เลือกเอกสารที่ต้องการ แล้วสร้างไฟล์ .docx (หลายฉบับรวมเป็น .zip) -->
+<sc-if value="{{ sdOpen }}" hint-placeholder-val="{{ false }}">
+<div class="noprint" style="position:fixed;inset:0;background:color-mix(in srgb, var(--color-neutral-900) 50%, transparent);z-index:1200;display:flex;align-items:flex-start;justify-content:center;padding:clamp(10px,3vw,26px) clamp(8px,3vw,16px);overflow:auto">
+  <div style="background:var(--color-neutral-100);border-radius:var(--radius-lg);width:100%;max-width:600px;box-shadow:var(--shadow-lg);display:flex;flex-direction:column">
+    <div style="display:flex;align-items:center;gap:10px;padding:14px 18px;border-bottom:1px solid var(--color-divider)">
+      <div class="hd" style="font-size:15px">เอกสารประกอบ (Word)</div>
+      <button sc-camel-on-click="{{ sd.close }}" style="margin-left:auto;background:transparent;border:1px solid var(--color-divider);border-radius:999px;padding:5px 13px;font-family:var(--font-body);font-size:12.5px;color:var(--color-text);cursor:pointer">ปิด</button>
+    </div>
+    <div style="padding:16px 18px;display:flex;flex-direction:column;gap:16px">
+      <div>
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:7px">
+          <div class="hd" style="font-size:12.5px">เลือกเอกสาร</div>
+          <span class="lbl" style="font-size:11px;font-weight:400">{{ sd.countTxt }}</span>
+          <span style="margin-left:auto"></span>
+          <button sc-camel-on-click="{{ sd.allOn }}" style="white-space:nowrap;background:var(--color-accent-100);color:var(--color-accent-700);border:1px solid var(--color-accent-300);border-radius:999px;padding:4px 11px;font-family:var(--font-body);font-size:11.5px;cursor:pointer">เลือกทั้งหมด</button>
+          <button sc-camel-on-click="{{ sd.noneOn }}" style="white-space:nowrap;background:transparent;color:var(--color-neutral-700);border:1px solid var(--color-divider);border-radius:999px;padding:4px 11px;font-family:var(--font-body);font-size:11.5px;cursor:pointer">ล้าง</button>
+        </div>
+        <div style="border:1px solid var(--color-divider);border-radius:var(--radius-md);padding:8px 10px;display:flex;flex-direction:column;gap:6px">
+          <sc-for list="{{ sd.docs }}" as="o" hint-placeholder-count="6">
+            <label style="display:flex;gap:8px;align-items:center;font-size:12.5px;line-height:1.45;cursor:pointer">
+              <input type="checkbox" checked="{{ o.on }}" sc-camel-on-change="{{ o.toggle }}" style="width:15px;height:15px;accent-color:var(--color-accent);flex:0 0 auto">
+              <span style="overflow-wrap:anywhere">{{ o.label }}</span>
+            </label>
+          </sc-for>
+        </div>
+      </div>
+      <sc-if value="{{ sd.needRound }}" hint-placeholder-val="{{ true }}">
+        <div>
+          <div class="hd" style="font-size:12.5px;margin-bottom:7px">งวดส่งงาน <span class="lbl" style="font-size:11px;font-weight:400">(ใบรายงานผลการตรวจรับพัสดุ · รายงานการประชุม)</span></div>
+          <sc-if value="{{ sd.noRounds }}" hint-placeholder-val="{{ false }}">
+            <div class="lbl" style="font-size:11.5px;font-weight:400;line-height:1.6">ยังไม่มีงวดส่งงาน — เพิ่มงวดที่แท็บ “ส่งงาน / งวดงาน” ก่อน (เอกสาร 2 ฉบับนี้จะไม่ถูกสร้าง)</div>
+          </sc-if>
+          <div style="display:flex;gap:6px;flex-wrap:wrap">
+            <sc-for list="{{ sd.rounds }}" as="r" hint-placeholder-count="2">
+              <button sc-camel-on-click="{{ r.pick }}" style="white-space:nowrap;border-radius:999px;padding:6px 14px;font-size:12.5px;font-family:var(--font-body);cursor:pointer;border:1px solid {{ r.bd }};background:{{ r.bg }};color:{{ r.fg }}">{{ r.label }}</button>
+            </sc-for>
+          </div>
+        </div>
+      </sc-if>
+      <sc-if value="{{ sd.needMeeting }}" hint-placeholder-val="{{ true }}">
+        <div>
+          <div class="hd" style="font-size:12.5px;margin-bottom:7px">รายงานการประชุม</div>
+          <label style="display:flex;gap:8px;align-items:flex-start;font-size:12.5px;line-height:1.45;cursor:pointer">
+            <input type="checkbox" checked="{{ sd.supplyOn }}" sc-camel-on-change="{{ sd.toggleSupply }}" style="margin-top:2px;width:15px;height:15px;accent-color:var(--color-accent);flex:0 0 auto">
+            <span>ใส่เจ้าหน้าที่พัสดุ</span>
+          </label>
+          <sc-if value="{{ sd.supplyOn }}" hint-placeholder-val="{{ true }}">
+            <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:7px">
+              <input value="{{ sd.supplyOfficer }}" sc-camel-on-change="{{ sd.setSupply }}" placeholder="ชื่อ-นามสกุล เจ้าหน้าที่พัสดุ" style="flex:1 1 200px;min-width:0;border:1px solid var(--color-divider);border-radius:999px;padding:7px 14px;font-size:12.5px;font-family:var(--font-body);background:var(--color-neutral-100);color:var(--color-text)">
+              <div style="flex:1 1 200px;min-width:0;display:flex;gap:4px">
+                <sc-if value="{{ sd.supplyCustom }}" hint-placeholder-val="{{ false }}">
+                  <input value="{{ sd.supplyPos }}" sc-camel-on-change="{{ sd.setSupplyPosText }}" placeholder="พิมพ์ตำแหน่ง" style="flex:1;min-width:0;border:1px solid var(--color-accent-300);border-radius:999px;padding:7px 14px;font-size:12.5px;font-family:var(--font-body);background:var(--color-accent-100);color:var(--color-text)">
+                  <button sc-camel-on-click="{{ sd.supplyBackToList }}" style="flex:0 0 auto;background:var(--color-neutral-200);color:var(--color-text);border:1px solid var(--color-divider);border-radius:999px;padding:4px 10px;font-size:12px;font-family:var(--font-body);cursor:pointer">รายการ</button>
+                </sc-if>
+                <sc-if value="{{ sd.supplyFromList }}" hint-placeholder-val="{{ true }}">
+                  <sc-raw-select value="{{ sd.supplyPos }}" sc-camel-on-change="{{ sd.setSupplyPos }}" style="flex:1;min-width:0;border:1px solid var(--color-divider);border-radius:999px;padding:7px 14px;font-size:12.5px;font-family:var(--font-body);background:var(--color-neutral-100);color:var(--color-text)">
+                    <option value="">เลือกตำแหน่ง</option>
+                    <sc-for list="{{ sd.supplyPosOptions }}" as="po" hint-placeholder-count="5">
+                      <option value="{{ po }}">{{ po }}</option>
+                    </sc-for>
+                    <option value="__other">อื่นๆ (พิมพ์เอง)</option>
+                  </sc-raw-select>
+                </sc-if>
+              </div>
+            </div>
+          </sc-if>
+          <div class="lbl" style="font-size:11px;font-weight:400;line-height:1.6;margin-top:4px">ติ๊ก = แสดงในผู้เข้าร่วมประชุม รายชื่อผู้เข้าร่วมประชุม และเป็นผู้จดรายงานการประชุม (ชื่อ/ตำแหน่งบันทึกไว้กับโครงการ) · ไม่ติ๊ก = ไม่ใส่ (ช่องผู้จดรายงานเว้นว่างไว้)</div>
+        </div>
+      </sc-if>
+      <sc-if value="{{ sd.needAsg }}" hint-placeholder-val="{{ true }}">
+        <div>
+          <div class="hd" style="font-size:12.5px;margin-bottom:7px">กรรมการผู้ได้รับมอบหมายออกตรวจงานจ้าง</div>
+          <sc-if value="{{ sd.noCom }}" hint-placeholder-val="{{ false }}">
+            <div class="lbl" style="font-size:11.5px;font-weight:400;line-height:1.6">ยังไม่มีรายชื่อคณะกรรมการ — กรอกที่ “แก้ไขข้อมูลโครงการ” ก่อน</div>
+          </sc-if>
+          <sc-raw-select value="{{ sd.asgVal }}" sc-camel-on-change="{{ sd.setAsg }}" style="width:100%;border:1px solid var(--color-divider);border-radius:999px;padding:7px 14px;font-size:12.5px;font-family:var(--font-body);background:var(--color-neutral-100);color:var(--color-text)">
+            <sc-for list="{{ sd.asgOpts }}" as="o" hint-placeholder-count="3">
+              <option value="{{ o.v }}">{{ o.t }}</option>
+            </sc-for>
+          </sc-raw-select>
+          <div class="lbl" style="font-size:11px;font-weight:400;line-height:1.6;margin-top:6px">ค่าเริ่มต้น: กรรมการคนถัดจาก ผอ.ขท. ในลำดับคณะกรรมการ · ใช้ในบันทึกมอบหมาย และเป็นผู้ลงนามบันทึกผลการออกตรวจประจำเดือน</div>
+        </div>
+      </sc-if>
+      <sc-if value="{{ sd.needMonthly }}" hint-placeholder-val="{{ true }}">
+        <div>
+          <div class="hd" style="font-size:12.5px;margin-bottom:7px">บันทึกผลการออกตรวจงานจ้างประจำเดือน</div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px">
+            <sc-for list="{{ sd.modes }}" as="t" hint-placeholder-count="2">
+              <button sc-camel-on-click="{{ t.pick }}" style="white-space:nowrap;border-radius:999px;padding:6px 14px;font-size:12.5px;font-family:var(--font-body);cursor:pointer;border:1px solid {{ t.bd }};background:{{ t.bg }};color:{{ t.fg }}">{{ t.label }}</button>
+            </sc-for>
+          </div>
+          <sc-if value="{{ sd.noMonths }}" hint-placeholder-val="{{ false }}">
+            <div class="lbl" style="font-size:11.5px;font-weight:400;line-height:1.6">ยังไม่ได้กรอกวันเริ่ม/สิ้นสุดสัญญา</div>
+          </sc-if>
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+            <span class="lbl" style="font-size:11px;font-weight:400">เดือนตามอายุสัญญา (1 หน้าต่อเดือน · เว้นวันที่ไว้กรอกเอง)</span>
+            <span style="margin-left:auto"></span>
+            <button sc-camel-on-click="{{ sd.monthsAll }}" style="white-space:nowrap;background:var(--color-accent-100);color:var(--color-accent-700);border:1px solid var(--color-accent-300);border-radius:999px;padding:3px 10px;font-family:var(--font-body);font-size:11px;cursor:pointer">ทุกเดือน</button>
+            <button sc-camel-on-click="{{ sd.monthsNone }}" style="white-space:nowrap;background:transparent;color:var(--color-neutral-700);border:1px solid var(--color-divider);border-radius:999px;padding:3px 10px;font-family:var(--font-body);font-size:11px;cursor:pointer">ล้าง</button>
+          </div>
+          <div style="max-height:220px;overflow:auto;border:1px solid var(--color-divider);border-radius:var(--radius-md);padding:8px 10px;display:flex;flex-direction:column;gap:5px">
+            <sc-for list="{{ sd.months }}" as="m" hint-placeholder-count="5">
+              <label style="display:flex;gap:8px;align-items:center;font-size:12px;line-height:1.45;cursor:pointer">
+                <input type="checkbox" checked="{{ m.on }}" sc-camel-on-change="{{ m.toggle }}" style="width:15px;height:15px;accent-color:var(--color-accent);flex:0 0 auto">
+                <span style="flex:0 0 auto;min-width:110px">{{ m.label }}</span>
+                <span class="lbl" style="font-weight:400;font-size:11.5px">{{ m.sub }}</span>
+              </label>
+            </sc-for>
+          </div>
+          <div class="lbl" style="font-size:11px;font-weight:400;line-height:1.6;margin-top:6px">รายการในแต่ละเดือน = ทุกรายการที่กรอก % ผลงานในสัปดาห์ของเดือนนั้น</div>
+        </div>
+      </sc-if>
+    </div>
+    <div style="padding:12px 18px 16px;display:flex;gap:8px;justify-content:flex-end;border-top:1px solid var(--color-divider)">
+      <button sc-camel-on-click="{{ sd.close }}" class="btn btn-secondary" style="white-space:nowrap;font-size:13px;cursor:pointer">ยกเลิก</button>
+      <button sc-camel-on-click="{{ sd.build }}" disabled="{{ sd.cantBuild }}" class="btn btn-primary" style="white-space:nowrap;font-size:13px;cursor:pointer">{{ sd.busyTxt }}</button>
     </div>
   </div>
 </div>
@@ -4560,6 +4730,9 @@ class Component extends DCLogic {
   WORK_UNIT_ALIASES={'M.':'ม.','SQ.M.':'ตร.ม.','CU.M.':'ลบ.ม.','TON':'ตัน','EACH':'อัน','EA.':'อัน','LS.':'L.S.','PS.':'P.S.'};
   workUnit(u){ return this.WORK_UNIT_ALIASES[u] || u || ''; }
   POSITIONS=['ผส.ทล.5','รส.ทล.5','ผอ.ขท.อุตรดิตถ์ที่ 1','ผอ.ขท.อุตรดิตถ์ที่ 2','ผอ.ขท.พิษณุโลกที่ 1','ผอ.ขท.พิษณุโลกที่ 2','ผอ.ขท.พิจิตร','วิศวกรโยธาปฏิบัติการ','วิศวกรโยธาชำนาญการ','นายช่างโยธาปฏิบัติงาน','นายช่างโยธาชำนาญงาน','นายช่างโยธาอาวุโส','วว.ทล.5','วบ.ทล.5','วผ.ทล.5'];
+  /* ตำแหน่งของผู้ควบคุมงาน / ผู้ช่วยผู้ควบคุมงาน / ผู้ควบคุมงานด้านวัสดุ และเจ้าหน้าที่พัสดุ (เลือกได้ หรือพิมพ์เอง) */
+  STAFF_POS=['นายช่างโยธาปฏิบัติงาน','นายช่างโยธาชำนาญงาน','นายช่างโยธาอาวุโส','วิศวกรโยธาปฏิบัติการ','วิศวกรโยธาชำนาญการ','วิศวกรโยธาชำนาญการพิเศษ'];
+  SUPPLY_POS=['เจ้าพนักงานพัสดุปฏิบัติงาน','เจ้าพนักงานพัสดุชำนาญงาน','เจ้าพนักงานพัสดุอาวุโส','นักวิชาการพัสดุปฏิบัติการ','นักวิชาการพัสดุชำนาญการ'];
   ROLES_ASSISTANT=['ผู้ช่วยช่างควบคุมงาน','ช่างควบคุมงาน','เจ้าหน้าที่ควบคุมงาน','ผู้ควบคุมงานด้านวัสดุ','ผู้ตรวจสอบคุณภาพ'];
   knownNames(){
     const set={};
@@ -7328,7 +7501,10 @@ class Component extends DCLogic {
   /* คำ/วลีที่ไม่ให้ Word ตัดบรรทัดกลางคำ (ตัวแบ่งคำของเบราว์เซอร์แยกเป็นหลายคำ เช่น ระยะ|เวลา) */
   THAI_KEEP=['ระยะเวลา','ระยะทาง','ค่าปรับ','ค่างาน','ผู้รับจ้าง','ผู้ควบคุมงาน','ผู้ช่วยผู้ควบคุมงาน','ทางหลวง','งบประมาณ',
     'ประจำปี','เริ่มสัญญา','สิ้นสุดสัญญา','ขยายสัญญา','ตอนควบคุม','ลงวันที่','สัญญาเลขที่','รายจ่าย','ก่อสร้าง','คณะกรรมการ',
-    'ตรวจรับพัสดุ','ประธานกรรมการ','ปฏิบัติงาน','ประสิทธิภาพ','โครงข่าย','คมนาคม','โลจิสติกส์','เศรษฐกิจ'];
+    'ตรวจรับพัสดุ','ประธานกรรมการ','ปฏิบัติงาน','ประสิทธิภาพ','โครงข่าย','คมนาคม','โลจิสติกส์','เศรษฐกิจ',
+    'แขวงทางหลวง','สำนักงานทางหลวง','เส้นทาง','ตอนล่าง','ตอนบน','ตอนกลาง','หมายเลข','จังหวัด','อำเภอ','ตำบล',
+    'กิโลเมตร','สิ้นสุด','กรมทางหลวง','ผู้ว่าจ้าง','ห้างหุ้นส่วนจำกัด','กิจการร่วมค้า','กิจการค้าร่วม','อิเล็กทรอนิกส์',
+    'เจ้าหน้าที่','เจ้าพนักงาน','ตรวจสอบ','ยังคง','รับผิดชอบ','ปริมาณงาน','ผู้ว่าราชการ'];
   thaiKeep(s){
     if(String(s).indexOf('​')<0) return s;
     if(!this._thaiKeepRe) this._thaiKeepRe=this.THAI_KEEP.map(w=>[new RegExp(Array.from(w).join('​?'),'g'), w]);
@@ -7806,6 +7982,509 @@ class Component extends DCLogic {
     }));
   }
 
+  /* ===== เอกสารประกอบ (Word): แบบฟอร์มเอกสารตรวจรับงานจ้าง ตามตัวอย่างของ สทล.5 =====
+     ผู้รับจ้างเข้าดำเนินการ / หนังสือส่งมอบงาน / บันทึกมอบหมายการออกตรวจงานจ้าง / บันทึกผลการออกตรวจงานจ้างประจำเดือน /
+     รายงานผลการตรวจรับพัสดุ / รายงานการประชุมพิจารณาตรวจรับงาน — เลือกได้หลายฉบับ (หลายฉบับรวมเป็น .zip) */
+  SD_DOCS=[
+    {k:'start', label:'ผู้รับจ้างเข้าดำเนินการ'},
+    {k:'handover', label:'หนังสือส่งมอบงาน'},
+    {k:'assign', label:'หนังสือบันทึกผลการออกตรวจงานจ้างแบบมอบ'},
+    {k:'monthly', label:'หนังสือบันทึกผลการออกตรวจงานจ้างประจำเดือน'},
+    {k:'report', label:'ใบรายงานผลการตรวจรับพัสดุ', round:true},
+    {k:'meeting', label:'รายงานการประชุมพิจารณาตรวจรับงาน', round:true}
+  ];
+  /* เบอร์โทรในหัวบันทึกข้อความของแขวง (ไม่ทราบ = เว้นจุดไว้กรอกเอง) */
+  /* ขอบกระดาษเอกสารที่ต้องจบ 1 แผ่น: บน 1.5 / ขวา 1.5 / ล่าง 1 / ซ้าย 2 ซม. */
+  SD_PG1={top:851,right:851,bottom:567,left:1134};
+  SD_TEL={'อุตรดิตถ์ที่ 1':'โทร. 0-5541-1005 , 33512  โทรสาร. 0-5541-6086'};
+  /* "ครั้งที่ 1 (งวดที่ 1)" / "ครั้งที่ 4 (งวดสุดท้าย)" */
+  sdRoundTxt(d,i){ const n=(d&&d.no)||(i+1); return 'ครั้งที่ '+n+' ('+((d&&d.final)? 'งวดสุดท้าย' : 'งวดที่ '+n)+')'; }
+  /* ตำแหน่งเต็มสำหรับรายงานการประชุม เช่น รส.ทล.5 → รองผู้อำนวยการสำนักงานทางหลวงที่ 5 */
+  sdFullPos(pos){
+    const s=String(pos||'').replace(/\s+/g,' ').trim(), t=s.replace(/\s+/g,'');
+    let m=t.match(/^รส\.ทล\.(\d+)$/); if(m) return 'รองผู้อำนวยการสำนักงานทางหลวงที่ '+m[1];
+    m=t.match(/^ผส\.ทล\.(\d+)$/); if(m) return 'ผู้อำนวยการสำนักงานทางหลวงที่ '+m[1];
+    m=s.match(/^ผอ\.\s*ขท\.\s*(.+)$/); if(m) return 'ผู้อำนวยการแขวงทางหลวง'+m[1].trim();
+    return s;
+  }
+  /* ตำแหน่งของบุคคลจากรายชื่อบุคลากร (ใช้กับผู้ควบคุมงาน/ผู้ควบคุมงานด้านวัสดุ) */
+  sdPosOf(name){ const n=String(name||'').replace(/\s+/g,''); if(!n) return '';
+    const x=this.people().find(o=>String(o.name||'').replace(/\s+/g,'')===n); return x? String(x.pos||'').trim() : ''; }
+  /* คณะกรรมการ: ประธาน, ผอ.ขท., กรรมการผู้ได้รับมอบหมายออกตรวจ (ค่าเริ่มต้น = กรรมการคนถัดจาก ผอ.ขท. ในลำดับคณะกรรมการ) */
+  sdPeople(p,asgIdx){
+    const com=((p&&p.committee)||[]).filter(c=>c && String(c.name||'').trim());
+    const chair=com.find(c=>c.role==='ประธานกรรมการ')||null;
+    const isDir=(c)=>/^ผอ\.ขท\./.test(String(c.pos||'').replace(/\s+/g,''));
+    const di=com.findIndex(isDir), dist=this.distOf(p);
+    let dir=di>=0? com[di] : null;
+    if(!dir){ const o=this.personBy('ผอ.ขท.'+dist); if(o) dir={name:o.name, pos:'ผอ.ขท.'+dist}; }
+    const others=com.filter(c=>c!==chair);
+    let asg=(asgIdx>=0 && com[asgIdx] && com[asgIdx]!==chair)? com[asgIdx] : null;
+    if(!asg && di>=0) asg=com.slice(di+1).find(c=>c!==chair)||null;
+    if(!asg) asg=others.find(c=>!isDir(c))||others[0]||null;
+    return {com, chair, dir, others, asg};
+  }
+  /* ผู้เข้าร่วมประชุมฝ่ายผู้ควบคุมงาน + เจ้าหน้าที่พัสดุ ตามรายละเอียดสัญญา
+     ตำแหน่ง: ที่กรอกใน "แก้ไขข้อมูลโครงการ" ถ้าไม่มีหาจากรายชื่อบุคลากร · role = หน้าที่ (คอลัมน์ขวา) */
+  sdAttendees(p,noSupply){
+    const nm=(s)=>String(s||'').replace(/\s+/g,' ').trim(), out=[];
+    const put=(name,pos,role)=>{ if(nm(name)) out.push({name:nm(name), pos:nm(pos)||this.sdPosOf(name), role}); };
+    put(p.supervisor, p.supervisorPos, 'ผู้ควบคุมงาน');
+    (p.assistants||[]).forEach(a=>{ if(a) put(a.name, a.pos, nm(a.role)||'ผู้ช่วยผู้ควบคุมงาน'); });
+    put(p.materialInspector, p.materialInspectorPos, 'ผู้ควบคุมงานด้านวัสดุ');
+    if(!noSupply) put(p.supplyOfficer, p.supplyOfficerPos, 'เจ้าหน้าที่พัสดุ');
+    return out;
+  }
+  sdAsgDefault(p){ const M=this.sdPeople(p,-1); return M.asg? M.com.indexOf(M.asg) : -1; }
+  /* เดือนตามอายุสัญญา (ถึงวันสิ้นสุดสัญญาหรือสัปดาห์สุดท้ายที่รายงาน) พร้อมรายการที่รายงาน % ผลงานในเดือนนั้น:
+     ทุกรายการที่กรอก % ผลงาน (มากกว่า 0) ในสัปดาห์ใดสัปดาห์หนึ่งของเดือนนั้น เรียงตามลำดับรายการในสัญญา */
+  sdMonths(p){
+    if(!p || !p.startDate) return [];
+    const keys=this.weeksOf(p), ws=p.weeks||{};
+    const filled=(k)=>{ const a=(ws[k]||{}).actual||{}; return Object.keys(a).some(n=>String(a[n]==null?'':a[n]).trim()!=='' && this.num(a[n])>0); };
+    const rep=Object.keys(ws).filter(filled).sort();
+    const first=[p.startDate, rep[0]||''].filter(Boolean).sort()[0];
+    const last=[this.endOf(p), keys[keys.length-1]||'', rep[rep.length-1]||''].filter(Boolean).sort().pop()||p.startDate;
+    const out=[], d=this.d(first.slice(0,7)+'-01'), e=last.slice(0,7);
+    let g=0;
+    while(this.iso(d).slice(0,7)<=e && g++<120){
+      const m=this.iso(d).slice(0,7);
+      const wk=rep.filter(k=>k.slice(0,7)===m);
+      const items=(p.items||[]).filter(it=>wk.some(k=>{ const v=((ws[k]||{}).actual||{})[it.no];
+        return v!==undefined && v!==null && String(v).trim()!=='' && this.num(v)>0; }));
+      out.push({m, label:this.MONTHS[d.getMonth()]+' '+(d.getFullYear()+543), items});
+      d.setMonth(d.getMonth()+1);
+    }
+    return out;
+  }
+  /* ข้อความที่ใช้ร่วมกันทุกฉบับ */
+  sdFacts(p){
+    const clean=(s)=>String(s==null?'':s).replace(/\s+/g,' ').trim();
+    const D=(iso)=>iso? this.cdate(this.d(iso)) : '';
+    /* เลขที่สัญญา "อต.2/ 49 / 2569" ไม่ให้ตัดบรรทัดกลางเลข (เว้นวรรคแบบไม่ตัดบรรทัด) */
+    const dist=this.distOf(p), no=this.contractShort(p).replace(/\s+/g,' ');
+    const sign=p.contractDate? D(p.contractDate) : clean((String(p.contractNo||'').match(/ลงวันที่\s*(.+)$/)||[])[1]||'');
+    const noSign='สัญญาเลขที่ '+(no||'..........')+(sign? ' ลงวันที่ '+sign : '');
+    const prog=['งบประมาณรายจ่ายประจำปีงบประมาณ พ.ศ. '+(p.fiscalYear||''),p.program1,p.program2,p.program3,
+      p.jobCode?('รหัสงาน '+p.jobCode):'',p.projectName,p.location].map(clean).filter(Boolean).join(' ');
+    const endO=p.endDateOrig||p.endDate||'', endN=this.hasNewEnd(p)? p.endDate : '';
+    const endTxt=(both)=>(both && endN)? 'สิ้นสุดสัญญา(เดิม)วันที่ '+D(endO)+' สิ้นสุดสัญญา(ใหม่)วันที่ '+D(endN) : 'สิ้นสุดสัญญาวันที่ '+(D(endO)||'..........');
+    const monthYear=(iso)=>{ const x=this.d((iso||this.today()).slice(0,10)); return this.MONTHS[x.getMonth()]+'  '+(x.getFullYear()+543); };
+    return { clean, D, dist, no, sign, noSign, prog, endO, endN, endTxt, monthYear,
+      distFull:'แขวงทางหลวง'+dist,
+      start:'เริ่มสัญญาวันที่ '+(D(p.startDate)||'..........'),
+      dur:'ระยะเวลาทำการ '+(this.durOf(p)||p.duration||'....')+' วัน',
+      val:'ค่างาน '+this.cmoney(p.contractValue)+' บาท',
+      fine:'ค่าปรับผิดสัญญาวันละ '+this.cmoney(p.finePerDay)+' บาท',
+      ctr:clean(p.contractor)||'..............................',
+      /* วันที่เว้นว่างไว้กรอกวัน: "วันที่          มกราคม  2569" */
+      blank:(iso)=>'          '+monthYear(iso) };
+  }
+  /* ชุดเครื่องมือสร้าง .docx (ฟอนต์ TH SarabunIT๙ แบบหนังสือราชการ — ตัวเลขแสดงเป็นเลขไทย) */
+  async sdKit(pg){
+    let gar=null;
+    try{ const r=await fetch((window.__resources&&window.__resources.garuda)||'garuda.png'); if(r.ok) gar=new Uint8Array(await r.arrayBuffer()); }catch(e){ gar=null; }
+    const FONT='TH SarabunIT๙';
+    const FN='<w:rFonts w:ascii="'+FONT+'" w:hAnsi="'+FONT+'" w:eastAsia="'+FONT+'" w:cs="'+FONT+'"/>';
+    const esc=(t)=>String(t==null?'':t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    /* Word ตัดบรรทัดภาษาไทยกลางคำได้ จึงใส่ zero-width space ระหว่างคำไทย */
+    const SEG=(typeof Intl!=='undefined' && Intl.Segmenter)? new Intl.Segmenter('th',{granularity:'word'}) : null;
+    const TH=/[฀-๿]/;
+    /* จำนวนตัวอักษรหลัก (ไม่นับสระบน/ล่าง วรรณยุกต์ การันต์) — ชิ้นที่มีตัวหลักตัวเดียว เช่น "สิ" "ริ" มักเป็นเศษของคำที่ตัวแบ่งคำไม่รู้จัก (ชื่อเฉพาะ) */
+    const base=(g)=>g.replace(/[ัิ-ฺ็-๎]/g,'').length;
+    /* ใส่จุดตัดบรรทัดเฉพาะ: ในกลุ่มคำไทยที่ยาวกว่า 24 ตัวอักษร (กลุ่มสั้น เช่น ชื่อเขื่อน/บริษัท/ตำบล ไม่ตัดกลาง)
+       และระหว่างคำที่มีตัวหลักอย่างน้อย 2 ตัวทั้งสองฝั่ง (ไม่ตัดเศษคำของชื่อเฉพาะ) แล้วรวมคำตาม THAI_KEEP
+       "e-GP" ใช้ขีดแบบไม่ตัดบรรทัด */
+    const wrap=(t)=>{ t=String(t==null?'':t).replace(/e-GP/g,'e‑GP'); if(!SEG || !TH.test(t)) return t;
+      return t.split(/( +)/).map(ch=>{
+        if(ch.length<=24 || !TH.test(ch)) return ch;
+        let out='', prev='';
+        for(const s of SEG.segment(ch)){ const g=s.segment;
+          if(prev && TH.test(prev.slice(-1)) && TH.test(g.charAt(0)) && base(prev)>=2 && base(g)>=2) out+='​';
+          out+=g; prev=g; }
+        return this.thaiKeep(out); }).join(''); };
+    const R=(t,o)=>{ o=o||{}; const z=o.sz||32;
+      return '<w:r><w:rPr>'+FN+(o.b?'<w:b/><w:bCs/>':'')+(o.u?'<w:u w:val="single"/>':'')+'<w:sz w:val="'+z+'"/><w:szCs w:val="'+z+'"/><w:cs/></w:rPr><w:t xml:space="preserve">'+esc(wrap(t))+'</w:t></w:r>'; };
+    const TAB='<w:r><w:rPr>'+FN+'</w:rPr><w:tab/></w:r>';
+    /* ขอบกระดาษ (twip) — ค่าเริ่มต้น บน 2 / ขวา 2 / ล่าง 1.5 / ซ้าย 2.5 ซม. · เอกสารที่ต้องให้จบ 1 แผ่นส่ง pg ที่แคบกว่า */
+    const PG=Object.assign({top:1134,right:1134,bottom:851,left:1418}, pg||{}), W=11906-PG.left-PG.right, half=Math.round(W/2);
+    const P=(runs,o)=>{ o=o||{}; const z=o.sz||32;
+      let pr='<w:pPr>';
+      if(o.keep) pr+='<w:keepNext/>';
+      if(o.brk) pr+='<w:pageBreakBefore/>';
+      if(o.rule) pr+='<w:pBdr><w:bottom w:val="single" w:sz="6" w:space="1" w:color="000000"/></w:pBdr>';
+      if(o.tabs) pr+='<w:tabs>'+o.tabs.map(t=>'<w:tab w:val="'+(t[1]||'left')+'" w:pos="'+t[0]+'"/>').join('')+'</w:tabs>';
+      pr+='<w:spacing w:before="'+(o.before||0)+'" w:after="'+(o.after||0)+'" w:line="240" w:lineRule="auto"/>';
+      pr+='<w:ind w:left="'+(o.left||0)+'" w:right="'+(o.right||0)+'"'+(o.first?' w:firstLine="'+o.first+'"':'')+(o.hang?' w:hanging="'+o.hang+'"':'')+'/>';
+      if(o.jc) pr+='<w:jc w:val="'+o.jc+'"/>';
+      pr+='<w:rPr>'+FN+'<w:sz w:val="'+z+'"/><w:szCs w:val="'+z+'"/></w:rPr></w:pPr>';
+      return '<w:p>'+pr+(runs||'')+'</w:p>'; };
+    const C=(x0,x1,runs,o)=>({x0,x1,runs,o});
+    /* ตารางไร้เส้น: เซลล์ระบุตำแหน่งเริ่ม/สิ้นสุด (twip) แล้วสร้างกริดคอลัมน์ร่วมให้เอง */
+    const TBL=(rows)=>{
+      const xs={}; xs[0]=1; xs[W]=1;
+      rows.forEach(r=>r.c.forEach(c=>{ xs[c.x0]=1; xs[c.x1]=1; }));
+      const grid=Object.keys(xs).map(Number).sort((a,b)=>a-b);
+      let x='<w:tbl><w:tblPr><w:tblW w:w="'+W+'" w:type="dxa"/><w:tblLayout w:type="fixed"/>'
+        +'<w:tblCellMar><w:top w:w="0" w:type="dxa"/><w:left w:w="0" w:type="dxa"/><w:bottom w:w="0" w:type="dxa"/><w:right w:w="0" w:type="dxa"/></w:tblCellMar>'
+        +'<w:tblLook w:val="0000"/></w:tblPr><w:tblGrid>'+grid.slice(1).map((g,i)=>'<w:gridCol w:w="'+(g-grid[i])+'"/>').join('')+'</w:tblGrid>';
+      rows.forEach(r=>{
+        const cs=r.c.slice().sort((a,b)=>a.x0-b.x0), full=[]; let cur=0;
+        cs.forEach(c=>{ if(c.x0>cur) full.push({x0:cur,x1:c.x0}); full.push(c); cur=c.x1; });
+        if(cur<W) full.push({x0:cur,x1:W});
+        x+='<w:tr><w:trPr><w:cantSplit/></w:trPr>';
+        full.forEach(c=>{
+          const span=grid.indexOf(c.x1)-grid.indexOf(c.x0);
+          const o=Object.assign({sz:r.sz, before:r.before}, c.o||{}, {keep:!!r.keep});
+          x+='<w:tc><w:tcPr><w:tcW w:w="'+(c.x1-c.x0)+'" w:type="dxa"/>'+(span>1?'<w:gridSpan w:val="'+span+'"/>':'')+'</w:tcPr>'
+            +(c.xml||P(c.runs||'',o))+'</w:tc>';
+        });
+        x+='</w:tr>';
+      });
+      return x+'</w:tbl>';
+    };
+    const GAR=gar? '<w:r><w:rPr>'+FN+'<w:noProof/></w:rPr><w:drawing><wp:anchor distT="0" distB="0" distL="114300" distR="114300" simplePos="0" relativeHeight="251660" behindDoc="0" locked="0" layoutInCell="1" allowOverlap="1"><wp:simplePos x="0" y="0"/><wp:positionH relativeFrom="column"><wp:posOffset>0</wp:posOffset></wp:positionH><wp:positionV relativeFrom="paragraph"><wp:posOffset>0</wp:posOffset></wp:positionV><wp:extent cx="533400" cy="517525"/><wp:effectExtent l="0" t="0" r="0" b="0"/><wp:wrapNone/><wp:docPr id="601" name="krut"/><wp:cNvGraphicFramePr/><a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"><a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:pic xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:nvPicPr><pic:cNvPr id="601" name="krut.png"/><pic:cNvPicPr/></pic:nvPicPr><pic:blipFill><a:blip r:embed="rId7"/><a:stretch><a:fillRect/></a:stretch></pic:blipFill><pic:spPr><a:xfrm><a:off x="0" y="0"/><a:ext cx="533400" cy="517525"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom></pic:spPr></pic:pic></a:graphicData></a:graphic></wp:anchor></w:drawing></w:r>' : '';
+    /* ความกว้างข้อความ (twip) และเส้นจุดลงชื่อที่ยาวพอดีช่อง */
+    const twW=(t,b,pt)=>Math.ceil(this.pptTextW(t,pt||16,!!b,'TH Sarabun New')*1440);
+    const fill=(tw,lead,tail,pt)=>{ const one=Math.max(20,twW('..........',false,pt)/10);
+      const n=Math.max(10,Math.floor((tw-twW((lead||'')+(tail||''),false,pt))/one)-2); return (lead||'')+'.'.repeat(n)+(tail||''); };
+    const L=(t)=>R(t,{b:1,sz:40});
+    /* หัวบันทึกข้อความ: ตราครุฑ + ส่วนราชการ / ที่ / วันที่ / เรื่อง */
+    const memo=(org,ref,date,subj)=>P(GAR+R('บันทึกข้อความ',{b:1,sz:58}),{jc:'center',before:60,after:200})
+      +P(L('ส่วนราชการ')+R('  '+org))
+      +P(L('ที่')+R('  '+ref)+TAB+L('วันที่')+R(date),{tabs:[[half]]})
+      +P(L('เรื่อง')+R('  '+subj),{rule:true,after:80});
+    /* ลายเซ็นกึ่งกลางช่อง: เส้นจุด / (ชื่อ) / บรรทัดตำแหน่ง */
+    const sig=(s,w,before)=>{ const sz=s.sz||32, pt=sz/2;
+      const ls=['( '+(String(s.name||'').trim()||'..............................')+' )'].concat((s.lines||[]).filter(Boolean));
+      /* เส้นจุดยาวอย่างน้อยเท่าชื่อในวงเล็บ (มี "ลงชื่อ ... หน้าที่" ให้บวกความยาวข้อความหน้า/หลังเพิ่ม) */
+      const nameW=Math.max(twW(ls[0],false,pt),s.minNameW||0)+300, extra=(s.lead||s.tail)? twW((s.lead||'')+(s.tail||''),false,pt) : 0;
+      /* dotsFit: เส้นจุดยาวไม่เกินชื่อในวงเล็บของคนนั้น */
+      const lineW=s.dotsFit? Math.min(w-200, twW(ls[0],false,pt)) :Math.min(w-100, Math.max(nameW+extra, (s.lead||s.tail)? 0 : Math.min(w-200,3600)));
+      return (s.noDots? P('',{before:before||0,keep:1,sz}) : P(R(fill(lineW,s.lead,s.tail,pt),{sz}),{jc:'center',before:before||0,keep:1,sz}))
+        +ls.map((t,k)=>P(R(t,{sz}),{jc:'center',keep:k<ls.length-1,sz})).join(''); };
+    /* กริดลายเซ็น per คนต่อแถว — align: center (ค่าเริ่มต้น) / left / right */
+    const sigGrid=(list,per,before,align,gap)=>{ list=list.filter(Boolean); if(!list.length) return '';
+      /* เส้นจุดยาวเท่ากันทุกคนในกลุ่ม (ตามชื่อที่ยาวที่สุด) */
+      const mw=Math.max.apply(null,list.map(s=>twW('( '+(String(s.name||'').trim()||'..............................')+' )',false,(s.sz||32)/2)));
+      list=list.map(s=>Object.assign({minNameW:mw},s));
+      const cw=Math.floor(W/per), rows=[];
+      for(let i=0;i<list.length;i+=per){
+        const grp=list.slice(i,i+per);
+        const off=align==='left'? 0 : align==='right'? W-grp.length*cw : Math.round((W-grp.length*cw)/2);
+        rows.push({c:grp.map((s,k)=>({x0:off+k*cw, x1:off+(k+1)*cw, xml:sig(s,cw,i===0? before : (gap||500))}))});
+      }
+      return TBL(rows); };
+    /* ลายเซ็นแบบเรียงลงมา: "(ลงชื่อ)........หน้าที่" แล้ว "(ชื่อ)   ตำแหน่ง" ตามแบบบันทึกมอบหมาย/บันทึกผลการออกตรวจ */
+    /* เส้นจุดยาวพอดีชื่อ (ไม่ยาวเต็มช่อง) ชิดขวาติดคำว่าหน้าที่ */
+    const X1=1134, X2=6100, DOTW=3500;
+    const sigList=(list,before)=>TBL([].concat.apply([],list.filter(Boolean).map((s,i)=>[
+      {keep:1, before:i===0? before : 320, c:[C(X1,X2,R(fill(DOTW,'(ลงชื่อ)','')),{jc:'right'}), C(X2,W,R(s.role||''))]},
+      {c:[C(X1,X2,R('('+(String(s.name||'').trim()||'..............................')+')'),{jc:'center',left:X2-X1-DOTW+400}), C(X2,W,R(s.pos||''))]}])));   /* ตำแหน่งเริ่มแนวเดียวกับหน้าที่ */
+    /* รายชื่อคณะกรรมการ: ลำดับ ชื่อ | ตำแหน่ง | หน้าที่ — คอลัมน์หน้าที่กว้างพอให้ "ประธานกรรมการตรวจรับพัสดุ" อยู่บรรทัดเดียว */
+    const RW=Math.max(2300, twW('ประธานกรรมการตรวจรับพัสดุ')+150), P2=W-RW, P1=Math.min(4100, P2-2400);
+    const comTbl=(list,start)=>TBL(list.map((c,i)=>({c:[C(1134,P1,R(((start||0)+i+1)+'. '+String(c.name||'').trim())),
+      C(P1,P2,R(String(c.pos||'').trim())), C(P2,W,R(c.role==='ประธานกรรมการ'? 'ประธานกรรมการตรวจรับพัสดุ' : 'กรรมการ'),{jc:'right'})]})));
+    /* ประกอบเป็นไฟล์ .docx */
+    const pack=(body)=>{
+      const NSW='xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"';
+      const XML='<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
+      const docXml=XML+'<w:document '+NSW+' xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing" xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture">'
+        +'<w:body>'+body+P('',{sz:8})
+        +'<w:sectPr><w:pgSz w:w="11906" w:h="16838" w:code="9"/><w:pgMar w:top="'+PG.top+'" w:right="'+PG.right+'" w:bottom="'+PG.bottom+'" w:left="'+PG.left+'" w:header="425" w:footer="425" w:gutter="0"/><w:cols w:space="720"/><w:docGrid w:linePitch="381"/></w:sectPr>'
+        +'</w:body></w:document>';
+      const CT=XML+'<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Default Extension="png" ContentType="image/png"/><Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/><Override PartName="/word/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.styles+xml"/></Types>';
+      const RELS=XML+'<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/></Relationships>';
+      const useGar=!!gar && body.indexOf('r:embed="rId7"')>=0;
+      const DRELS=XML+'<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/>'
+        +(useGar? '<Relationship Id="rId7" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/krut.png"/>' : '')+'</Relationships>';
+      const STYLES=XML+'<w:styles '+NSW+'><w:docDefaults><w:rPrDefault><w:rPr>'+FN+'<w:sz w:val="32"/><w:szCs w:val="32"/><w:lang w:val="en-US" w:eastAsia="en-US" w:bidi="th-TH"/></w:rPr></w:rPrDefault><w:pPrDefault><w:pPr><w:spacing w:after="0" w:line="240" w:lineRule="auto"/></w:pPr></w:pPrDefault></w:docDefaults><w:style w:type="paragraph" w:default="1" w:styleId="Normal"><w:name w:val="Normal"/><w:qFormat/></w:style></w:styles>';
+      const enc=new TextEncoder();
+      const ents=[
+        {name:'[Content_Types].xml', data:enc.encode(CT)},
+        {name:'_rels/.rels', data:enc.encode(RELS)},
+        {name:'word/document.xml', data:enc.encode(docXml)},
+        {name:'word/styles.xml', data:enc.encode(STYLES)},
+        {name:'word/_rels/document.xml.rels', data:enc.encode(DRELS)}];
+      if(useGar) ents.push({name:'word/media/krut.png', data:gar});
+      return this.zipStore(ents);
+    };
+    return {R,P,TAB,C,TBL,W,half,L,memo,sig,sigGrid,sigList,comTbl,fill,twW,pack};
+  }
+  /* ชื่องานของรายการ: ตัดเลขรายการที่ซ้ำหน้าชื่อออก */
+  sdItemName(it){
+    const no=String(it.no||'').trim(); let nm=String(it.name||'').replace(/\s+/g,' ').trim();
+    if(no && nm.indexOf(no+' ')===0) nm=nm.slice(no.length+1).trim();
+    return nm;
+  }
+
+  /* 1) ผู้รับจ้างเข้าดำเนินการ */
+  /* วันที่หนังสือ: เดือนของวันเริ่มสัญญา — เว้นวันไว้กรอกเอง */
+  sdDocStart(p,K,F,M){
+    const {R,P,W}=K;
+    let x=K.memo('ส่วนควบคุมงานก่อสร้างทาง  '+this.OFFICE+'  โทร. 0-5530-2518','สทล.5.7 /',F.blank(p.startDate),'ผู้รับจ้างเข้าดำเนินการ');
+    x+=P(R('(1)  เรียน  ผอ.ขท.'+F.dist+'  ผ่าน รก.ชก.ทล.5'),{before:160,after:120});
+    x+=P(R(['ตามสัญญาเลขที่ '+(F.no||'..........'), F.sign? 'ลงวันที่ '+F.sign : '', F.prog,
+      'ระหว่าง กรมทางหลวง โดย '+F.distFull+' กับ '+F.ctr, F.start, F.endTxt(false), F.dur, F.val, F.fine, 'นั้น'].filter(Boolean).join(' ')),
+      {first:1418,jc:'thaiDistribute'});
+    x+=P(R('บัดนี้ผู้รับจ้างได้เริ่มปฏิบัติงานตามสัญญาแล้ว ตั้งแต่วันที่ '+(F.D(p.startDate)||'..........')
+      +' ผู้ควบคุมงานได้ทำการตรวจสอบปริมาณงานในสนาม พร้อมเอกสารแนบบัญชีแสดงผลการตรวจนับป้ายจราจรและอุปกรณ์อำนวยความปลอดภัยระหว่างการดำเนินการก่อสร้างในสายทางดังกล่าวแล้ว'),
+      {first:1418,jc:'thaiDistribute',before:160});
+    x+=P(R('จึงเรียนมาเพื่อโปรดทราบ'),{first:1418,before:160,keep:1});
+    /* เส้นจุดเหนือชื่อยาวไม่เกินชื่อ (dotsFit) · เว้น 2 บรรทัดหลังผู้ควบคุมงาน และ 1 บรรทัดหลังประธานกรรมการ */
+    x+=K.sigGrid([{name:p.supervisor, lines:['ผู้ควบคุมงาน'], dotsFit:1}],2,420,'center');
+    x+=P('')+P('');
+    /* (2) และ (3) วางคู่กันซ้าย-ขวา ประหยัดพื้นที่ให้จบ 1 แผ่น · กรรมการที่เหลือเรียงแถวเดียวด้านล่าง */
+    const hw=K.half, blk=(head,note,s)=>P(R(head),{keep:1,right:120})+P(R(note),{left:567,keep:1})+K.sig(Object.assign({dotsFit:1},s),hw,480);
+    x+=K.TBL([{before:0, c:[
+      {x0:0, x1:hw, xml:blk('(2)  เรียน  ประธานกรรมการตรวจรับพัสดุ'+(M.chair&&M.chair.pos? ' ('+String(M.chair.pos).trim()+')' : ''),'- เพื่อโปรดทราบตาม (1)',
+        {name:M.dir&&M.dir.name, lines:[(M.dir&&M.dir.pos)||('ผอ.ขท.'+F.dist)]})},
+      {x0:hw, x1:W, xml:blk('(3)  เรียน  คณะกรรมการตรวจรับพัสดุ','- เพื่อทราบ',
+        M.chair? {name:M.chair.name, lines:[String(M.chair.pos||'').trim(),'ประธานกรรมการตรวจรับพัสดุ']} : {name:'', lines:['ประธานกรรมการตรวจรับพัสดุ']})} ]}]);
+    const mem=M.others.map(c=>({name:c.name, lines:[String(c.pos||'').trim()], dotsFit:1}));
+    x+=P('');
+    /* กรรมการแถวละไม่เกิน 4 คน: ชื่อยาวเกินช่อง → ลดขนาดตัวอักษรเฉพาะแถวนี้ (15 / 14 pt — ไม่เล็กกว่า 14 pt) */
+    mem.forEach(s=>{ s.name=String(s.name||'').replace(/\s+/g,' ').trim(); });
+    const per=Math.max(1,Math.min(4,mem.length)), cellW=Math.floor(W/per)-120;
+    const longest=Math.max(0,...mem.map(s=>K.twW('( '+s.name+' )')), ...mem.map(s=>K.twW(s.lines[0]||'')));
+    const sz=[32,30,28].find(z=>longest*z/32<=cellW)||28;
+    if(sz<32) mem.forEach(s=>{ s.sz=sz; });
+    x+=K.sigGrid(mem, per, 420, 'center', 420);
+    return x;
+  }
+  /* 2) หนังสือส่งมอบงาน */
+  sdDocHandover(p,K,F,M){
+    const {R,P,C,TBL,W}=K;
+    let x=P(R('หนังสือส่งมอบงาน',{b:1,sz:36}),{jc:'center',after:280});
+    x+=P(R('ตามที่ '+F.ctr+' เป็นผู้รับจ้างดำเนินการ '+F.prog+' '+F.noSign+' นั้น'),{first:1418,jc:'thaiDistribute'});
+    x+=P(R('บัดนี้  ผู้รับจ้างได้ดำเนินการตามสัญญาดังกล่าวข้างต้นเสร็จเรียบร้อยถูกต้องตามเงื่อนไขในสัญญาและแบบทุกประการ ตั้งแต่ วันที่ ............. เดือน .............................. พ.ศ. .............. จึงขอส่งมอบงานตามสัญญาดังกล่าวข้างต้นให้แก่ผู้ว่าจ้างหรือผู้แทนของผู้ว่าจ้างไว้ต่อไป ในการส่งมอบงานนี้ '
+      +F.ctr+' ยังคงต้องรับผิดชอบตามเงื่อนไขของ '+F.noSign+' ข้อ 8 ทุกประการ'),{first:1418,jc:'thaiDistribute',before:200});
+    x+=P(R('ส่งมอบงาน ณ วันที่...............เดือน..............................พ.ศ. ..................'),{jc:'center',before:280});
+    const A=1700, B=2700, E=6500;
+    const blk=(lab,s,before)=>[
+      {keep:1, before, c:[C(A,B,R(lab||'')), C(B,E,R(K.fill(E-B,'ลงชื่อ ',''))), C(E,W,R(s.role),{left:120})]},
+      {c:[C(B,E,R('('+(String(s.name||'').trim()||'..............................')+')'),{jc:'center',left:500}), C(E,W,R(s.pos||''),{left:120})]}];
+    const repPos=String(p.contractorRepPos||'').trim();
+    let rows=blk('ผู้ส่งมอบ',{name:p.contractorRep, role:'ผู้รับจ้าง', pos:(repPos && repPos!=='ผู้รับจ้าง')? repPos : 'ผู้รับมอบอำนาจ'},800);
+    rows=rows.concat(blk('ผู้รับมอบ',{name:M.chair&&M.chair.name, role:'ประธานกรรมการตรวจรับพัสดุ', pos:String((M.chair&&M.chair.pos)||'').trim()},800));
+    M.others.forEach(c=>{ rows=rows.concat(blk('',{name:c.name, role:'กรรมการตรวจรับพัสดุ', pos:String(c.pos||'').trim()},620)); });
+    return x+TBL(rows);
+  }
+  /* หัวบันทึกแบบไม่มีตราครุฑ (บันทึกมอบหมาย / บันทึกผลการออกตรวจ): ชื่อเรื่อง / วันที่ / เรียน ผอ.ขท. */
+  sdHead(K,F,title,iso,brk){
+    const {R,P,TAB}=K;
+    return P(R(title,{b:1,sz:40}),{jc:'center',before:brk?0:120,after:200,brk})
+      +P(R('วันที่',{b:1})+R(F.blank(iso)),{left:4820,after:120})
+      +P(R('เรียน',{b:1})+R('      ผอ.ขท.'+F.dist),{after:120});   /* เว้นวรรคด้วยช่องว่าง (ไม่ใช้แท็บ) ให้เห็นระยะเท่ากันทุกโปรแกรม */
+  }
+  /* 3) บันทึกมอบหมายการออกตรวจงานจ้าง: มอบหมายกรรมการคนถัดจาก ผอ.ขท. (เลือกเปลี่ยนได้ในหน้าต่าง Export) */
+  sdDocAssign(p,K,F,M){
+    const {R,P}=K;
+    let x=this.sdHead(K,F,'บันทึกมอบหมายการออกตรวจงานจ้าง',p.startDate);
+    x+=P(R(['ตามอนุมัติ ผู้อำนวยการแขวงทางหลวง'+F.dist+' ได้แต่งตั้งคณะกรรมการตรวจรับพัสดุในงานจ้างก่อสร้าง', F.prog, F.start, F.endTxt(false), F.dur, F.val, F.fine,
+      'โดย '+F.distFull+' กับ '+F.ctr, 'สัญญาจ้างก่อสร้างเลขที่ '+(F.no||'..........')+(F.sign? ' ลงวันที่ '+F.sign : '')+' นั้น'].join(' ')),{first:1418,jc:'thaiDistribute'});
+    x+=P(R('คณะกรรมการตรวจรับพัสดุ ประกอบด้วย'),{first:1418,before:200,after:120,keep:1});
+    x+=K.comTbl(M.com);
+    x+=P(R('คณะกรรมการฯ ได้ร่วมกันพิจารณาแล้ว เพื่อให้เป็นไปตามระเบียบกระทรวงการคลังว่าด้วยการจัดซื้อจัดจ้างและการบริหารพัสดุภาครัฐ ข้อ 176 (3) เห็นควรมอบหมายให้กรรมการฯ ผู้มีรายชื่อข้างท้ายนี้ มีหน้าที่ออกตรวจงานจ้าง ณ สถานที่ที่กำหนดไว้ในสัญญาหรือที่ตกลงให้ทำงานจ้างนั้น ตามเวลาที่เหมาะสมและเห็นสมควร แล้วรายงานผลการตรวจงานจ้างให้ประธานกรรมการฯ/หัวหน้าหน่วยงานทราบ'),
+      {first:1418,jc:'thaiDistribute',before:200,after:120});
+    x+=K.comTbl(M.asg? [Object.assign({},M.asg,{role:'กรรมการ'})] : [{name:'..............................',pos:'',role:'กรรมการ'}]);
+    x+=K.sigList(M.com.map(c=>({name:c.name, pos:String(c.pos||'').trim(), role:c===M.chair? 'ประธานกรรมการตรวจรับพัสดุ' : 'กรรมการ'})),480);
+    return x;
+  }
+  /* 4) บันทึกผลการออกตรวจงานจ้างประจำเดือน: 1 หน้าต่อเดือน เว้นวันที่ไว้กรอกเอง
+     mode 'asg' = กรรมการผู้ได้รับมอบหมายลงนาม · 'all' = คณะกรรมการทั้งคณะ (แสดงรายชื่อคณะกรรมการและหมายเหตุ) */
+  sdDocMonthly(p,K,F,M,months,mode){
+    const {R,P}=K, all=mode==='all';
+    let x='';
+    months.forEach((mo,k)=>{
+      const iso=mo.m+'-01';
+      /* ขยายสัญญาแล้ว: แสดงวันสิ้นสุดเดิม/ใหม่ตั้งแต่เดือนที่มีวันสิ้นสุดสัญญาเดิม */
+      const both=!!F.endN && mo.m>=String(F.endO).slice(0,7);
+      x+=this.sdHead(K,F,'บันทึกผลการออกตรวจงานจ้าง',iso,k>0);
+      x+=P(R(['ตามอนุมัติสัญญาเลขที่ '+(F.no||'..........')+(F.sign? ' ลงวันที่ '+F.sign : ''), 'ได้แต่งตั้งคณะกรรมการตรวจรับพัสดุในงานจ้างก่อสร้าง', F.prog, F.start, F.endTxt(both), F.dur, F.val, F.fine,
+        'ผู้รับจ้าง '+F.ctr, 'สัญญาจ้างก่อสร้างเลขที่ '+(F.no||'..........')+(F.sign? ' ลงวันที่ '+F.sign : '')+(all? ' ประกอบด้วย' : ' นั้น')].join(' ')),{first:1418,jc:'thaiDistribute'});
+      if(all) x+=P('',{sz:16})+K.comTbl(M.com);
+      x+=P(R('เพื่อให้เป็นไปตามระเบียบกระทรวงการคลังว่าด้วยการจัดซื้อจัดจ้างและการบริหารพัสดุภาครัฐ ข้อ 176 (3) คณะกรรมการฯ ได้ดำเนินการออกตรวจงานจ้าง ครั้งที่ '+(k+1)
+        +' เมื่อวันที่'+F.blank(iso)+' ผลการออกตรวจงานจ้าง ปรากฏดังนี้'),{first:1418,jc:'thaiDistribute',before:200});
+      const its=mo.items.length? mo.items.map(it=>'รายการที่ '+it.no+' '+this.sdItemName(it)) : ['..........................................................................................'];
+      /* รายการมาก (เกิน 10) ใช้ตัวอักษร 14 pt ให้อยู่หน้าเดียวกันมากที่สุด */
+      const isz=its.length>10? 28 : 32;
+      its.forEach((t,i)=>{ x+=P(R((i+1)+'. '+t,{sz:isz}),{left:1701,hang:340,before:i? 0 : 60,sz:isz}); });
+      x+=P(R('จึงเรียนมาเพื่อทราบ'),{left:720,before:200,keep:1});
+      if(all){
+        x+=K.sigList(M.com.map(c=>({name:c.name, pos:String(c.pos||'').trim(), role:c===M.chair? 'ประธานกรรมการตรวจรับพัสดุ' : 'กรรมการ'})),720);
+        x+=P(R('หมายเหตุ  :-',{sz:28,b:1})+R(' การออกตรวจงานจ้างกรณีไม่มีการมอบหมาย ให้คณะกรรมการทั้งคณะออกตรวจร่วมกันตามระยะเวลาที่พิจารณาเห็นสมควรตามความเหมาะสมกับสภาพข้อเท็จจริงของแต่ละโครงการ โดยสรุปรายงานผลการออกตรวจ เช่น งานดำเนินการถึงขั้นตอนใด มีปัญหา อุปสรรคใด ๆ หรือไม่ เป็นต้น สามารถแนบเอกสารที่เกี่ยวข้อง หรือ ภาพถ่าย เพื่อประกอบรายงานได้ แล้วจัดเก็บบันทึกผลการออกตรวจไว้เป็นหลักฐานที่สำนักงาน/โครงการ',{sz:28}),
+          {sz:28,left:1134,hang:1134,jc:'thaiDistribute',before:360});
+      } else {
+        const a=M.asg||{};
+        x+=K.sigList([{name:a.name, pos:String(a.pos||'').trim(), role:'กรรมการ'}],960);
+      }
+    });
+    return x;
+  }
+  /* 5) รายงานผลการตรวจรับพัสดุ (เรียน ผส.ทล.5) */
+  sdDocReport(p,K,F,M,di){
+    const {R,P}=K, d=this.dvList(p)[di]||{}, RD=this.sdRoundTxt(d,di);
+    let x=K.memo(F.distFull+'  '+(this.SD_TEL[F.dist]||'โทร. ..............................'),'สทล.5 ขท.'+F.dist+'/',F.blank(d.iDate||d.dDate||this.today()),'รายงานผลการตรวจรับพัสดุ');
+    x+=P(R('เรียน',{b:1})+R('      ผส.ทล.5'),{before:160,after:120});
+    x+=P(R(['ตาม'+F.noSign, 'ระหว่างกรมทางหลวงโดย '+F.distFull+' ผู้ว่าจ้างกับ '+F.ctr+' ผู้รับจ้างทำการก่อสร้าง', F.prog,
+      'วงเงินค่างาน '+this.cmoney(p.contractValue)+' บาท', F.start, F.endTxt(true)+' นั้น'].join(' ')),{first:1418,jc:'thaiDistribute'});
+    x+=P(R('เพื่อให้เป็นไปตามพระราชบัญญัติการจัดซื้อจัดจ้างและการบริหารพัสดุภาครัฐ พ.ศ.2560 ระเบียบกระทรวงการคลังว่าด้วยการจัดซื้อจัดจ้างและการบริหารพัสดุภาครัฐ พ.ศ.2560 หนังสือกรมบัญชีกลางด่วนที่สุด ที่ กค (กวจ) 0405.4/ว681 ลงวันที่ 8 ตุลาคม 2568 และคำสั่งกรมฯ ที่ บ.1/182/2568 ลงวันที่ 3 พฤศจิกายน 2568 เรื่อง การกำหนดระยะเวลาดำเนินการและการมอบอำนาจในการอนุมัติให้ขยายเวลาดำเนินการ การพิจารณาสั่งการและการรับทราบรายงานผลการดำเนินการของคณะกรรมการและเจ้าหน้าที่ในการจัดซื้อจัดจ้างและการบริหารพัสดุภาครัฐ'),
+      {first:1418,jc:'thaiDistribute',before:120});
+    x+=P(R('บัดนี้  ผู้รับจ้างได้ส่งมอบงาน'+RD+' ตามหนังสือขอส่งงานเลขที่ ........................ ลงวันที่ '+(F.D(d.dDate)||'..............................')
+      +' คณะกรรมการตรวจรับพัสดุได้ทำการตรวจรับแล้ว เมื่อวันที่ '+(F.D(d.iDate)||'..............................')
+      +' เห็นว่าเป็นการถูกต้องครบถ้วน เป็นไปตามแบบรูปรายการละเอียดและข้อกำหนดในสัญญา จึงขอรายงานผลการตรวจรับพัสดุดังกล่าว เพื่อบันทึกข้อมูลการตรวจรับพัสดุในระบบจัดซื้อจัดจ้างภาครัฐด้วยอิเล็กทรอนิกส์ (e-GP) ตามกระบวนการจัดซื้อจัดจ้างจนถึงการบริหารสัญญาในระบบ e-GP ภายในวันที่ได้ดำเนินการจริง'),
+      {first:1418,jc:'thaiDistribute',before:120});
+    x+=P(R('จึงเรียนมาเพื่อโปรดทราบ'),{first:1418,before:160,keep:1});
+    x+=K.sigGrid([{name:M.chair&&M.chair.name, lines:[String((M.chair&&M.chair.pos)||'').trim()], lead:'ลงชื่อ', tail:'ประธานกรรมการ'}],2,420,'center');
+    x+=K.sigGrid(M.others.map(c=>({name:c.name, lines:[String(c.pos||'').trim()], lead:'ลงชื่อ', tail:'กรรมการ'})),2,300,'center',300);
+    return x;
+  }
+  /* 6) รายงานการประชุมพิจารณาตรวจรับงาน (ตัวอักษร 14 pt ตามแบบ) */
+  sdDocMeeting(p,K,F,M,di,noSupply){   /* noSupply = ไม่ใส่เจ้าหน้าที่พัสดุ (ติ๊กออกในหน้าต่าง Export) */
+    const {R,P,C,TBL,W}=K, dl=this.dvList(p), d=dl[di]||{}, n=d.no||(di+1), RD=this.sdRoundTxt(d,di);
+    const s={sz:28}, b={sz:28,b:1}, r=(t,o)=>R(t,Object.assign({},s,o||{}));
+    const nm=(o)=>String((o&&o.name)||'').replace(/\s+/g,' ').trim();
+    /* วันประชุม: วันตรวจรับของงวด → วันนัดตรวจรับครั้งนี้ → เว้นว่าง */
+    const ap=(p.appointments||[]).find(a=>{ const t=String(a.phase||'')+' '+String(a.phaseNo||''); return new RegExp('(ครั้งที่|งวดที่)\\s*'+n+'(?!\\d)').test(t); });
+    const date=F.D(d.iDate)||(ap&&ap.date? F.D(ap.date) : '')||'..............................';
+    let x='';
+    [ 'รายงานการประชุมพิจารณาตรวจรับ'+RD, 'ครั้งที่ '+n+' / '+(p.fiscalYear||''), 'วันที่ '+date, 'ณ ห้องประชุม '+F.distFull ]
+      .forEach(t=>{ x+=P(R(t,{sz:32,b:1}),{jc:'center',sz:32}); });
+    const X1=3100, X2=6500;
+    const lst=(head,rows)=>P(r(head,{b:1}),{before:200,sz:28,keep:1})+TBL(rows.map((o,i)=>({sz:28, keep:i<rows.length-1, c:[C(0,X1,r((i+1)+'. '+o[0])), C(X1,X2,r(o[1]||'')), C(X2,W,r(o[2]||''))]})));
+    x+=lst('ผู้มาประชุม',M.com.map(c=>[nm(c), this.sdFullPos(c.pos), c===M.chair? 'ประธานกรรมการ' : 'กรรมการ']));
+    /* คอลัมน์กลาง = ตำแหน่ง, คอลัมน์ขวา = หน้าที่ (ตามแบบ) */
+    const att=this.sdAttendees(p,noSupply).map(a=>[a.name, a.pos, a.role]);
+    if(nm({name:p.contractorRep})) att.push([nm({name:p.contractorRep}), 'ผู้รับจ้าง', F.ctr]);
+    if(att.length) x+=lst('ผู้เข้าร่วมประชุม',att);
+    /* วาระ: ป้ายซ้าย | ข้อความ */
+    const LW=2268;
+    const row=(lab,text,o)=>{ o=o||{}; return {sz:28, before:o.before||0, keep:o.keep, c:[C(0,LW,r(lab,{b:1,u:o.u})), o.xml? {x0:LW,x1:W,xml:o.xml} : C(LW,W,r(text,o.tb),{jc:'thaiDistribute'})]}; };
+    const sup=nm({name:p.supervisor})||'ผู้ควบคุมงาน', mat=nm({name:p.materialInspector})||'ผู้ควบคุมงานด้านวัสดุ', ch=nm(M.chair)||'ประธาน';
+    const items=(p.items||[]).filter(it=>this.num(it.qty)>0 && this.dvQty(p,di,it.no)>0);
+    let rows=[ row('เริ่มประชุม','เวลา ................... น.',{before:200,tb:{b:1}}),
+      row('ระเบียบวาระที่ 1','เรื่องที่ประธานแจ้งให้ที่ประชุมทราบ',{u:1,tb:{b:1},keep:1}) ];
+    x+=TBL(rows);
+    x+=P(r(['เนื่องจากผู้รับจ้างได้ก่อสร้างแล้วเสร็จและขอส่งงาน'+RD, F.noSign, F.prog, F.start, F.endTxt(true), F.dur, F.val, F.fine,
+      F.ctr+' เป็นผู้รับจ้างนั้น วัตถุประสงค์การประชุมครั้งนี้เพื่อพิจารณาตรวจรับงาน'+RD].join(' ')),{first:LW,jc:'thaiDistribute',sz:28});
+    rows=[ row('มติที่ประชุม','- รับทราบ'),
+      row('ระเบียบวาระที่ 2','เรื่องที่เสนอให้ที่ประชุมพิจารณา',{u:1,tb:{b:1}}),
+      row('ประธาน','- ให้ผู้ควบคุมงานชี้แจงรายละเอียดที่ผู้รับจ้างขอส่งมอบ'+RD+' สัญญาเลขที่ '+(F.no||'..........')),
+      row(sup,'- ปัจจุบันโครงการก่อสร้างผู้รับจ้างได้ก่อสร้างแล้วเสร็จและได้ขอส่งงาน'+RD+' ซึ่งผู้ควบคุมงานได้ทำการตรวจสอบปริมาณงาน และคิดค่างานก่อสร้างแต่ละรายการ จำนวน '+items.length+' รายการ มีรายละเอียดดังเอกสารแนบ'),
+      row(ch,'- การดำเนินการก่อสร้างของกรมทางหลวงมีมาตรฐานในการควบคุมและทดสอบวัสดุ โดยมีเจ้าหน้าที่ส่วนตรวจสอบและวิเคราะห์ทางวิศวกรรม '+this.OFFICE.replace(/\s*\(.*\)\s*$/,'')+' คอยดูแลควบคุมตรวจสอบวัสดุที่ใช้ในการก่อสร้าง จึงขอให้เจ้าหน้าที่ส่วนตรวจสอบและวิเคราะห์ทางวิศวกรรม ชี้แจงผลการทดสอบวัสดุ'),
+      row(mat,'- ขอชี้แจงรายละเอียดผลการทดสอบวัสดุตามมาตรฐานกรมทางหลวง สรุปได้ดังนี้',{before:120}) ];
+    x+=TBL(rows);
+    const RX=7500;
+    x+=TBL(items.map((it,i)=>({sz:28, before:i? 0 : 80, c:[C(LW+284,RX,r((i+1)+'. รายการที่ '+it.no+'. '+this.sdItemName(it)),{left:340,hang:340}), C(RX,W,r('ผลการทดลอง “ใช้ได้”'))]})));
+    x+=P(r('“สรุปผลการทดลองผ่านเกณฑ์มาตรฐานของกรมทางหลวง”',{b:1}),{jc:'center',before:200,after:120,sz:28});
+    rows=[ row(ch,'- ตามผู้ควบคุมงานได้นำเสนอปริมาณงานและมีรายละเอียดค่างานในการส่งงาน'+RD+' คณะกรรมการตรวจรับพัสดุเห็นชอบหรือไม่') ]
+      .concat(M.others.map(c=>row(nm(c),'- เห็นชอบตามผู้ควบคุมงานเสนอ')));
+    x+=TBL(rows);
+    /* มติ: ยอดเงินตามงวด (หักประกัน / เงินล่วงหน้า / ค่าปรับ) */
+    const Y=this.dvPay(p,di), N2=(v)=>this.cmoney(v);
+    const res=['ตรวจรับงาน'+RD+' '+F.noSign, 'รายการก่อสร้างที่ต้องจ่ายครั้งนี้ จำนวน '+items.length+' รายการ เป็นเงิน '+N2(Y.amt)+' บาท'];
+    if(Y.final){ if(Y.retain>0) res.push('คืนเงินประกันผลงาน เป็นเงิน '+N2(Y.retain)+' บาท'); }
+    else if(Y.retain>0) res.push('หักเงินประกันผลงาน '+this.n(Y.rt,0)+' % เป็นเงิน '+N2(Y.retain)+' บาท');
+    if(Y.adv>0) res.push('หักเงินค่าจ้างล่วงหน้า เป็นเงิน '+N2(Y.adv)+' บาท');
+    if(Y.fine>0) res.push('หักค่าปรับ '+this.n(this.num(d.fineDays),0)+' วัน เป็นเงิน '+N2(Y.fine)+' บาท');
+    res.push('คงเป็นเงินที่ต้องจ่ายเป็นเงิน '+N2(Y.pay)+' บาท');
+    x+=P('',{sz:20,keep:1});
+    x+=TBL([ row('มติที่ประชุม','',{xml:res.map(t=>P(r(t,{b:1}),{sz:28,keep:1})).join('')}),
+      row('เลิกประชุม','เวลา ................ น.',{before:200,tb:{b:1}}) ]);
+    /* ผู้จด / ผู้ตรวจ / ผู้รับรองรายงานการประชุม (ชิดขวา) */
+    const sg=[
+      /* ผู้จดรายงาน: ติ๊กใส่เจ้าหน้าที่พัสดุ = ชื่อ/ตำแหน่งเจ้าหน้าที่พัสดุ · ไม่ติ๊ก = ผู้ควบคุมงาน (มีเส้นจุดเหนือชื่อไว้ลงนาม) */
+      noSupply? {name:nm({name:p.supervisor}), lines:[String(p.supervisorPos||'').trim()||this.sdPosOf(p.supervisor),'ผู้ควบคุมงาน','ผู้จดรายงานการประชุม'], sz:28}
+        : {name:nm({name:p.supplyOfficer}), lines:[String(p.supplyOfficerPos||'').trim(),'ผู้จดรายงานการประชุม'], sz:28},
+      {name:nm(M.dir), lines:[this.sdFullPos((M.dir&&M.dir.pos)||('ผอ.ขท.'+F.dist)),'ผู้ตรวจรายงานการประชุม'], sz:28},
+      {name:nm(M.chair), lines:[this.sdFullPos(M.chair&&M.chair.pos),'ประธานกรรมการ','ผู้รับรองรายงานการประชุม'], sz:28}];
+    x+=TBL(sg.map(o=>({c:[{x0:K.half, x1:W, xml:K.sig(o,W-K.half,720)}]})));
+
+    /* แผ่นสุดท้าย: รายชื่อผู้เข้าร่วมประชุม (ตารางมีเส้น: ลำดับที่ | ชื่อ - สกุล | ตำแหน่ง | ลายมือชื่อ | หมายเหตุ)
+       ความสูงแถวพอดีข้อความ (ไม่กำหนดความสูงขั้นต่ำ) · คอลัมน์ตำแหน่งกว้างพอไม่ให้ตัดบรรทัด */
+    x+=P('',{brk:true,sz:8});
+    [ 'รายชื่อผู้เข้าร่วมประชุมพิจารณาตรวจรับ'+RD, F.noSign, 'ประชุม  ครั้งที่ '+n+' / '+(p.fiscalYear||''),
+      'วันที่ '+date+'  เวลา                น.', 'ณ  ห้องประชุม'+F.distFull ]
+      .forEach((t,i)=>{ x+=P(R(t,{sz:32,b:1}),{jc:'center',sz:32,after:i===4? 120 : 40}); });
+    /* ตารางยื่นเข้าขอบกระดาษซ้าย 0.5 ซม. (284) / ขวา 1 ซม. (567) · ช่องลายมือชื่อกว้าง 3 ซม. (1701)
+       ชื่อ - สกุล: นามสกุลเริ่มที่แนวแท็บเดียวกันทุกแถว (ตามชื่อต้นที่ยาวที่สุด) */
+    const att2=this.sdAttendees(p,noSupply).map(a=>[a.name, a.pos||a.role]);
+    if(nm({name:p.contractorRep})) att2.push([nm({name:p.contractorRep}), F.ctr]);
+    const com2=M.com.map(c=>[nm(c), this.sdFullPos(c.pos)]);
+    const split=(s)=>{ s=String(s||'').replace(/\s+/g,' ').trim(); const i=s.indexOf(' '); return i>0? [s.slice(0,i), s.slice(i+1)] : [s,'']; };
+    const all=com2.concat(att2).map(r=>split(r[0]));
+    const tabPos=Math.max(900, ...all.map(s=>K.twW(s[0]))) + 200;
+    const needName=tabPos + Math.max(0, ...all.map(s=>K.twW(s[1]))) + 200;
+    const TIND=284, TW=W+TIND+567, SIGW=1701, NOTEW=1050, NOW=850;
+    const nameW=Math.max(2400, needName), CW=[NOW, nameW, TW-NOW-nameW-SIGW-NOTEW, SIGW, NOTEW];
+    const BD='<w:tcBorders><w:top w:val="single" w:sz="8" w:space="0" w:color="000000"/><w:left w:val="single" w:sz="8" w:space="0" w:color="000000"/><w:bottom w:val="single" w:sz="8" w:space="0" w:color="000000"/><w:right w:val="single" w:sz="8" w:space="0" w:color="000000"/></w:tcBorders>';
+    const btbl=(rows,head)=>{
+      let t='<w:tbl><w:tblPr><w:tblW w:w="'+TW+'" w:type="dxa"/><w:tblInd w:w="'+(-TIND)+'" w:type="dxa"/><w:tblLayout w:type="fixed"/><w:tblCellMar><w:top w:w="0" w:type="dxa"/><w:left w:w="60" w:type="dxa"/><w:bottom w:w="0" w:type="dxa"/><w:right w:w="60" w:type="dxa"/></w:tblCellMar><w:tblLook w:val="0000"/></w:tblPr><w:tblGrid>'
+        +CW.map(w=>'<w:gridCol w:w="'+w+'"/>').join('')+'</w:tblGrid>';
+      const tr=(cells,b,isHead)=>'<w:tr><w:trPr><w:cantSplit/>'+(isHead? '<w:tblHeader/>' : '')+'</w:trPr>'
+        +cells.map((c,j)=>'<w:tc><w:tcPr><w:tcW w:w="'+CW[j]+'" w:type="dxa"/>'+BD+'<w:vAlign w:val="center"/></w:tcPr>'
+          +((!b && j===1 && c)? P(R(split(c)[0])+K.TAB+R(split(c)[1]),{tabs:[[tabPos]]})
+            : P(R(c,{b}),{jc:(b||j===0)? 'center' : 'left'}))+'</w:tc>').join('')+'</w:tr>';
+      if(head) t+=tr(['ลำดับที่','ชื่อ - สกุล','ตำแหน่ง','ลายมือชื่อ','หมายเหตุ'],1,true);
+      rows.forEach((r,i)=>{ t+=tr([String(i+1), r[0], r[1]||'', '', ''],0); });
+      for(let k=0;k<3;k++) t+=tr(['','','','',''],0);   /* แถวว่างต่อท้าย 3 แถว ไว้เขียนเพิ่ม */
+      return t+'</w:tbl>';
+    };
+    x+=P(R('ผู้มาประชุม',{b:1}),{before:120,after:60,keep:1,left:-TIND});
+    x+=btbl(com2,true);
+    x+=P(R('ผู้เข้าร่วมประชุม',{b:1}),{before:360,after:60,keep:1,left:-TIND}); x+=btbl(att2,true);
+    return x;
+  }
+  exportSupportDocs = () => {
+    this.setState({exportMenu:false});
+    const p=this.byId(this.state.pid);
+    if(!p){ this.showNotice('กรุณาเลือกโครงการก่อน'); return; }
+    const months={}; this.sdMonths(p).forEach(o=>{ months[o.m]=true; });
+    const sel={}; this.SD_DOCS.forEach(o=>{ sel[o.k]=true; });
+    this.setState({sdDlg:{pid:p.id, sel, di:this.dvActive(p), asg:this.sdAsgDefault(p), mode:'asg', months, busy:false}});
+  };
+  buildSupportDocs = async () => {
+    const g=this.state.sdDlg; if(!g || g.busy) return;
+    const p=this.byId(g.pid); if(!p) return;
+    const d=this.dvList(p)[g.di];
+    const months=this.sdMonths(p).filter(o=>g.months[o.m]);
+    const docs=this.SD_DOCS.filter(o=>g.sel[o.k] && !(o.round && !d) && !(o.k==='monthly' && !months.length));
+    if(!docs.length){ this.showNotice('ยังไม่ได้เลือกเอกสาร'); return; }
+    this.setState({sdDlg:Object.assign({},g,{busy:true})});
+    try{
+      const K=await this.sdKit(), F=this.sdFacts(p), M=this.sdPeople(p,g.asg);
+      /* ผู้รับจ้างเข้าดำเนินการ / ใบรายงานผลการตรวจรับพัสดุ / บันทึกมอบหมาย: ขอบแคบลง ให้จบในแผ่นเดียว */
+      const K1=await this.sdKit(this.SD_PG1);
+      const short=(this.contractShort(p)||'โครงการ').replace(/[\/\\:*?"<>|]/g,'-').replace(/\s+/g,'');
+      const files=docs.map(o=>{
+        const one=o.k==='start' || o.k==='report' || o.k==='assign', KK=one? K1 : K;
+        const body= o.k==='start'? this.sdDocStart(p,K1,F,M)
+          : o.k==='handover'? this.sdDocHandover(p,K,F,M)
+          : o.k==='assign'? this.sdDocAssign(p,K1,F,M)
+          : o.k==='monthly'? this.sdDocMonthly(p,K,F,M,months,g.mode)
+          : o.k==='report'? this.sdDocReport(p,K1,F,M,g.di)
+          : this.sdDocMeeting(p,K,F,M,g.di,g.noSupply);
+        const tag=o.round? ' '+this.sdRoundTxt(d,g.di) : '';
+        return {name:(o.label+tag+' '+short).replace(/[\/\\:*?"<>|]/g,'-')+'.docx', blob:KK.pack(body)};
+      });
+      let blob=files[0].blob, name=files[0].name;
+      if(files.length>1){
+        const ents=[];
+        for(const f of files) ents.push({name:f.name, data:new Uint8Array(await f.blob.arrayBuffer())});
+        blob=this.zipStore(ents,'application/zip'); name='เอกสารประกอบ '+short+'.zip';
+      }
+      const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=name;
+      document.body.appendChild(a); a.click();
+      setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); },1500);
+      this.setState({sdDlg:null});
+    }catch(e){
+      console.error(e);
+      this.setState({sdDlg:Object.assign({},this.state.sdDlg||g,{busy:false})});
+      this.showNotice('สร้างไฟล์ไม่สำเร็จ: '+(e&&e.message||e));
+    }
+  };
+
   /* ===== งานนำเสนอตรวจรับงาน (.pptx) ===== */
   loadPptxLib(){
     if(window.PptxGenJS) return Promise.resolve(window.PptxGenJS);
@@ -8126,7 +8805,11 @@ class Component extends DCLogic {
       const x=S(true);
       const LW=1.25, ty = LOGO? 1.65 : 0.85;
       if(LOGO) x.addImage({data:LOGO.data,x:(10-LW)/2,y:0.3,w:LW,h:LW*LOGO.r});
-      x.addText('ตรวจรับงาน'+RD,T({x:XL,y:ty,w:WC,h:0.85,fontSize:44,bold:true,align:'center',valign:'middle',color:TTL,margin:0}));
+      /* ตรวจรับงานครั้งที่ N (งวดที่ N) — งวดสุดท้ายแสดง (งวดสุดท้าย) แทนเลขงวด */
+      const rn=(cur&&cur.no)||(di>=0? di+1 : 1);
+      const coverTtl='ตรวจรับงานครั้งที่ '+rn+' '+((cur&&cur.final)? '(งวดสุดท้าย)' : '(งวดที่ '+rn+')');
+      const ttlFs=[44,40,36,32].find(s=>this.pptWrap(coverTtl,s,WC*0.96,true,FONT,false).length<=1)||32;
+      x.addText(coverTtl,T({x:XL,y:ty,w:WC,h:0.85,fontSize:ttlFs,bold:true,align:'center',valign:'middle',color:TTL,margin:0}));
       const dated=/ลงวันที่/.test(short) || !p.contractDate;
       x.addText(short+(dated? '' : ('  ลงวันที่ '+(this.th(p.contractDate)||''))),
         T({x:XL,y:ty+0.85,w:WC,h:0.55,fontSize:28,bold:true,align:'center',valign:'middle',color:SUB,margin:0}));
@@ -9137,6 +9820,7 @@ class Component extends DCLogic {
       exportCoverAll: this.exportCoverAll,
       exportItemsXlsx: this.exportItemsXlsx,
       exportTuaDoc: this.exportTuaDoc,
+      exportSupportDocs: this.exportSupportDocs,
       openPeople: this.openPeople,
       closePeople: this.closePeople,
       peopleOpen: !!this.state.peopleOpen,
@@ -9266,6 +9950,58 @@ class Component extends DCLogic {
         close:()=>this.setState({payDlg:null})
       };
     } else out.pay={rounds:[],items:[]};
+    /* เอกสารประกอบ (Word): เลือกเอกสาร / งวด / กรรมการผู้ได้รับมอบหมาย / เดือนที่ออกตรวจ */
+    const sg=this.state.sdDlg;
+    out.sdOpen=!!sg;
+    if(sg){
+      const sp=this.byId(sg.pid)||{}, sdl=this.dvList(sp);
+      const cur=()=>this.state.sdDlg||sg;
+      const setS=(o)=>this.setState({sdDlg:Object.assign({},cur(),o)});
+      const PB=(on)=>({ bg:on?'var(--color-accent)':'var(--color-neutral-100)', fg:on?'var(--color-bg)':'var(--color-neutral-800)', bd:on?'var(--color-accent)':'var(--color-divider)' });
+      const SM=this.sdPeople(sp,sg.asg), ms=this.sdMonths(sp), sel=sg.sel||{};
+      let k=0;
+      const count=this.SD_DOCS.filter(o=>sel[o.k]).length;
+      out.sd={
+        docs:this.SD_DOCS.map(o=>({label:o.label, on:!!sel[o.k], toggle:()=>{ const s=Object.assign({},cur().sel); if(s[o.k]) delete s[o.k]; else s[o.k]=true; setS({sel:s}); }})),
+        allOn:()=>{ const s={}; this.SD_DOCS.forEach(o=>{ s[o.k]=true; }); setS({sel:s}); },
+        noneOn:()=>setS({sel:{}}),
+        countTxt:'เลือกแล้ว '+count+' ฉบับ'+(count>1? ' · ดาวน์โหลดเป็นไฟล์ .zip' : ''),
+        needMeeting: !!sel.meeting,
+        supplyOn: !sg.noSupply,
+        toggleSupply:()=>setS({noSupply:!cur().noSupply}),
+        /* เจ้าหน้าที่พัสดุ: กรอกในหน้าต่างนี้ บันทึกไว้กับโครงการ (ครั้งหน้าไม่ต้องกรอกซ้ำ) */
+        supplyOfficer: sp.supplyOfficer||'',
+        setSupply:(e)=>{ const c=this.byId(sg.pid); if(!c) return; const np=JSON.parse(JSON.stringify(c)); np.supplyOfficer=String(e.target.value||''); this.writeProject(np); },
+        supplyPos: String(sp.supplyOfficerPos||''),
+        supplyPosOptions: (sp.supplyOfficerPos && this.SUPPLY_POS.indexOf(sp.supplyOfficerPos)<0)? this.SUPPLY_POS.concat([sp.supplyOfficerPos]) : this.SUPPLY_POS,
+        supplyCustom: !!sg.supplyCustom, supplyFromList: !sg.supplyCustom,
+        setSupplyPos:(e)=>{ const v=e.target.value, c=this.byId(sg.pid); if(!c) return;
+          const other=v==='__other'; if(other) setS({supplyCustom:true});
+          const np=JSON.parse(JSON.stringify(c)); np.supplyOfficerPos=other? '' : String(v||''); this.writeProject(np); },
+        setSupplyPosText:(e)=>{ const c=this.byId(sg.pid); if(!c) return; const np=JSON.parse(JSON.stringify(c)); np.supplyOfficerPos=String(e.target.value||''); this.writeProject(np); },
+        supplyBackToList:()=>setS({supplyCustom:false}),
+        needRound: !!(sel.report||sel.meeting),
+        noRounds: sdl.length===0,
+        rounds: sdl.map((d,i)=>Object.assign({label:'ส่งงาน'+this.sdRoundTxt(d,i), pick:()=>setS({di:i})}, PB(sg.di===i))),
+        needAsg: !!(sel.assign||sel.monthly),
+        noCom: SM.com.length===0,
+        asgVal: String(SM.asg? SM.com.indexOf(SM.asg) : -1),
+        asgOpts: SM.com.filter(c=>c!==SM.chair).map(c=>({v:String(SM.com.indexOf(c)), t:String(c.name||'').trim()+(c.pos? ' — '+String(c.pos).trim() : '')})),
+        setAsg:(e)=>setS({asg:parseInt(e.target.value,10)}),
+        needMonthly: !!sel.monthly,
+        modes:[{k:'asg',label:'กรรมการผู้ได้รับมอบหมายลงนาม'},{k:'all',label:'คณะกรรมการทั้งคณะลงนาม'}]
+          .map(t=>Object.assign({label:t.label, pick:()=>setS({mode:t.k})}, PB(sg.mode===t.k))),
+        noMonths: ms.length===0,
+        months: ms.map(o=>{ const on=!!(sg.months||{})[o.m]; if(on) k++;
+          return { label:o.label, on, sub:(on? 'ครั้งที่ '+k+' · ' : '')+(o.items.length? o.items.length+' รายการ' : 'ไม่มีรายการที่รายงาน % ผลงาน'),
+            toggle:()=>{ const m=Object.assign({},cur().months); if(m[o.m]) delete m[o.m]; else m[o.m]=true; setS({months:m}); } }; }),
+        monthsAll:()=>{ const m={}; ms.forEach(o=>{ m[o.m]=true; }); setS({months:m}); },
+        monthsNone:()=>setS({months:{}}),
+        busy:!!sg.busy, busyTxt: sg.busy? 'กำลังสร้างไฟล์…' : 'สร้างไฟล์ Word',
+        cantBuild: !!sg.busy || count===0,
+        build:this.buildSupportDocs, close:()=>this.setState({sdDlg:null})
+      };
+    } else out.sd={docs:[],rounds:[],asgOpts:[],modes:[],months:[]};
     const tg=this.state.tuaDlg;
     out.tuaOpen=!!tg;
     if(tg){
@@ -9491,6 +10227,7 @@ class Component extends DCLogic {
       out.navList=NAV(this.state.view==='overview' || this.state.view==='project');
       const _acct=(this.ROLES[this.roleKey()]||{}).th;
       out.roleShort=_acct || 'เข้าสู่ระบบ';
+      out.roleGuest=!_acct;   /* แถบล่างมือถือ: ยังไม่เข้าสู่ระบบ แสดง "(เฉพาะเจ้าหน้าที่)" บรรทัดที่สอง */
       out.accountName=_acct || 'ผู้เยี่ยมชม';
       out.accountAction=_acct? 'บัญชี' : 'เข้าสู่ระบบ';
       const standalone=(typeof window!=='undefined' && ((window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) || window.navigator.standalone===true));
@@ -10315,8 +11052,6 @@ class Component extends DCLogic {
           value:String(this.durOf(d)||''),
           onChange:()=>{}, readOnly:true, hasHint:true, hint:'นับจากวันเริ่มสัญญาถึงวันสิ้นสุดสัญญา' },
         F('ผู้รับจ้าง','contractor','text',2),
-        F('ช่างควบคุมงาน','supervisor'),
-        F('ผู้ควบคุมงานด้านวัสดุ','materialInspector'),
         F('ละติจูด (Lat) เช่น 17.5887','lat'),
         F('ลองจิจูด (Long) เช่น 99.9762','lng')
       ].map(FIN);
@@ -10385,10 +11120,27 @@ class Component extends DCLogic {
         items.push({no:parentNo+'.'+(subCount+1),name:'',qty:0,unit:'',price:0});
         nd.items=items; this.setState({draft:nd});
       };
+      /* ตำแหน่งแบบเลือกจากรายการ หรือ "อื่นๆ (พิมพ์เอง)" — key แยกกันใน state.posOther */
+      const posPick=(key,cur,opts,setPos)=>{ const custom=!!(this.state.posOther||{})[key]; cur=cur||'';
+        return { pos:cur, posOptions:(cur && opts.indexOf(cur)<0)? opts.concat([cur]) : opts, posCustom:custom, posFromList:!custom,
+          onPosText:(e)=>setPos(e.target.value),
+          posBackToList:()=>{ const n=Object.assign({},this.state.posOther||{}); delete n[key]; this.setState({posOther:n}); },
+          onPos:(e)=>{ const v=e.target.value;
+            if(v==='__other'){ const n=Object.assign({},this.state.posOther||{}); n[key]=true; this.setState({posOther:n}); setPos(''); return; }
+            setPos(v); } }; };
+      const setDK=(k)=>(v)=>{ const nd=JSON.parse(JSON.stringify(this.state.draft||d)); nd[k]=v; this.setState({draft:nd}); };
+      /* ผู้ควบคุมงาน / ผู้ควบคุมงานด้านวัสดุ / เจ้าหน้าที่พัสดุ: ชื่อ + ตำแหน่ง (ใช้ในรายงานการประชุมพิจารณาตรวจรับ) */
+      out.staffRows=[
+        ['ช่างควบคุมงาน','supervisor','supervisorPos',this.STAFF_POS],
+        ['ผู้ควบคุมงานด้านวัสดุ','materialInspector','materialInspectorPos',this.STAFF_POS]
+      ].map(([label,k,kp,opts])=>Object.assign({ label, name:d[k]||'', onName:(e)=>setDK(k)(e.target.value) },
+        posPick('st_'+k, d[kp], opts, setDK(kp))));
       out.assistantRows=(d.assistants||[]).map((a,i)=>{
-        const set=(k)=>(e)=>{ const nd=JSON.parse(JSON.stringify(d)); nd.assistants[i][k]=e.target.value; nd.assistants[i].role='ผู้ช่วยควบคุมงาน'; this.setState({draft:nd}); };
-        return { name:a.name||'', role:'ผู้ช่วยควบคุมงาน', onChange:set('name'), onRole:set('role'),
-          remove:()=>{ const nd=JSON.parse(JSON.stringify(d)); nd.assistants.splice(i,1); this.setState({draft:nd}); } };
+        const set=(k)=>(e)=>{ const nd=JSON.parse(JSON.stringify(this.state.draft||d)); nd.assistants[i][k]=e.target.value; nd.assistants[i].role='ผู้ช่วยควบคุมงาน'; this.setState({draft:nd}); };
+        const setPos=(v)=>{ const nd=JSON.parse(JSON.stringify(this.state.draft||d)); if(nd.assistants[i]) nd.assistants[i].pos=v; this.setState({draft:nd}); };
+        return Object.assign({ name:a.name||'', role:'ผู้ช่วยควบคุมงาน', onChange:set('name'), onRole:set('role'),
+          remove:()=>{ const nd=JSON.parse(JSON.stringify(d)); nd.assistants.splice(i,1); this.setState({draft:nd}); } },
+          posPick('st_a'+i, a.pos, this.STAFF_POS, setPos));
       });
       out.addAssistant=()=>{ const nd=JSON.parse(JSON.stringify(d)); nd.assistants=(nd.assistants||[]).concat([{name:'',role:'ผู้ช่วยควบคุมงาน'}]); this.setState({draft:nd}); };
       out.itemTotals={ amount:this.n(tot,2), weight:tot? '100.000':'-',
