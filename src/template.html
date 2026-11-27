@@ -1630,10 +1630,14 @@ svg.leaflet-image-layer.leaflet-interactive path {
   .wk-card-date{flex:none;font-size:9.5px;color:#645c50;white-space:nowrap}
   .wk-pill{flex:none;font-size:10px;font-weight:700;line-height:1.3;padding:2px 9px;border:1px solid;border-radius:999px;white-space:nowrap}
   .wk-card-bd{flex:1;display:grid;grid-template-columns:minmax(0,1fr) 312px;min-height:0}
-  .wk-prog{display:flex;flex-direction:column;gap:2px;padding:7px 10px 8px;min-width:0}
+  .wk-prog{display:flex;flex-direction:column;gap:2px;padding:10px 10px 8px;min-width:0}
   .wk-prog-line{font-size:10.5px;font-weight:500;line-height:1.5;color:#201e1d}
   .wk-prog-line:empty{display:none}
-  .wk-prog-para{text-align:justify;text-justify:inter-character}
+  /* ชื่อโครงการ: จัดกระจายแบบไทย (ยืดช่องไฟระหว่างตัวอักษรให้เต็มบรรทัด บรรทัดสุดท้ายชิดซ้าย)
+     ตัดบรรทัดเฉพาะระหว่างคำ (wkProjectParts ใส่ zero-width space ระหว่างคำไทย) */
+  .wk-prog-para{text-align:justify;text-justify:inter-character;text-align-last:left;line-break:auto;word-break:normal}
+  /* ในการ์ดรายงาน: ย่อหน้าบรรทัดแรก 1 แท็บ */
+  .wk-prog-line.wk-prog-para{text-indent:3.5em}
   .wk-bars{margin-top:auto;padding-top:6px;display:flex;flex-direction:column;gap:3px}
   .wk-bar-row{display:grid;grid-template-columns:62px minmax(0,1fr) 62px;align-items:center;gap:6px}
   .wk-bar-lbl{font-size:10px;color:#474238;white-space:nowrap}
@@ -1650,8 +1654,9 @@ svg.leaflet-image-layer.leaflet-interactive path {
   .wk-k{font-size:9.5px;color:#645c50;white-space:nowrap}
   .wk-v{font-size:10.5px;font-weight:600;overflow-wrap:anywhere}
   .wk-num{font-variant-numeric:tabular-nums}
-  .wk-note{padding:4px 10px;border-top:1px solid #dcd3c4;font-size:10px;line-height:1.38;color:#2e2b25}
-  .wk-note-lbl{font-weight:700;color:#645c50;margin-right:3px}
+  /* หมายเหตุ: ข้อความแบบเดียวกับชื่อโครงการ (.wk-prog-line) ป้าย "หมายเหตุ :" ตัวหนา */
+  .wk-note{padding:4px 10px;border-top:1px solid #dcd3c4;font-size:10.5px;font-weight:500;line-height:1.5;color:#201e1d}
+  .wk-note-lbl{font-weight:700;color:#201e1d;margin-right:4px}
   .wk-foot{display:flex;justify-content:space-between;gap:12px;padding-top:5px;border-top:1px solid #dcd3c4;font-size:9px;color:#645c50}
   @media print{
     body{background:var(--color-neutral-100)}
@@ -2029,9 +2034,9 @@ svg.leaflet-image-layer.leaflet-interactive path {
                     </sc-for>
                   </span>
                 </sc-for>
-                <span style="display:flex;justify-content:space-between;gap:4px;margin-top:5px;font-size:9px;font-weight:700;color:{{ a.fg }}">
-                  <span>{{ a.doneTxt }}</span>
-                  <span>{{ a.toggleTxt }}</span>
+                <span style="display:flex;flex-wrap:wrap;justify-content:space-between;gap:2px 4px;margin-top:5px;font-size:9px;font-weight:700;color:{{ a.fg }}">
+                  <span style="white-space:nowrap">{{ a.doneTxt }}</span>
+                  <span style="white-space:nowrap;margin-left:auto">{{ a.toggleTxt }}</span>
                 </span>
               </button>
               <sc-if value="{{ a.expanded }}" hint-placeholder-val="{{ false }}">
@@ -3085,7 +3090,7 @@ svg.leaflet-image-layer.leaflet-interactive path {
                   </div>
                 </div>
 
-                <div class="wk-note"><span class="wk-note-lbl">หมายเหตุ</span> {{ s.h.note }}</div>
+                <div class="wk-note"><span class="wk-note-lbl">หมายเหตุ :</span> {{ s.h.note }}</div>
               </div>
             </sc-for>
             <sc-for list="{{ pg.blanks }}" as="b" hint-placeholder-count="0">
@@ -3283,9 +3288,9 @@ svg.leaflet-image-layer.leaflet-interactive path {
       <div style="flex:1;min-width:0">
         <div class="hd" style="font-size:16px;line-height:1.3">{{ detail.contractNo }}</div>
         <sc-if value="{{ detail.hasProgram }}" hint-placeholder-val="{{ true }}">
-          <div class="lbl" style="font-size:12px;font-weight:400;margin-top:3px;line-height:1.45;text-align:justify;text-justify:inter-character">{{ detail.programTxt }}</div>
+          <div class="lbl" style="font-size:12px;font-weight:400;margin-top:3px;line-height:1.45;text-align:left">{{ detail.programTxt }}</div>
         </sc-if>
-        <div class="lbl" style="font-size:12.5px;font-weight:600;margin-top:3px;line-height:1.45;color:var(--color-neutral-800);text-align:justify;text-justify:inter-character">{{ detail.siteTxt }}</div>
+        <div class="lbl" style="font-size:12.5px;font-weight:600;margin-top:3px;line-height:1.45;color:var(--color-neutral-800);text-align:left">{{ detail.siteTxt }}</div>
       </div>
       <button sc-camel-on-click="{{ closeDetail }}" class="btn btn-secondary" style="white-space:nowrap;font-size:13px;cursor:pointer">ปิด</button>
     </div>
@@ -4882,7 +4887,11 @@ class Component extends DCLogic {
   };
   /* ประธานตำแหน่งอื่น (หน่วยงานภายนอก) ใช้สีส้มเดียวกันทุกสถานะ */
   OTHER_CHAIR_BOX={bg:'#fcd9b8', fg:'#7a3a0e', bd:'#d9782b'};
-  apptBoxStyle(status,p){ return this.CHAIR_BOX[this.chairOf(p).pos] || this.OTHER_CHAIR_BOX; }
+  /* ตรวจรับแล้ว: กล่องนัดหมายเป็นสีเทา (ทุกตำแหน่งประธาน) */
+  DONE_BOX={bg:'#e3e3e0', fg:'#4a4a46', bd:'#9c9c97'};
+  /* ตรวจรับแล้ว: สถานะ "ตรวจแล้ว" หรือเลยวันนัดมาแล้ว (ฟอร์มนัดหมายไม่มีช่องตั้งสถานะ) */
+  isApptDone(a){ return !!a && (this.normStatus(a.status)==='ตรวจแล้ว' || (!!a.date && a.date<this.today())); }
+  apptBoxStyle(a,p){ return this.isApptDone(a)? this.DONE_BOX : (this.CHAIR_BOX[this.chairOf(p).pos] || this.OTHER_CHAIR_BOX); }
   fiscalYearOf(p){
     if(p.fiscalYear) return String(p.fiscalYear);
     if(!p.startDate) return '';
@@ -5345,13 +5354,27 @@ class Component extends DCLogic {
     const keep=compact
       ? /โลจิสติกส์|กม\.\S+(?:\s[-–])?|(?:ตำบล|อำเภอ|จังหวัด)\S{1,12}(?![ัิ-ฺ็-๎])|พ\.ศ\.\s?\d+|\(\S+\s\S+\)|[^\sัิ-ฺ็-๎]\S{0,7}\s\d[\d.,+]*(?:\s(?:กิโลเมตร|กม\.|แห่ง))?/g
       : /ตอน\s\S+(?:\s[-–])?|(?:ระหว่าง\s)?กม\.\S+(?:\s[-–])?|(?:ตำบล|อำเภอ|จังหวัด)\S{1,24}(?:\s\d+)?|ระยะทาง\s\S+\s\S+|พ\.ศ\.\s?\d+|\(\S+\s\S+\)|(?<=[-–]\s)\S+|\S{1,8}\s\d[\d.,+]*/g;
+    /* แบ่งคำไทย (Intl.Segmenter): ท่อนที่ล็อกไม่ตัดบรรทัดต้องเริ่มที่ต้นคำ (เดิม "ทางหลวงหมายเลข 1244" ถูกตัดเป็น "ทางหลว|งหมายเลข 1244")
+       และใส่ zero-width space ระหว่างคำในท่อนปกติ ให้ตัดบรรทัดได้เฉพาะระหว่างคำ */
+    const SEG=(typeof Intl!=='undefined' && Intl.Segmenter)? new Intl.Segmenter('th',{granularity:'word'}) : null;
+    const starts=new Set([0]);
+    if(SEG) for(const sg of SEG.segment(txt)) starts.add(sg.index);
+    const thaiRe=/[฀-๿]/;
+    const brk=(t)=>{
+      if(!SEG) return t;
+      let o='', prev='';
+      for(const sg of SEG.segment(t)){ const w=sg.segment; if(prev && thaiRe.test(prev.slice(-1)) && thaiRe.test(w[0])) o+='​'; o+=w; prev=w; }
+      return o;
+    };
     const parts=[]; let last=0, m;
     while((m=keep.exec(txt))){
-      if(m.index>last) parts.push({t:txt.slice(last,m.index), ws:'normal'});
-      parts.push({t:m[0], ws:'nowrap'});
+      let st=m.index;
+      if(SEG) while(st>last && !starts.has(st) && /\S/.test(txt[st-1])) st--;
+      if(st>last) parts.push({t:brk(txt.slice(last,st)), ws:'normal'});
+      parts.push({t:txt.slice(st,m.index+m[0].length), ws:'nowrap'});
       last=m.index+m[0].length;
     }
-    if(last<txt.length) parts.push({t:txt.slice(last), ws:'normal'});
+    if(last<txt.length) parts.push({t:brk(txt.slice(last)), ws:'normal'});
     return parts;
   }
   sheetData(p, wkIdx){
@@ -6383,6 +6406,8 @@ class Component extends DCLogic {
   }
   apptCardFields(a){
     const groups=this.apptGroups(a.project), key=a.pid+':'+a.id, expanded=this.state.calExpand===key;
+    /* ตรวจรับแล้ว: ชื่อประธานเป็นสีเทาตามกล่อง */
+    if(this.isApptDone(a)) groups.forEach(g=>{ if(g.label==='ประธานกรรมการ') g.color=this.DONE_BOX.fg; });
     return { chairGroups:groups.filter(g=>g.label==='ประธานกรรมการ'),
       moreGroups:groups.filter(g=>g.label!=='ประธานกรรมการ'),
       expanded, ariaExp:String(expanded), toggleTxt:expanded? 'ย่อ ▴' : 'รายละเอียด ▾',
@@ -10119,9 +10144,9 @@ class Component extends DCLogic {
         diffBg:stt.bg, diffFg:stt.fg, diffBd:stt.bd,
         showPeople:true, people:this.peopleGroups(dp),
         showAppts:!this.isExec() && apps.length>0,
-        appts:apps.map(a=>{ const s=this.apptBoxStyle(a.status,dp);
+        appts:apps.map(a=>{ const s=this.apptBoxStyle(a,dp);
           return { dateTh:this.thShort(a.date), time:this.timeTh(a.time), phase:a.phase||'ตรวจรับงาน', place:a.place||'-',
-            statusTxt:this.normStatus(a.status), bg:s.bg, fg:s.fg, bd:s.bd, open:this.openAppt(dp.id,a.id) }; }) };
+            statusTxt:this.isApptDone(a)? 'ตรวจแล้ว' : this.normStatus(a.status), bg:s.bg, fg:s.fg, bd:s.bd, open:this.openAppt(dp.id,a.id) }; }) };
     } else { out.detail={people:[],appts:[]}; }
 
     /* calendar */
@@ -10150,16 +10175,16 @@ class Component extends DCLogic {
           pill: ['#c62828','#b58900','#d6337f','#2e7d32','#e0610e','#1e6fc9','#7b2fa8'][dow],
           fg: iso===todayIso? 'var(--color-text)' : ((dow===0||dow===6)? 'var(--c-late)' : 'var(--color-text)'),
           fw: iso===todayIso? '800' : (list.length? '700':'400'),
-          appts:list.map(a=>{ const s=this.apptBoxStyle(a.status,a.project), ch=this.chairOf(a.project);
+          appts:list.map(a=>{ const s=this.apptBoxStyle(a,a.project), ch=this.chairOf(a.project);
             const tt=this.timeTh(a.time);
             return { time:tt||'ไม่ระบุเวลา', timeLine:tt? 'เวลา '+tt : 'ไม่ระบุเวลา',
-              doneTxt:this.normStatus(a.status)==='ตรวจแล้ว'? 'ตรวจแล้ว ✓' : '',
+              doneTxt:this.isApptDone(a)? 'หมายเหตุ ตรวจรับแล้ว ✓' : '',
               phaseLine:(()=>{ const ph=String(a.phase||'ตรวจรับงาน').trim(), no=String(this.phaseLabel(a)).trim().replace(/^\(\s*(.*?)\s*\)$/,'$1'); return no&&no!==ph? ph+' ('+no+')' : ph; })(),
               ...this.apptCardFields(a),
               hasPlace:!!String(a.place||'').trim(), placeTxt:String(a.place||'').trim(),
               navUrl:this.navUrlOf(a.project)||'#', hasNav:!!this.navUrlOf(a.project),
               hasPlaceOrNav:!!String(a.place||'').trim() || !!this.navUrlOf(a.project),
-              textColor: (ch.pos==='ผส.ทล.5'||ch.pos==='รส.ทล.5')? ch.color : s.fg,
+              textColor: (!this.isApptDone(a) && (ch.pos==='ผส.ทล.5'||ch.pos==='รส.ทล.5'))? ch.color : s.fg,
               contractNo:this.contractShort(a.project).replace(/\s*\/\s*/g,'/')||'ไม่ระบุเลขสัญญา',
               bg:s.bg, fg:s.fg, bd:s.bd, open:this.openAppt(a.pid,a.id) }; }) });
       }
@@ -10177,7 +10202,7 @@ class Component extends DCLogic {
         agenda.push({ iso, isToday:iso===todayIso,
           dateTh:'วัน'+DOWFULL[d.getDay()]+'ที่ '+d.getDate()+' '+this.MONTHS_S[d.getMonth()]+' '+(d.getFullYear()+543),
           appts:byDate[iso].slice().sort((a,b)=>String(a.time||'').localeCompare(String(b.time||''))).map(a=>{
-            const s=this.apptBoxStyle(a.status,a.project);
+            const s=this.apptBoxStyle(a,a.project);
             /* "ตรวจรับงานครั้งที่ N งวดที่ N" ต่อท้ายเลขสัญญา (ไม่แสดง "ลงวันที่ …") */
             const ph=String(a.phase||'').trim(), no=String(a.phaseNo||'').trim().replace(/^\(\s*(.*?)\s*\)$/,'$1');
             const inspTxt=[ph? (/^\d+$/.test(ph)? 'ตรวจรับงานครั้งที่ '+ph : ph) : '', no].filter(Boolean).join(' ');
@@ -10185,7 +10210,7 @@ class Component extends DCLogic {
               /* ชื่อทางหลวง: ตัดบรรทัดได้เฉพาะที่ช่องว่าง (ไม่ตัดกลางคำ เช่น "ห้วย|หูด") */
               projWords:String(a.project.projectName||'-').trim().split(/\s+/).map((w,i,arr)=>w+(i<arr.length-1? ' ' : '')),
               /* แสดงสถานะเฉพาะ "ตรวจแล้ว" (ตำแหน่งเดิมของ "นัดแล้ว" เป็นสัญลักษณ์นำทาง) */
-              doneTxt:this.normStatus(a.status)==='ตรวจแล้ว'? 'ตรวจแล้ว ✓' : '',
+              doneTxt:this.isApptDone(a)? 'หมายเหตุ ตรวจรับแล้ว ✓' : '',
               navPad:this.navUrlOf(a.project)? '44px' : '0',
               ...this.apptCardFields(a),
               navUrl:this.navUrlOf(a.project), hasNav:!!this.navUrlOf(a.project),
